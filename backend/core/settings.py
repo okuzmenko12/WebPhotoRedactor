@@ -29,6 +29,8 @@ INSTALLED_APPS = [
     'rest_framework',
 
     # applications
+    'apps.users',
+    'apps.picsart'
 ]
 
 MIDDLEWARE = [
@@ -66,7 +68,7 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': os.getenv('DB_ENGINE'),
-        'NAME': os.getenv('DB_USER'),
+        'NAME': os.getenv('DB_NAME'),
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASSWORD'),
         'HOST': os.getenv('DB_HOST'),
@@ -111,6 +113,19 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key field type
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# AUTH USER MODEL
+
+AUTH_USER_MODEL = 'users.User'
+
+# PICSART SETTINGS
+
+PICSART_API_KEY = os.getenv('PICSART_KEY')
+
+# DOMAIN SETTINGS
+
+BACK_DOMAIN = 'localhost:8000'
+BACK_DOMAIN_URL = 'http://localhost:8000'
 
 # DJANGO JAZZMIN
 
@@ -160,7 +175,7 @@ JAZZMIN_SETTINGS = {
     "topmenu_links": [
 
         # Url that gets reversed (Permissions can be added)
-        {"name": "Home",  "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "Home", "url": "admin:index", "permissions": ["auth.view_user"]},
 
         # external url that opens in a new window (Permissions can be added)
 

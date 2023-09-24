@@ -7,12 +7,14 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.11"
-django = "^4.2.5"
 python-dotenv = "^1.0.0"
 djangorestframework = "^3.14.0"
 django-jazzmin = "^2.6.0"
 psycopg2 = "^2.9.7"
 pillow = "^10.0.1"
+django = "^4.2.5"
+opencv-python = "^4.8.0.76"
+requests = "^2.31.0"
 
 
 [build-system]
