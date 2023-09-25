@@ -1,0 +1,99 @@
+html,
+body {
+    font-family: 'Inter';
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background: linear-gradient(to bottom, #000 0%, #020414 15%, #020414 85%, #000 100%);
+}
+
+#app {
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.no-margin {
+    margin: 0;
+}
+
+.fs--50 {
+    font-size: 50px;
+}
+
+.fs--40 {
+    font-size: 40px;
+}
+
+.fs--25 {
+    font-size: 25px;
+}
+
+.fs--20 {
+    font-size: 20px;
+}
+
+.fs--15 {
+    font-size: 15px;
+}
+
+.fs--12 {
+    font-size: 12px;
+}
+
+.fw--900 {
+    font-weight: 900
+}
+
+.fw--700 {
+    font-weight: 700
+}
+
+.fw--400 {
+    font-weight: 400
+}
+
+.fw--100 {
+    font-weight: 100
+}
+
+.blur-circle {
+    --blur: blur(225px);
+    --position: 27%;
+    width: 300px;
+    height: 300px;
+    background-color: #0500FF;
+    border-radius: 50%;
+    filter: var(--blur);
+    position: absolute;
+    top: 200px;
+    left: var(--position);
+}
+
+.blur-circle:nth-child(2n) {
+    background-color: #00FF85;
+    top: 200px;
+    left: unset;
+    right: var(--position) !important;
+}
+
+.blur-circle:nth-child(3n) {
+    background-color: #00FF85;
+    border-radius: 50%;
+    filter: var(--blur);
+    top: unset;
+    bottom: 100px;
+    left: var(--position);
+}
+
+.blur-circle:nth-child(4n) {
+    background-color: #0500FF;
+    top: unset;
+    bottom: 100px;
+    left: unset;
+    right: var(--position) !important;
+}

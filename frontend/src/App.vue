@@ -1,15 +1,18 @@
 <template>
-    <div>
-        <h1>Hello!</h1>
-    </div>
+  <div>
+    <main-page />
+  </div>
 </template>
-
+  
 <script>
-export default {
-
-}
+ import MainPage from "@/pages/MainPage.vue"
+  export default {
+    components: {
+      MainPage
+    }
+  }
 </script>
-
+  
 <style>
 
 </style>
