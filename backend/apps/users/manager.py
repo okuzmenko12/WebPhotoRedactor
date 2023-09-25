@@ -4,7 +4,7 @@ from django.utils import timezone
 
 class UserManager(BaseUserManager):
 
-    def _generate_username(self, email: str):
+    def generate_username(self, email: str):
         username = '@' + email.split('@')[0]
         if not self.filter(username=username).exists():
             return username
@@ -15,7 +15,7 @@ class UserManager(BaseUserManager):
 
     def _create_user(self, email, password, **extra_fields):
         email = self.normalize_email(email)
-        extra_fields['username'] = self._generate_username(email)
+        extra_fields['username'] = self.generate_username(email)
         user = self.model(
             email=email,
             is_active=True,
