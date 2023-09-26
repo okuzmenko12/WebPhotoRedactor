@@ -11,7 +11,8 @@ from .views import (UserRegistrationAPIView,
                     ChangeEmailAPIView,
                     ChangeEmailConfirmAPIView,
                     SendPasswordResetAPIView,
-                    PasswordResetAPIView)
+                    PasswordResetAPIView,
+                    UserAPIView)
 
 urlpatterns = [
     path('registration/', UserRegistrationAPIView.as_view(), name='registration'),
@@ -24,5 +25,6 @@ urlpatterns = [
     path('password_reset/<token>/<email>/', PasswordResetAPIView.as_view(), name='password_reset'),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('token/blacklist/', TokenBlacklistView.as_view(), name='token_blacklist')
+    path('token/blacklist/', TokenBlacklistView.as_view(), name='token_blacklist'),
+    path('user/', UserAPIView.as_view(), name='user')
 ]

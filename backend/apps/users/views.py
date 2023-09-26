@@ -5,8 +5,9 @@ from rest_framework import generics, status
 from .serializers import (RegistrationSerializer,
                           ChangeEmailSerializer,
                           SendPasswordResetMailSerializer,
-                          PasswordResetSerializer)
-from .permissions import IsNotAuthenticated
+                          PasswordResetSerializer,
+                          UserSerializer)
+from .permissions import IsNotAuthenticated, IsUserOrReadOnly
 
 from rest_framework.views import APIView
 from .models import User
@@ -125,3 +126,12 @@ class PasswordResetAPIView(AuthTokenMixin,
         else:
             return Response({'error': token_data.error},
                             status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserAPIView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated, IsUserOrReadOnly]
+
+    def get_object(self):
+        return User.objects.get(id=self.request.user.id)

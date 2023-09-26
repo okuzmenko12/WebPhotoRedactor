@@ -14,9 +14,9 @@ class IsNotAuthenticated(permissions.BasePermission):
         return bool(not request.user.is_authenticated)
 
 
-class IsOwnerOrReadOnly(permissions.BasePermission):
+class IsUserOrReadOnly(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True
-        return obj.user == request.user
+        return obj == request.user
