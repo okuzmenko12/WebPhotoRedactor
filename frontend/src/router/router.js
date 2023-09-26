@@ -1,5 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
+
 import MainPage from "@/pages/MainPage"
+import PricingPage from "@/pages/PricingPage"
+import BlogPage from "@/pages/BlogPage"
+import FeaturesPage from "@/pages/FeaturesPage"
 
 const routes = [
     {
@@ -9,20 +13,27 @@ const routes = [
     },
     {
         path: '/pricing',
-        alias: '/',
         name: 'Pricing',
-        component: MainPage
+        component: PricingPage
     },
     {
         path: '/features',
-        alias: '/',
         name: 'Features',
-        component: MainPage
+        component: FeaturesPage
     },
     {
         path: '/blog',
-        alias: '/',
         name: 'Blog',
+        component: BlogPage
+    },
+    {
+        path: '/login',
+        name: 'Log in',
+        component: MainPage
+    },
+    {
+        path: '/singup',
+        name: 'Sing Up',
         component: MainPage
     },
 ]
