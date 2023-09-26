@@ -1,13 +1,13 @@
 function createCircles() {
     const body = document.body;
 
-    const spacing = 400;
+    const spacing = 900;
     const position = '7%';
 
     const viewportHeight = window.innerHeight;
     const numCircles = Math.max(1, Math.floor(viewportHeight / spacing));
 
-    for (let i = 0; i < numCircles - 1; i++) {
+    for (let i = 0; i < numCircles; i++) {
         const div1 = document.createElement("div");
         const div2 = document.createElement("div");
 
