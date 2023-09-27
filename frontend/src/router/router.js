@@ -4,6 +4,9 @@ import MainPage from "@/pages/MainPage"
 import PricingPage from "@/pages/PricingPage"
 import BlogPage from "@/pages/BlogPage"
 import FeaturesPage from "@/pages/FeaturesPage"
+import LoginPage from "@/pages/LoginPage"
+import SingupPage from "@/pages/SingupPage"
+
 
 const routes = [
     {
@@ -29,12 +32,12 @@ const routes = [
     {
         path: '/login',
         name: 'Log in',
-        component: MainPage
+        component: LoginPage
     },
     {
         path: '/singup',
         name: 'Sing Up',
-        component: MainPage
+        component: SingupPage
     },
 ]
 

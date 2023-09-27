@@ -1,14 +1,15 @@
 <template>
     <div class="auth-block">
         <div class="question-auth">
-            <router-link to="/singup" class="ask__btn">Sing Up</router-link>
-            <h5>Don't have an account? Sing Up!</h5>
+            <router-link to="/login" class="ask__btn">Log In</router-link>
+            <h5>Already have an account? Log in!</h5>
         </div>
         <form class="auth-form" @submit.prevent>
-            <h1>Log In</h1>
+            <h1>Sing Up</h1>
             <input-ui maxlength="50" v-model="email" placeholder="Email"/>
             <input-ui maxlength="50" v-model="password" placeholder="Password"/>
-            <button class="auth__authpage__btn" @click="sendLogInRequest">Sing up</button>
+            <input-ui maxlength="50" v-model="password1" placeholder="Confirm password"/>
+            <button class="auth__authpage__btn" @click="sendSingUpRequest">Sing up</button>
         </form>
     </div>
 </template>
@@ -24,13 +25,15 @@
             return {
                 email: "",
                 password: "",
+                password1: ""
             }
         },
         methods: {
-            sendLogInRequest() {
-                axios.post(`${this.$backendDomain}/api/v1/auth/token/`, {
+            sendSingUpRequest() {
+                axios.post(`${this.$backendDomain}/api/v1/auth/registration/`, {
                 "email": this.email,
                 "password": this.password,
+                "password1": this.password1
                 })
             }
         }
@@ -99,7 +102,6 @@
     padding-left: 20px;
     box-sizing: border-box;
     border: 1px #2e2f35 solid;
-    color: #fff;
     outline: none;
     border-radius: 10px;
     transition: .3s;
