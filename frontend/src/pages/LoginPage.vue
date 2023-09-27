@@ -14,8 +14,9 @@
 </template>
 
 <script>
-    import axios from 'axios'
-    import InputUi from "@/components/UI/InputUi.vue"
+    import axios from 'axios';
+    import InputUi from "@/components/UI/InputUi.vue";
+    import handlePopState from "@/utils/index.js";
     export default {
         components: {
             InputUi
@@ -33,12 +34,18 @@
                 "password": this.password,
                 })
             }
+        },
+        mounted() {
+            handlePopState()
         }
     }
 </script>
 
 <style>
 .auth-block {
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 50%;
     height: 100%;
     display: flex;
