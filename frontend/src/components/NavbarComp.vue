@@ -1,7 +1,7 @@
 <template>
     <nav>
         <div class="nav__sect">
-            <h1 class="white up">SSSSFlexFi Upscale</h1>
+            <h1 class="white up">FlexFi Upscale</h1>
             <div class="nav__subsect">
                 <router-link to="/pricing" class="nav__btn white up link">
                     Pricing
@@ -39,7 +39,9 @@ export default {
 
 <style>
 nav {
-    widows: 100%;
+    position: absolute;
+    top: 0;
+    width: 100%;
     height: auto;
     display: flex;
     align-items: center;
@@ -47,6 +49,7 @@ nav {
     padding-left: 200px;
     padding-right: 100px;
     box-sizing: border-box;
+    z-index: 100;
 }
 
 .white {

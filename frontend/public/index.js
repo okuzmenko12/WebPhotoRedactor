@@ -19,9 +19,14 @@ function createCircles() {
             div2.className = "blur-circle blue-circle";
         }
 
-        const marginTop = i * spacing;
-        div1.style.marginTop = `${marginTop}px`;
-        div2.style.marginTop = `${marginTop}px`;
+        if (i == 0) {
+            div1.style.top = `250px`;
+            div2.style.top = `250px`;
+        } else {
+            const marginTop = i * spacing;
+            div1.style.top = `${marginTop}px`;
+            div2.style.top = `${marginTop}px`;
+        }
 
         if (i % 2 !== 0) {
             div1.style.left = position;
