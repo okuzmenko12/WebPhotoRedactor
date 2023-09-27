@@ -1,12 +1,12 @@
 <template>
-    <nav>
+    <nav id="navbar-nav">
         <div class="nav__sect">
-            <h1 class="white up">FlexFi Upscale</h1>
+            <router-link to="/" class="white up link fs--25 fw--900">FlexFi Upscale</router-link>
             <div class="nav__subsect">
                 <router-link to="/pricing" class="nav__btn white up link">
                     Pricing
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="21" viewBox="0 0 12 21">
-                        <path d="M11 7.03255C11 1.07441 1 0.683712 1 7.03255C1 13.3814 11 12.893 11 16.507C11 20.1209 1 20.5116 1 16.507M6 0V21" stroke-width="2"/>
+                        <path d="M11 7.03255C11 1.07441 1 0.683712 1 7.03255C1 13.3814 11 12.893 11 16.507C11 20.1209 1 20.5116 1 16.507M6 0V21" stroke-width="2" fill="none"/>
                     </svg>
                 </router-link>
                 <router-link to="/features" class="nav__btn white up link">
@@ -18,7 +18,7 @@
                 <router-link to="/blog" class="nav__btn white up link">
                     Blog
                     <svg xmlns="http://www.w3.org/2000/svg" width="33" height="22" viewBox="0 0 33 22">
-                        <path d="M7.875 20.5H31.5V1.5H7.875V7.12963M7.875 20.5V7.12963M7.875 20.5L1.5 9.94444L7.875 7.12963M29.25 7.12963H10.125M17.625 11H29.25M29.25 14.5185H10.125M10.125 9.24074V12.4074H13.5V9.24074H10.125Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M7.875 20.5H31.5V1.5H7.875V7.12963M7.875 20.5V7.12963M7.875 20.5L1.5 9.94444L7.875 7.12963M29.25 7.12963H10.125M17.625 11H29.25M29.25 14.5185H10.125M10.125 9.24074V12.4074H13.5V9.24074H10.125Z" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
                     </svg>
                 </router-link>
             </div>
@@ -33,23 +33,39 @@
 
 <script>
 export default {
+    mounted() {
+        const navBar = document.getElementById('navbar-nav');
 
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 0) {
+                navBar.classList.add('scrolled');
+            } else {
+                navBar.classList.remove('scrolled');
+            }
+        });
+    }
 }
 </script>
 
 <style>
-nav {
-    position: absolute;
+#navbar-nav {
+    position: fixed;
     top: 0;
     width: 100%;
     height: auto;
+    padding: 10px 100px 10px 200px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-left: 200px;
-    padding-right: 100px;
+    background: transparent;
     box-sizing: border-box;
     z-index: 100;
+    transition: .3s
+}
+
+#navbar-nav.scrolled {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(25px);
 }
 
 .white {
