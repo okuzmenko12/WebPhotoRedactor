@@ -32,7 +32,8 @@ INSTALLED_APPS = [
 
     # applications
     'apps.users',
-    'apps.picsart'
+    'apps.picsart',
+    'apps.subscriptions'
 ]
 
 MIDDLEWARE = [
@@ -187,6 +188,12 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = os.getenv('EMAIL_PORT')
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS')
+
+# SRTIPE SETTINGS
+
+STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
+SRTIPE_PRICE_ID = os.getenv('SRTIPE_PRICE_ID')
 
 # DJANGO JAZZMIN
 
