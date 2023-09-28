@@ -85,3 +85,49 @@ body {
 .green-circle {
     background-color: #00FF85;
 }
+
+@media (min-width: 1600px) {
+
+}
+
+@media (min-width: 1400px) and (max-width: 1599px) {
+    .blur-circle {
+        width: 60%;
+    }
+}
+
+@media (min-width: 1200px) and (max-width: 1399px) {
+    .blur-circle {
+        width: 60%;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+    .blur-circle {
+        width: 70%;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .blur-circle {
+        width: 50%;
+    }
+}
+
+@media (min-width: 651px) and (max-width: 767px) {
+    .blur-circle {
+        width: 50%;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 650px) {
+    .blur-circle {
+        width: 50%;
+    }
+}
+
+@media (max-width: 480px) {
+    .blur-circle {
+        width: 100%;
+    }
+}
