@@ -41,7 +41,7 @@
     border-radius: 20px;
     overflow-wrap: anywhere;
     background: linear-gradient(rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.4)) padding-box,
-    linear-gradient(to right, #0500FF, #00FFA3) border-box;
+    linear-gradient(to right, var(--first_color), var(--secondary_color)) border-box;
     backdrop-filter: blur(25px);
     border-radius: 20px;
     border: 4px solid transparent;

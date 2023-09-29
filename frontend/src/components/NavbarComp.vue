@@ -201,18 +201,6 @@ export default {
     fill: rgba(238, 130, 238, 0.911);
 }
 
-@media (min-width: 1400px) and (max-width: 1599px) {
-
-}
-
-@media (min-width: 1200px) and (max-width: 1399px) {
-
-}
-
-@media (min-width: 992px) and (max-width: 1199px) {
-
-}
-
 @media (min-width: 768px) and (max-width: 991px) {
     #navbar-nav {
         position: fixed;

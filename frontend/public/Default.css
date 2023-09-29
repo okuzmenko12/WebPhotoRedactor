@@ -7,6 +7,11 @@ body {
     padding: 0;
     box-sizing: border-box;
     background: linear-gradient(to bottom, #000 0%, #020414 15%, #020414 85%, #000 100%);
+    --first_color: #0500FF;
+    --secondary_color: #00FF85;
+    --secondary_hover_color: #07c982;
+    --first_darker_color: #020075;
+
 }
 
 #app {
@@ -75,11 +80,11 @@ body {
 
 
 .blue-circle {
-    background-color: #0500FF;
+    background-color: var(--first_color);
 }
 
 .green-circle {
-    background-color: #00FF85;
+    background-color: var(--secondary_color);
 }
 
 @media (min-width: 1400px) and (max-width: 1599px) {

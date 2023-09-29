@@ -84,7 +84,7 @@
     align-items: center;
     justify-content: center;
     border-radius: 10px;
-    background: linear-gradient(to right, #0029FF, #00FFA3, #0029FF);
+    background: linear-gradient(to right, var(--first_color), var(--secondary_color), var(--first_color));
     background-position: 0 50%;
     text-transform: uppercase;
     background-size: 200px;
