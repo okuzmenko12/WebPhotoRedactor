@@ -8,7 +8,6 @@
           <h1 class="fs--25 fw--400 whatis-text-desc">It's a website where you have all tools in your hand. From upscaling to removing bacgkrounds.</h1>
           <div class="whatis-block-block">
             <img class="whatis-img" src="https://www.meme-arsenal.com/memes/934f7ff8a841afd39949a57bde01cc0f.jpg"/>
-            <router-link to="/features" class="check-pricing whatis__btn">Read blog</router-link>
           </div>
         </div>
       </div>
@@ -75,6 +74,7 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  text-align: center;
   gap: 10px;
 }
 
@@ -88,6 +88,7 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  text-align: center;
   gap: 10px;
 }
 
@@ -135,36 +136,67 @@
   width: 100%;
 }
 
-@media (min-width: 1600px) {
-
-}
-
-@media (min-width: 1400px) and (max-width: 1599px) {
-
-}
-
-@media (min-width: 1200px) and (max-width: 1399px) {
-
-}
-
-@media (min-width: 992px) and (max-width: 1199px) {
-
-}
-
 @media (min-width: 768px) and (max-width: 991px) {
+  .whatis-about {
+    width: 75%;
+  }
 
+  .tools-cards-block {
+    flex-direction: column;
+    gap: 20px;
+  }
 }
 
 @media (min-width: 651px) and (max-width: 767px) {
+  .whatis-about {
+    width: 75%;
+  }
 
+  .tools-cards-block {
+    flex-direction: column;
+    gap: 20px;
+  }
 }
 
-
 @media (min-width: 481px) and (max-width: 650px) {
+  .whatis-about {
+    width: 75%;
+    display: flex;
+    flex-direction: column;
+  }
 
+  .whatis-block-block {
+    width: 85%;
+  }
+
+  .whatis-about {
+    width: 75%;
+  }
+
+  .tools-cards-block {
+    flex-direction: column;
+    gap: 20px;
+  }
 }
 
 @media (max-width: 480px) {
-    
+  .whatis-text-desc {
+    font-size: 20px;
+  }
+
+  .whatis-about {
+    width: 75%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .whatis-block-block {
+    width: 100%;
+  }
+
+  .tools-cards-block {
+    flex-direction: column;
+    gap: 20px;
+  }
 }
 </style>

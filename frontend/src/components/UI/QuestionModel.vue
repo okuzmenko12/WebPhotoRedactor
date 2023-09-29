@@ -69,6 +69,7 @@ export default {
   height: 0;
   overflow: hidden;
   overflow-y: auto;
+  overflow-wrap: anywhere;
   transition: .3s;
 }
 
