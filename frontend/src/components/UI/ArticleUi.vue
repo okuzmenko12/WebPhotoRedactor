@@ -51,4 +51,40 @@
     margin: 0;
     text-transform: capitalize;
 }
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .article {
+        width: 75%;
+    }
+}
+
+@media (min-width: 651px) and (max-width: 767px) {
+    .article {
+        width: 75%;
+    }
+
+    .article .fs--50 {
+        font-size: 30px;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 650px) {
+    .article {
+        width: 90%;
+    }
+
+    .article .fs--50 {
+        font-size: 25px;
+    }
+}
+
+@media (max-width: 480px) {
+    .article {
+        width: 90%;
+    }
+
+    .article .fs--50 {
+        font-size: 25px;
+    }
+}
 </style>

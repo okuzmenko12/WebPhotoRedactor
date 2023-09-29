@@ -1,6 +1,7 @@
 <template>
     <navbar-comp />
     <div class="features-container">
+        <h1 class="white fs--50 fw--700">FlexFI Upscale features:</h1>
         <article-ui name="Upscaling" article="article text" />
         <article-ui name="Background remove" article="article text" />
         <article-ui name="Remove JPEG Artifacts" article="article text" />
