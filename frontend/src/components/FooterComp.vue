@@ -42,20 +42,4 @@ footer {
     align-items: center;
     flex-direction: column;
 }
-
-@media (min-width: 768px) and (max-width: 991px) {
-
-}
-
-@media (min-width: 651px) and (max-width: 767px) {
-
-}
-
-@media (min-width: 481px) and (max-width: 650px) {
-
-}
-
-@media (max-width: 480px) {
-
-}
 </style>

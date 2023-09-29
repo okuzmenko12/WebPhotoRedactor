@@ -81,13 +81,13 @@
     height: 35px;
     border-radius: 10px;
     cursor: pointer;
-    background: #00FFA3;
+    background: var(--secondary_color);
     border: 0;
     transition: .3s;
 }
 
 .ask__btn:hover {
-    background: #07c982;
+    background: var(--secondary_hover_color);
 }
 
 .auth-form {
@@ -127,12 +127,12 @@
     height: 35px;
     border-radius: 10px;
     cursor: pointer;
-    background: #00FFA3;
+    background: var(--secondary_color);
     border: 0;
     transition: .3s;
 }
 
 .auth__authpage__btn:hover {
-    background: #07c982;
+    background: var(--secondary_hover_color);
 }
 </style>

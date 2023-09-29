@@ -107,7 +107,7 @@
 .whatis-img {
   width: 90%;
   background: linear-gradient(white, white) padding-box,
-  linear-gradient(to right, #0500FF, #00FFA3) border-box;
+  linear-gradient(to right, var(--first_color), var(--secondary_color)) border-box;
   border-radius: 20px;
   border: 4px solid transparent;
 }
@@ -132,13 +132,13 @@
   background: transparent;
   border-radius: 10px;
   cursor: pointer;
-  background: #00FFA3;
+  background: var(--secondary_color);
   border: 0;
   transition: .3s;
 }
 
 .check-pricing:hover {
-    background: #07c982;
+    background: var(--secondary_hover_color);
 }
 
 .whatis__btn {
