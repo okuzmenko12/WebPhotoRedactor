@@ -136,10 +136,6 @@
     background: #07c982;
 }
 
-@media (min-width: 1600px) {
-
-}
-
 @media (min-width: 1400px) and (max-width: 1599px) {
 
 }
