@@ -181,7 +181,7 @@
 
 @media (max-width: 480px) {
   .whatis-text-desc {
-    font-size: 20px;
+    font-size: 15px;
   }
 
   .whatis-about {

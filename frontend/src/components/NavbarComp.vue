@@ -1,4 +1,7 @@
 <template>
+    <div @click="navbarToggle" id="mobile__btn">
+    </div>
+    <div @click="navbarToggle" id="mobile__btn_close">✖</div>
     <nav id="navbar-nav">
         <div class="nav__sect">
             <router-link to="/" class="white up link fs--25 fw--900">FlexFi Upscale</router-link>
@@ -43,6 +46,16 @@ export default {
                 navBar.classList.remove('scrolled');
             }
         });
+    },
+    methods: {
+        navbarToggle() {
+            const navbar = document.getElementById('navbar-nav')
+            const button = document.getElementById('mobile__btn')
+            const closeButton = document.getElementById('mobile__btn_close')
+            navbar.classList.toggle('visible')
+            closeButton.classList.toggle('visible')
+            button.classList.toggle('hide')
+        }
     }
 }
 </script>
@@ -66,6 +79,58 @@ export default {
 #navbar-nav.scrolled {
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(25px);
+}
+
+#mobile__btn {
+    position: fixed;
+    top: 20%;
+    left: 0;
+    border-radius: 0 20px 20px 0;
+    width: 30px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(25px);
+    z-index: 2;
+    display: none;
+    transition: .3s;
+}
+
+#mobile__btn::before {
+    content: ">";
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 25px;
+    color: #fff;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+#mobile__btn_close {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: transparent;
+    display: none;
+    color: #ffffff;
+    font-weight: 900;
+    z-index: 101;
+    transition: .3s;
+}
+
+#mobile__btn_close:hover {
+    color: #FF0000;
+}
+
+.visible {
+    display: flex !important;
+}
+
+.hide {
+    display: none !important;
 }
 
 .white {
@@ -140,5 +205,149 @@ export default {
 
 .link:hover .fill_obj {
     fill: rgba(238, 130, 238, 0.911);
+}
+
+@media (min-width: 1400px) and (max-width: 1599px) {
+
+}
+
+@media (min-width: 1200px) and (max-width: 1399px) {
+
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    #navbar-nav {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        padding: 100px 10px 100px 10px;
+        display: none;
+        align-items: center;
+        justify-content: space-between;
+        flex-direction: column;
+        background: transparent;
+        box-sizing: border-box;
+        z-index: 100;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(25px);
+        transition: .3s
+    }
+
+    .nav__sect {
+        flex-direction: column;
+    }
+
+    .nav__subsect {
+        flex-direction: column;
+    }
+
+
+    #mobile__btn {
+        display: flex;
+    }
+}
+
+@media (min-width: 651px) and (max-width: 767px) {
+    #navbar-nav {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        padding: 100px 10px 100px 10px;
+        display: none;
+        align-items: center;
+        justify-content: space-between;
+        flex-direction: column;
+        background: transparent;
+        box-sizing: border-box;
+        z-index: 100;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(25px);
+        transition: .3s
+    }
+
+    .nav__sect {
+        flex-direction: column;
+    }
+
+    .nav__subsect {
+        flex-direction: column;
+    }
+
+
+    #mobile__btn {
+        display: flex;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 650px) {
+    #navbar-nav {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        padding: 100px 10px 100px 10px;
+        display: none;
+        align-items: center;
+        justify-content: space-between;
+        flex-direction: column;
+        background: transparent;
+        box-sizing: border-box;
+        z-index: 100;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(25px);
+        transition: .3s
+    }
+
+    .nav__sect {
+        flex-direction: column;
+    }
+
+    .nav__subsect {
+        flex-direction: column;
+    }
+
+
+    #mobile__btn {
+        display: flex;
+    }
+}
+
+@media (max-width: 480px) {
+    #navbar-nav {
+        position: fixed;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        padding: 100px 10px 100px 10px;
+        display: none;
+        align-items: center;
+        justify-content: space-between;
+        flex-direction: column;
+        background: transparent;
+        box-sizing: border-box;
+        z-index: 100;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(25px);
+        transition: .3s
+    }
+
+    .nav__sect {
+        flex-direction: column;
+    }
+
+    .nav__subsect {
+        flex-direction: column;
+    }
+
+
+    #mobile__btn {
+        display: flex;
+    }
 }
 </style>
