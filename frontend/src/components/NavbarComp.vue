@@ -22,7 +22,7 @@
         </div>
         <div class="nav__auth-btn white">
             <router-link to="/login" class="auth link">Log in</router-link >
-            <router-link to="/singup" class="log-in__btn auth link">Sing up</router-link >
+            <router-link to="/signup" class="log-in__btn auth link">Sign up</router-link >
         </div>
         <router-view/>
     </nav>
@@ -85,6 +85,7 @@ export default {
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(25px);
     z-index: 2;
+    cursor: pointer;
     display: none;
     transition: .3s;
 }
@@ -112,6 +113,7 @@ export default {
     color: #ffffff;
     font-weight: 900;
     z-index: 101;
+    cursor: pointer;
     transition: .3s;
 }
 

@@ -11,7 +11,7 @@ export default function handlePopState() {
         const app = document.getElementById("app");
         const body = document.body;
     
-        const spacing = 900;
+        const spacing = 1100;
         const position = '7%';
     
         const appHeight = app.clientHeight;

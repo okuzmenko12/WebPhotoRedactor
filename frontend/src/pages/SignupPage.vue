@@ -5,11 +5,11 @@
             <h5>Already have an account? Log in!</h5>
         </div>
         <form class="auth-form" @submit.prevent>
-            <h1>Sing Up</h1>
+            <h1>Sign Up</h1>
             <input-ui maxlength="50" v-model="email" placeholder="Email"/>
             <input-ui maxlength="50" v-model="password" placeholder="Password"/>
             <input-ui maxlength="50" v-model="password1" placeholder="Confirm password"/>
-            <button class="auth__authpage__btn" @click="sendSingUpRequest">Sing up</button>
+            <button class="auth__authpage__btn" @click="sendSignUpRequest">Sign up</button>
         </form>
     </div>
 </template>
@@ -30,7 +30,7 @@
             }
         },
         methods: {
-            sendSingUpRequest() {
+            sendSignUpRequest() {
                 axios.post(`${this.$backendDomain}/api/v1/auth/registration/`, {
                 "email": this.email,
                 "password": this.password,

@@ -2,7 +2,7 @@
     <article :id=createId() class="article_article">
         <div class="article">
             <p class="white fs--50 fw--700">{{ name }}</p>
-            <p class="white fs--20">{{ article }}</p>
+            <p class="small_text fs--20">{{ article }}</p>
         </div>
     </article>
 </template>
