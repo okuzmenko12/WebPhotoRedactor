@@ -83,10 +83,10 @@ export default {
 
 #mobile__btn {
     position: fixed;
-    top: 20%;
-    left: 0;
-    border-radius: 0 20px 20px 0;
-    width: 30px;
+    top: 20px;
+    right: 20px;
+    border-radius: 10px;
+    width: 50px;
     height: 50px;
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(25px);
@@ -96,7 +96,7 @@ export default {
 }
 
 #mobile__btn::before {
-    content: ">";
+    content: "≡";
     position: absolute;
     display: flex;
     justify-content: center;

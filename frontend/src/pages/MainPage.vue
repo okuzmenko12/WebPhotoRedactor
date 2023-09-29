@@ -78,6 +78,10 @@
   gap: 10px;
 }
 
+.whatis-about h1 {
+  width: 90%;
+}
+
 .tools-cards-block {
   display: flex;
   gap: 10px;
@@ -95,12 +99,17 @@
 .whatis-about {
   display: flex;
   align-items: center;
-  width: 50%;
+  flex-direction: column;
+  width: 100%;
   gap: 30px;
 }
 
 .whatis-img {
-  width: 100%;
+  width: 90%;
+  background: linear-gradient(white, white) padding-box,
+  linear-gradient(to right, #0500FF, #00FFA3) border-box;
+  border-radius: 20px;
+  border: 4px solid transparent;
 }
 
 .whatis-text-desc {
@@ -137,10 +146,6 @@
 }
 
 @media (min-width: 768px) and (max-width: 991px) {
-  .whatis-about {
-    width: 75%;
-  }
-
   .tools-cards-block {
     flex-direction: column;
     gap: 20px;
@@ -148,10 +153,6 @@
 }
 
 @media (min-width: 651px) and (max-width: 767px) {
-  .whatis-about {
-    width: 75%;
-  }
-
   .tools-cards-block {
     flex-direction: column;
     gap: 20px;
@@ -159,18 +160,8 @@
 }
 
 @media (min-width: 481px) and (max-width: 650px) {
-  .whatis-about {
-    width: 75%;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .whatis-block-block {
-    width: 85%;
-  }
-
-  .whatis-about {
-    width: 75%;
+  .whatis-block h1 {
+    margin: 0;
   }
 
   .tools-cards-block {
@@ -180,14 +171,12 @@
 }
 
 @media (max-width: 480px) {
-  .whatis-text-desc {
-    font-size: 15px;
+  .whatis-block h1 {
+    margin: 0;
   }
 
-  .whatis-about {
-    width: 75%;
-    display: flex;
-    flex-direction: column;
+  .whatis-text-desc {
+    font-size: 15px;
   }
 
   .whatis-block-block {
