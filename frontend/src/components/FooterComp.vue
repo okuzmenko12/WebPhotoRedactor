@@ -27,7 +27,7 @@ footer {
     flex-direction: column;
     width: 100%;
     height: auto;
-    padding: 0 20px;
+    padding: 20px 0;
     background-color: rgba(0, 0, 0, 0.3);
     backdrop-filter: blur(25px);
     margin-top: 100px;
@@ -41,5 +41,21 @@ footer {
     justify-content: center;
     align-items: center;
     flex-direction: column;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+
+}
+
+@media (min-width: 651px) and (max-width: 767px) {
+
+}
+
+@media (min-width: 481px) and (max-width: 650px) {
+
+}
+
+@media (max-width: 480px) {
+
 }
 </style>
