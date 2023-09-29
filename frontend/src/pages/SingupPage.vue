@@ -137,4 +137,28 @@
 .auth__authpage__btn:hover {
     background: #07c982;
 }
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .auth-block {
+        width: 60%;
+    }
+}
+
+@media (min-width: 651px) and (max-width: 767px) {
+    .auth-block {
+        width: 100%;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 650px) {
+    .auth-block {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .auth-block {
+        width: 100%;
+    }
+}
 </style>
