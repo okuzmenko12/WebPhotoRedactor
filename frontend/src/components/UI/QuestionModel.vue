@@ -1,9 +1,9 @@
 <template>
-        <div @click="toggleActive" class="ContentBx white">
+        <div @click="toggleActive" :class="{ active: isActive }" class="ContentBx white">
             <div class="Label" :class="{ active: isActive }">
                 {{ question }}
             </div>
-            <div class="Content" @click.stop :class="{ active: isActive }">
+            <div class="Content small_text" @click.stop :class="{ active: isActive }">
                 {{ answear }}
             </div>
         </div>
@@ -32,22 +32,28 @@ export default {
 .ContentBx {
   width: 100%;
   min-height: 50px;
+  border-radius: 10px;
+  transition: .3s;
 }
 
 .Label {
   position: relative;
   padding: 10px;
-  background: linear-gradient(to right, var(--first_color), var(--secondary_color), var(--first_color));
-  background-position: 0 50%;
-  background-size: 700px;
-  cursor: pointer;
+  background: #ffffff0a;
+  backdrop-filter: blur(25px);
   border-radius: 10px;
+  border: 1px solid #3d3d3d;
+  cursor: pointer;
   transition: .3s;
 }
 
 .Label.active {
   border-radius: 10px 10px 0 0;
-  background-position: 50% 100%;
+  border: 0;
+}
+
+.ContentBx.active {
+  border: 1px solid #3d3d3d;
 }
 
 .Label::before {
@@ -65,7 +71,8 @@ export default {
 
 .Content {
   position: relative;
-  background: var(--first_darker_color);
+  background: #ffffff0a;
+  backdrop-filter: blur(25px);
   height: 0;
   overflow: hidden;
   overflow-y: auto;

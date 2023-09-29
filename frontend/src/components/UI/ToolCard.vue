@@ -4,7 +4,7 @@
             <p class="fs--25 fw--900 no-margin">{{ name }}</p>
         </div>
         <div class="tool-card-desc no-margin">
-            <p class="fs--15 fw--700 no-margin tool-desc-elem">
+            <p class="small_text fs--15 fw--700 no-margin tool-desc-elem">
                 {{ description }}
             </p>
         </div>
@@ -32,13 +32,15 @@
     width: 300px;
     height: 350px;
     border-radius: 20px;
-    background: #171921 no-repeat;
+    background: linear-gradient(#171921, #171921) padding-box,
+    linear-gradient(to right, var(--first_color), var(--secondary_color)) border-box;
     display: flex;
     justify-content: space-between;
     flex-direction: column;
     align-items: center;
     padding: 20px 0;
     box-sizing: border-box;
+    border: 4px solid transparent;
     z-index: 1;
 }
 

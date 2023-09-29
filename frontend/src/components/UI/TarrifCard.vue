@@ -3,6 +3,15 @@
         <div class="card-top">
             <p class="fs--40 fw--900 no-margin">{{ name }}</p>
             <div class="tarrif-price">
+                <svg xmlns="http://www.w3.org/2000/svg" id="header_card_top" viewBox="0 0 371 195">
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                        <stop offset="0%"   stop-color="var(--first_color)"/>
+                        <stop offset="100%" stop-color="var(--secondary_color)"/>
+                        </linearGradient>
+                    </defs>
+                    <path fill="url(#gradient)" stroke="url(#gradient)" stroke-width="1" d="M 13.50,-0.50 C 127.83,-0.50 242.17,-0.50 356.50,-0.50 361.98,1.60 366.65,4.93 370.50,9.50 370.50,60.50 370.50,111.50 370.50,162.50 369.17,162.83 369.17,163.17 370.50,163.50 370.50,163.83 370.50,164.17 370.50,164.50 369.20,165.64 368.03,166.97 367.00,168.50 312.12,168.78 257.79,168.44 204.00,167.50 202.49,168.09 200.99,168.76 199.50,169.50 194.56,177.73 189.89,186.06 185.50,194.50 184.83,194.50 184.17,194.50 183.50,194.50 179.11,186.06 174.44,177.73 169.50,169.50 165.96,168.80 162.46,168.13 159.00,167.50 107.92,168.42 55.92,168.75 3.00,168.50 2.34,166.68 1.17,165.34 -0.50,164.50 -0.50,112.83 -0.50,61.17 -0.50,9.50 3.35,4.97 8.02,1.64 13.50,-0.50 Z" />
+                </svg>
                 <p class="fs--40 no-margin fw--900">{{ price }}</p>
                 <p class="fs--12 no-margin fw--900">/ {{ time }}</p>
             </div>
@@ -56,7 +65,7 @@
     width: 300px;
     height: 448px;
     border-radius: 20px;
-    background: #171921 url(CardTop.png) no-repeat;
+    background: #171921;
     background-size: contain;
     background-position: top;
     display: flex;
@@ -65,6 +74,12 @@
     padding-bottom: 20px;
     box-sizing: border-box;
     z-index: 1;
+}
+
+#header_card_top {
+    position: absolute;
+    top: 0;
+    width: 100%;
 }
 
 .card-top {
@@ -101,6 +116,15 @@
     display: flex;
     justify-content: center;
     align-items: baseline;
+}
+
+
+.tarrif-price p {
+    z-index: 2;
+}
+
+.card-top p {
+    z-index: 2;
 }
 
 .hor-line {

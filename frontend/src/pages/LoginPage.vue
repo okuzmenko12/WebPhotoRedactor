@@ -1,14 +1,14 @@
 <template>
     <div class="auth-block">
         <div class="question-auth">
-            <router-link to="/singup" class="ask__btn">Sing Up</router-link>
-            <h5>Don't have an account? Sing Up!</h5>
+            <router-link to="/signup" class="ask__btn">Sign Up</router-link>
+            <h5>Don't have an account? Sign Up!</h5>
         </div>
         <form class="auth-form" @submit.prevent>
             <h1>Log In</h1>
             <input-ui maxlength="50" v-model="email" placeholder="Email"/>
             <input-ui maxlength="50" v-model="password" placeholder="Password"/>
-            <button class="auth__authpage__btn" @click="sendLogInRequest">Sing up</button>
+            <button class="auth__authpage__btn" @click="sendLogInRequest">Log in</button>
         </form>
     </div>
 </template>

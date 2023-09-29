@@ -3,16 +3,16 @@
   <div class="main-container">
     <div class="main-page">
       <div class="whatis-block white">
-        <h1 class="fs--50">What is FlexFi Upscale?</h1>
+        <h1 class="fs--50 fw--700 headet_text">What is FlexFi Upscale?</h1>
         <div class="whatis-about">
-          <h1 class="fs--25 fw--400 whatis-text-desc">It's a website where you have all tools in your hand. From upscaling to removing bacgkrounds.</h1>
+          <h1 class="fs--25 fw--400 whatis-text-desc small_text">It's a website where you have all tools in your hand. From upscaling to removing bacgkrounds.</h1>
           <div class="whatis-block-block">
-            <img class="whatis-img" src="https://www.meme-arsenal.com/memes/934f7ff8a841afd39949a57bde01cc0f.jpg"/>
+            <router-link class="main_signup_btn" to="/signup">Start upscaling</router-link>
           </div>
         </div>
       </div>
       <div class="tools-usage-block">
-        <h1 class="white">We have many tools for your usage</h1>
+        <h1 class="fs--50 fw--700 headet_text">We have many tools for your usage</h1>
         <div class="tools-cards-block">
           <tool-card name="Upscaling" description="
           Upscale your image resolution and quality just in one click
@@ -84,7 +84,7 @@
 
 .tools-cards-block {
   display: flex;
-  gap: 10px;
+  gap: 20px;
 }
 
 .whatis-block {
@@ -117,6 +117,9 @@
 }
 
 .whatis-block-block {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 50%;
 }
 
@@ -143,6 +146,27 @@
 
 .whatis__btn {
   width: 100%;
+}
+
+.main_signup_btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    text-decoration: 0;
+    background: transparent;
+    padding: 0 10px;
+    width: 50%;
+    height: 35px;
+    border-radius: 10px;
+    cursor: pointer;
+    background: var(--secondary_color);
+    border: 0;
+    transition: .3s;
+}
+
+.main_signup_btn:hover {
+    background: var(--secondary_hover_color);
 }
 
 @media (min-width: 768px) and (max-width: 991px) {
