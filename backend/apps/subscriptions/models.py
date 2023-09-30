@@ -7,9 +7,9 @@ from apps.users.models import User
 from .utils import month_total_days
 
 
-class Subscription(models.Model):
+class Plan(models.Model):
     name = models.CharField(max_length=250,
-                            verbose_name='Plan/Subscription name')
+                            verbose_name='Plan name')
     price = models.IntegerField(verbose_name='Price in $')
     period = models.CharField(
         max_length=150,
@@ -25,20 +25,33 @@ class Subscription(models.Model):
         default=100,
         verbose_name='JPEG artifacts deletions count'
     )
+    stripe_price_id = models.CharField(max_length=5000,
+                                       verbose_name='Stripe price ID',
+                                       blank=True,
+                                       null=True)
+    paypal_plan_id = models.CharField(max_length=350,
+                                      verbose_name='PayPal plan Id',
+                                      blank=True,
+                                      null=True)
 
     class Meta:
-        db_table = 'subscriptions'
-        verbose_name = 'subscription'
-        verbose_name_plural = 'Subscriptions'
+        db_table = 'plans'
+        verbose_name = 'plan'
+        verbose_name_plural = 'Plans'
 
     def __str__(self):
-        return f'Subscription {self.price}$ / {self.period}'
+        return f'Plan {self.price}$ / {self.period}'
 
 
 class UserSubscription(models.Model):
-    subscription = models.ForeignKey(Subscription,
-                                     on_delete=models.CASCADE,
-                                     verbose_name='Subscription')
+    PAYMENT_SERVICE = (
+        (1, 'PayPal'),
+        (2, 'Stripe')
+    )
+
+    plan = models.ForeignKey(Plan,
+                             on_delete=models.CASCADE,
+                             verbose_name='Subscription')
     user = models.ForeignKey(User,
                              on_delete=models.CASCADE,
                              verbose_name='User',
@@ -48,6 +61,12 @@ class UserSubscription(models.Model):
     ends_at = models.DateTimeField(verbose_name='Subscription end date',
                                    blank=True,
                                    null=True)
+    paypal_subscription_id = models.CharField(
+        max_length=450,
+        verbose_name='PayPal subscription id',
+        blank=True,
+        null=True
+    )
 
     class Meta:
         db_table = 'users_subscriptions'
@@ -64,3 +83,21 @@ class UserSubscription(models.Model):
 
     def __str__(self):
         return f'User: {self.user.username}. Subscription: {self.subscription}'
+
+
+class PayPalProduct(models.Model):
+    product_id = models.CharField(max_length=350,
+                                  verbose_name='PayPal product ID')
+    name = models.CharField(max_length=350,
+                            verbose_name='PayPal product name')
+    description = models.TextField(verbose_name='Description')
+    image_url = models.URLField(verbose_name='Image url')
+    home_url = models.URLField(verbose_name='Home url')
+
+    class Meta:
+        db_table = 'paypal_product'
+        verbose_name = 'product'
+        verbose_name_plural = 'PayPal Products'
+
+    def __str__(self):
+        return f'Product: {self.name}'
