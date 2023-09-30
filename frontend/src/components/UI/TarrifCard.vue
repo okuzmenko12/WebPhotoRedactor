@@ -42,7 +42,7 @@
                 </svg>
             </p>
         </div>
-        <a class="buy-tariff-button fw--25 fw--700 white">buy</a>
+        <button @click="showModal" class="buy-tariff-button fw--25 fw--700 white">buy</button>
     </div>
 </template>
 
@@ -54,8 +54,13 @@
             time: String,
             Upcount: Number,
             BgRemcount: Number,
-            JPEGcount: Number
+            JPEGcount: Number,
         },
+        methods: {
+            showModal() {
+                this.$emit('update:modelValue', true);
+            }
+        }
     }
 </script>
 
