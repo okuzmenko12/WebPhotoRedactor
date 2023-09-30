@@ -3,12 +3,13 @@
   <div class="pricing-container">
     <div class="pricing-block">
         <div class="tarrifs-row">
-            <card Upcount="100" BgRemcount="100" JPEGcount="100" name="Starter plan" price="12$" time="month"/>
-            <card Upcount="300" BgRemcount="300" JPEGcount="300" name="Smart plan" price="30$" time="3 monthes"/>
-            <card Upcount="600" BgRemcount="600" JPEGcount="600" name="Pro plan" price="50$" time="6 monthes"/>
-            <card Upcount="1000" BgRemcount="1000" JPEGcount="1000" name="Fancy plan" price="90$" time="year"/>
+            <card Upcount="100" BgRemcount="100" JPEGcount="100" name="Starter plan" price="12$" time="month" v-model="modalVisible"/>
+            <card Upcount="300" BgRemcount="300" JPEGcount="300" name="Smart plan" price="30$" time="3 monthes" v-model="modalVisible"/>
+            <card Upcount="600" BgRemcount="600" JPEGcount="600" name="Pro plan" price="50$" time="6 monthes" v-model="modalVisible"/>
+            <card Upcount="1000" BgRemcount="1000" JPEGcount="1000" name="Fancy plan" price="90$" time="year" v-model="modalVisible"/>
         </div>
     </div>
+    <sub-modal-wind v-if="modalVisible" v-model="modalVisible" />
   </div>
   <footer-comp />
 </template>
@@ -18,14 +19,21 @@
   import NavbarComp from "@/components/NavbarComp.vue";
   import FooterComp from "@/components/FooterComp.vue";
   import handlePopState from "@/utils/index.js";
+  import SubModalWind from "@/components/SubscriptionModalWindow.vue"
   export default {
     components: {
       Card,
       NavbarComp,
-      FooterComp
+      FooterComp,
+      SubModalWind
     },
     mounted() {
       handlePopState()
+    },
+    data() {
+      return {
+          modalVisible: false
+      };
     }
   }
 </script>
