@@ -11,6 +11,8 @@ class Plan(models.Model):
     name = models.CharField(max_length=250,
                             verbose_name='Plan name')
     price = models.IntegerField(verbose_name='Price in $')
+    description = models.TextField(max_length=15000,
+                                   verbose_name='Description')
     period = models.CharField(
         max_length=150,
         verbose_name='Price per (month, 3 months, 6 months, year etc.)'

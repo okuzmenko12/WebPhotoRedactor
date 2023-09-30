@@ -27,7 +27,6 @@ class PayPalAuthMixin:
         auth = (settings.PAYPAL_CLIENT_ID, settings.PAYPAL_SECRET)
         url = "https://api-m.sandbox.paypal.com/v1/oauth2/token"
         response = requests.post(url, headers=headers, data=data, auth=auth)
-        print(response.json())
         return response.json().get('access_token')
 
     @property
@@ -100,6 +99,36 @@ class PayPalService(PayPalAuthMixin):
                         "interval_unit": "MONTH",
                         "interval_count": data['period_in_months']
                     },
+                    "tenure_type": "TRIAL",
+                    "sequence": 1,
+                    "total_cycles": 2,
+                    "pricing_scheme": {
+                        "fixed_price": {
+                            "value": data['price'],
+                            "currency_code": "USD"
+                        }
+                    }
+                },
+                {
+                    "frequency": {
+                        "interval_unit": "MONTH",
+                        "interval_count": data['period_in_months']
+                    },
+                    "tenure_type": "TRIAL",
+                    "sequence": 2,
+                    "total_cycles": 3,
+                    "pricing_scheme": {
+                        "fixed_price": {
+                            "value": data['price'],
+                            "currency_code": "USD"
+                        }
+                    }
+                },
+                {
+                    "frequency": {
+                        "interval_unit": "MONTH",
+                        "interval_count": data['period_in_months']
+                    },
                     "tenure_type": "REGULAR",
                     "sequence": 3,
                     "total_cycles": 12,
@@ -130,10 +159,7 @@ class PayPalService(PayPalAuthMixin):
             headers=self.headers_dict,
             data=json.dumps(data_for_post)
         )
-
-        if response.status_code == 201:
-            return response.json().get('id')
-        return None
+        return response.json().get('id')
 
 
 class StripeMixin:
