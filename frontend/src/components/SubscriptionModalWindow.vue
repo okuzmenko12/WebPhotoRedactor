@@ -101,4 +101,16 @@ export default {
 .checkmark {
     fill: #fff;
 }
+
+@media (min-width: 481px) and (max-width: 650px) {
+  #payment-block {
+    padding: 20px 104px;
+  }
+}
+
+@media (max-width: 480px) {
+  #payment-block {
+    padding: 20px 104px;
+  }
+}
 </style>
