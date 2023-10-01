@@ -46,11 +46,14 @@
   padding-top: 200px;
   box-sizing: border-box;
   justify-content: center;
+  align-items: center;
   flex-direction: column;
 }
 
 .pricing-block {
+  width: 90%;
   display: flex;
+  align-items: center;
   justify-content: center;
   flex-direction: column;
 }
@@ -60,6 +63,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap;
     gap: 40px;
 }
 </style>

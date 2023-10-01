@@ -27,3 +27,6 @@ Thumbs.db
 
 # Compiled Python files
 *.pyc
+
+# Environment
+.env.development

@@ -29,7 +29,7 @@
         },
         methods: {
             sendLogInRequest() {
-                axios.post(`${this.$backendDomain}/api/v1/auth/token/`, {
+                axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/auth/token/`, {
                 "email": this.email,
                 "password": this.password,
                 })

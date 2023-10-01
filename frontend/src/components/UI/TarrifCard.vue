@@ -158,4 +158,50 @@
 .buy-tariff-button:hover {
     background-position: 100% 50%;
 }
+
+@media (min-width: 481px) and (max-width: 650px) {
+    .card {
+        width: 230px;
+        height: 348px;
+    }
+
+    .card-top {
+        height: 150px;
+    }
+
+    .card-top p {
+        font-size: 25px;
+    }
+
+    .card-top .fs--12 {
+        font-size: 12px;
+    }
+
+    .card-desc p {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .card {
+        width: 200px;
+        height: 348px;
+    }
+
+    .card-top {
+        height: 150px;
+    }
+
+    .card-top p {
+        font-size: 25px;
+    }
+
+    .card-top .fs--12 {
+        font-size: 9px;
+    }
+
+    .card-desc p {
+        font-size: 10px;
+    }
+}
 </style>
