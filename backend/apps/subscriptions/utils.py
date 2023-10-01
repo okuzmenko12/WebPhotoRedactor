@@ -67,3 +67,18 @@ def month_total_days(month, year):
 #
 # response = requests.get('https://api-m.sandbox.paypal.com/v1/billing/subscriptions/I-V6CUMLYUJG0Y', headers=headers)
 # print(response.json())
+
+# import requests
+#
+#
+# headers_dict = {
+#     'Authorization': f'Bearer A21AALZDzxcr9XEhz9KE_-HgTjJTcHd3SzzN-ksihmb6XSJEYj1VMFVy-HlkuKyamUoJkCNOyqCebgDC6HSGBWrFG54ipwu4A',
+#     'Content-Type': 'application/json',
+#     'Accept': 'application/json',
+# }
+#
+# url = f'https://api-m.sandbox.paypal.com/v1/billing/subscriptions/I-5GEENH04KJ4A/cancel'
+#
+# data = '{ "reason": "Not satisfied with the service" }'
+#
+# response = requests.post(url, headers=headers_dict, data=data)

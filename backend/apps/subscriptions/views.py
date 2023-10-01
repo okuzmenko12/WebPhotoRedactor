@@ -12,7 +12,7 @@ from rest_framework import status
 from rest_framework.response import Response
 
 from .services import PayPalService
-from .serializers import PayPalProductSerializer
+from .serializers import PayPalProductSerializer, CreateUserSubscriptionSerializer
 
 
 class StripeConfigAPIView(PayPalService, APIView):
@@ -43,8 +43,21 @@ class PayPalProductAPIView(PayPalService, APIView):
             return Response({'error': e}, status=status.HTTP_400_BAD_REQUEST)
 
 
+class CreateUserSubscriptionAPIView(PayPalService, APIView):
+    serializer_class = CreateUserSubscriptionSerializer
+
+    def post(self, *args, **kwargs):
+        try:
+            pass
+        except Exception as e:
+            return Response({'error': e}, status=status.HTTP_400_BAD_REQUEST)
+
+
 @login_required
 def home(request):
+    pr = PayPalService()
+    user = User.objects.get(email='admin@gmail.com')
+    print(pr.create_user_subscription(user, 'I-4DXYTR7S2L59'))
     return render(request, 'subscriptions/index.html')
 
 
@@ -61,7 +74,6 @@ def stripe_config(request):
                 'home_url': 'https://example.com'
             }
         )
-        print(product)
         stripe_config = {'publicKey': settings.STRIPE_PUBLISHABLE_KEY}
         return JsonResponse(stripe_config, safe=False)
 

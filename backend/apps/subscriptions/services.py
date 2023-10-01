@@ -1,12 +1,15 @@
-from typing import NamedTuple, Optional
-
 import stripe
 import requests
 import json
+import os
+import binascii
+
+from typing import NamedTuple, Optional
 
 from django.conf import settings
 
-from .models import PayPalProduct
+from .models import PayPalProduct, UserSubscription, Plan
+from apps.users.models import User
 
 
 class PayPalPaymentData(NamedTuple):
@@ -16,8 +19,13 @@ class PayPalPaymentData(NamedTuple):
 
 class PayPalAuthMixin:
 
-    @staticmethod
-    def get_access_token() -> str | None:
+    @property
+    def urls_first_part(self):
+        if not settings.PAYPAL_SANDBOX_URLS:
+            return 'https://api-m.paypal.com'
+        return 'https://api-m.sandbox.paypal.com'
+
+    def get_access_token(self) -> str | None:
         headers = {
             "Content-Type": "application/x-www-form-urlencoded"
         }
@@ -25,28 +33,33 @@ class PayPalAuthMixin:
             "grant_type": "client_credentials"
         }
         auth = (settings.PAYPAL_CLIENT_ID, settings.PAYPAL_SECRET)
-        url = "https://api-m.sandbox.paypal.com/v1/oauth2/token"
+        url = f"{self.urls_first_part}/v1/oauth2/token"
         response = requests.post(url, headers=headers, data=data, auth=auth)
         return response.json().get('access_token')
 
     @property
     def auth_token(self):
-        return f'Bearer {PayPalAuthMixin.get_access_token()}'
+        return f'Bearer {self.get_access_token()}'
 
 
 class PayPalService(PayPalAuthMixin):
 
     @property
     def products_url(self):
-        return 'https://api-m.sandbox.paypal.com/v1/catalogs/products'
+        return f'{self.urls_first_part}/v1/catalogs/products'
+
+    @staticmethod
+    def __generate_request_id():
+        return binascii.hexlify(os.urandom(16)).decode()
 
     @property
     def headers_dict(self):
+        request_id = self.__generate_request_id()
         headers_dict = {
             'Authorization': self.auth_token,
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'PayPal-Request-Id': 'PRODUCT-23231-001',
+            'PayPal-Request-Id': f'{request_id}',
             'Prefer': 'return=representation'
         }
         return headers_dict
@@ -87,6 +100,7 @@ class PayPalService(PayPalAuthMixin):
         if product_data.instance is None:
             return None
         product: PayPalProduct = product_data.instance
+        print(product.product_id)
 
         data_for_post = {
             "product_id": product.product_id,
@@ -155,11 +169,52 @@ class PayPalService(PayPalAuthMixin):
             }
         }
         response = requests.post(
-            'https://api-m.sandbox.paypal.com/v1/billing/plans',
+            f'{self.urls_first_part}/v1/billing/plans',
             headers=self.headers_dict,
             data=json.dumps(data_for_post)
         )
         return response.json().get('id')
+
+    def get_subscription_by_id(self, subscription_id):
+        url = f'{self.urls_first_part}/v1/billing/subscriptions/{subscription_id}'
+        response = requests.get(url, headers=self.headers_dict).json()
+        response_data = {
+            'subscription_id': response.get('id'),
+            'plan_id': response.get('plan_id'),
+            'start_time': response.get('start_time'),
+            'update_time': response.get('update_time'),
+            'cancel_link': response.get('links')[0]['href'],
+            'next_pay_time': response.get('billing_info')['next_billing_time'],
+            'failed_payments_count': response.get('billing_info')['failed_payments_count'],
+            'status': response.get('status')
+        }
+        return response_data
+
+    @staticmethod
+    def get_plan_by_pp_id(plan_id) -> Plan | None:
+        if not Plan.objects.filter(paypal_plan_id=plan_id).exists():
+            return None
+        return Plan.objects.get(paypal_plan_id=plan_id)
+
+    def create_user_subscription(self, user: User, subscription_id):
+        pp_subscription_data = self.get_subscription_by_id(subscription_id)
+
+        plan_id = pp_subscription_data.get('plan_id')
+        plan = self.get_plan_by_pp_id(plan_id)
+
+        subscription, _ = UserSubscription.objects.get_or_create(
+            plan=plan,
+            user=user,
+            start_time=pp_subscription_data['start_time'],
+            next_pay_time=pp_subscription_data['next_pay_time'],
+            payment_service=1,  # PAYPAL,
+            status=pp_subscription_data['status'],
+            paypal_subscription_cancel_link=pp_subscription_data['cancel_link']
+        )
+        return subscription
+
+    def cancel_subscription(self):
+        pass
 
 
 class StripeMixin:

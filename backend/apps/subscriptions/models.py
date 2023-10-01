@@ -46,9 +46,17 @@ class Plan(models.Model):
 
 
 class UserSubscription(models.Model):
-    PAYMENT_SERVICE = (
-        (1, 'PayPal'),
-        (2, 'Stripe')
+    PAYMENT_SERVICES = (
+        (1, 'PAYPAL'),
+        (2, 'STRIPE')
+    )
+    STATUSES = (
+        ('ACTIVE', 'ACTIVE'),
+        ('SUSPENDED', 'SUSPENDED'),
+        ('CANCELED', 'CANCELED'),
+        ('EXPIRED', 'EXPIRED'),
+        ('APPROVED', 'APPROVED'),
+        ('APPROVAL_PENDING', 'APPROVAL_PENDING')
     )
 
     plan = models.ForeignKey(Plan,
@@ -58,33 +66,35 @@ class UserSubscription(models.Model):
                              on_delete=models.CASCADE,
                              verbose_name='User',
                              related_name='subscription')
-    started_at = models.DateTimeField(auto_now_add=True,
-                                      verbose_name='Subscription starting date')
-    ends_at = models.DateTimeField(verbose_name='Subscription end date',
-                                   blank=True,
-                                   null=True)
+    start_time = models.DateTimeField(verbose_name='Subscription starting date',
+                                      blank=True,
+                                      null=True)
+    next_pay_time = models.DateTimeField(verbose_name='Subscription end date',
+                                         blank=True,
+                                         null=True)
     paypal_subscription_id = models.CharField(
         max_length=450,
         verbose_name='PayPal subscription id',
         blank=True,
         null=True
     )
+    paypal_subscription_cancel_link = models.URLField(
+        verbose_name='PayPal subscription cancel link',
+        blank=True,
+        null=True
+    )
+    status = models.CharField(verbose_name='Subscription status',
+                              choices=STATUSES)
+    payment_service = models.IntegerField(verbose_name='Payment service',
+                                          choices=PAYMENT_SERVICES)
 
     class Meta:
         db_table = 'users_subscriptions'
         verbose_name = 'subscription'
         verbose_name_plural = 'Users Subscriptions'
 
-    def save(self, *args, **kwargs):
-        if not self.ends_at:
-            now = datetime.datetime.now()
-            self.ends_at = now + timedelta(
-                days=month_total_days(now.month, now.year)
-            )
-        super().save(*args, **kwargs)
-
     def __str__(self):
-        return f'User: {self.user.username}. Subscription: {self.subscription}'
+        return f'User: {self.user.username}. Subscription: {self.plan}'
 
 
 class PayPalProduct(models.Model):
