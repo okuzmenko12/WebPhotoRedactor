@@ -11,6 +11,7 @@
 </template>
 
 <script>
+/* eslint-disable */
 export default {
   mounted() {
     this.loadPayPalSDK().then(() => {
@@ -21,7 +22,7 @@ export default {
     loadPayPalSDK() {
       return new Promise((resolve, reject) => {
         const script = document.createElement('script');
-        script.src = `https://www.paypal.com/sdk/js?client-id=${this.clientId}&vault=true&intent=subscription`;
+        script.src = `https://www.paypal.com/sdk/js?client-id=${process.env.VUE_APP_PAYPAL_CLIENT_ID}&vault=true&intent=subscription`;
         script.async = true;
         script.onload = resolve;
         script.onerror = reject;
@@ -62,6 +63,7 @@ export default {
     position: fixed;
     width: 100%;
     height: 100%;
+    top: 0;
     background-color: rgba(0, 0, 0, 0.3);
     z-index: 110;
     display: flex;

@@ -31,7 +31,7 @@
         },
         methods: {
             sendSignUpRequest() {
-                axios.post(`${this.$backendDomain}/api/v1/auth/registration/`, {
+                axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/auth/registration/`, {
                 "email": this.email,
                 "password": this.password,
                 "password1": this.password1
