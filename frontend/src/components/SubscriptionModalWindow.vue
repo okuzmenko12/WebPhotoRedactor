@@ -5,7 +5,8 @@
             You have bought a tarrif!
         </div>
         <div id="payment-block">
-            <div id="paypal-button-container"> </div>
+          <div @click="changeState" id="close_modal">✖</div>
+            <div id="paypal-button-container"></div>
         </div>
     </div>
 </template>
@@ -81,6 +82,22 @@ export default {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+#close_modal {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 900;
+  cursor: pointer;
+  transition: .3s;
+}
+
+#close_modal:hover {
+    color: #FF0000 !important;
 }
 
 #success {
