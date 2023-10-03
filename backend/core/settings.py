@@ -32,7 +32,8 @@ INSTALLED_APPS = [
 
     # applications
     'apps.users',
-    'apps.picsart'
+    'apps.picsart',
+    'apps.subscriptions'
 ]
 
 MIDDLEWARE = [
@@ -106,6 +107,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'static'
+STATICFILES_DIRS = [
+    BASE_DIR / 'templates/static'
+]
 
 # MEDIA FILES
 
@@ -187,6 +191,21 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_PORT = os.getenv('EMAIL_PORT')
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS')
+
+# STRIPE SETTINGS
+
+STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
+STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
+STRIPE_PRICE_ID = os.getenv('STRIPE_PRICE_ID')  # we can set it at model
+
+STRIPE_WEBHOOK_CODE = 'merit-ideal-enrich-fave'
+STRIPE_ENDPOINT_SECRET = 'whsec_dfa943d539b2fd1e973e1506ec5a24cdebdf0cf2cc0eaf1b35ac46121817654f'
+
+# PAYPAL SETTINGS
+
+PAYPAL_CLIENT_ID = os.getenv('PAYPAL_CLIENT_ID')
+PAYPAL_SECRET = os.getenv('PAYPAL_SECRET')
+PAYPAL_SANDBOX_URLS = True
 
 # DJANGO JAZZMIN
 
