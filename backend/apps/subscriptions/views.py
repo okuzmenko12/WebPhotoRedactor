@@ -47,17 +47,33 @@ class CreateUserSubscriptionAPIView(PayPalService, APIView):
     serializer_class = CreateUserSubscriptionSerializer
 
     def post(self, *args, **kwargs):
-        try:
-            pass
-        except Exception as e:
-            return Response({'error': e}, status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.serializer_class(data=self.request.data)
+        serializer.is_valid(raise_exception=True)
+        user = User.objects.get(email='admin@gmail.com')  # USER FOR TEST
+        subscription = self.create_user_subscription(user, serializer.data.get('subscription_id'))
+        return Response({'STATUS': subscription.status})
+
+
+class CancelUserSubscriptionAPIView(PayPalService, APIView):
+
+    def post(self, *args, **kwargs):
+        sub_pk = self.kwargs['subscription_pk']
+        sub_canceled = self.cancel_subscription(sub_pk)
+
+        if not sub_canceled:
+            return Response({
+                'error': 'The subscription wasn\'t canceled. Please, try again.'  # noqa
+            }, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+            'success': 'The subscription was successfully canceled!'
+        }, status=status.HTTP_200_OK)
 
 
 @login_required
 def home(request):
     pr = PayPalService()
     user = User.objects.get(email='admin@gmail.com')
-    print(pr.create_user_subscription(user, 'I-4DXYTR7S2L59'))
+    # print(pr.create_user_subscription(user, 'I-PWKHCF6ACC4K'))
     return render(request, 'subscriptions/index.html')
 
 

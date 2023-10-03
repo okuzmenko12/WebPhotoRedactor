@@ -175,20 +175,46 @@ class PayPalService(PayPalAuthMixin):
         )
         return response.json().get('id')
 
-    def get_subscription_by_id(self, subscription_id):
+    @staticmethod
+    def __check_values_keys(value, allowed_keys):
+        value_dict = {}
+        for k, v in value.items():
+            if k in allowed_keys:
+                value_dict[k] = v
+        return value_dict
+
+    def __subscription_detail_response(self, response: dict) -> dict:
+        allowed_keys = ('id', 'plan_id', 'start_time', 'links',
+                        'billing_info', 'next_billing_time',
+                        'failed_payments_count', 'status')
+        response_data = {}
+        for key, value in response.items():
+            if key in allowed_keys:
+                if isinstance(value, dict):
+                    value = self.__check_values_keys(value, allowed_keys)
+                response_data[key] = value
+        return response_data
+
+    def get_subscription_by_id(self, subscription_id) -> dict:
         url = f'{self.urls_first_part}/v1/billing/subscriptions/{subscription_id}'
         response = requests.get(url, headers=self.headers_dict).json()
+        data = self.__subscription_detail_response(response)
         response_data = {
-            'subscription_id': response.get('id'),
-            'plan_id': response.get('plan_id'),
-            'start_time': response.get('start_time'),
-            'update_time': response.get('update_time'),
-            'cancel_link': response.get('links')[0]['href'],
-            'next_pay_time': response.get('billing_info')['next_billing_time'],
-            'failed_payments_count': response.get('billing_info')['failed_payments_count'],
-            'status': response.get('status')
+            'subscription_id': data.get('id'),
+            'plan_id': data.get('plan_id'),
+            'start_time': data.get('start_time'),
+            'cancel_link': data.get('links')[0]['href'],
+            'next_pay_time': data.get('billing_info').get('next_billing_time'),
+            'failed_payments_count': data.get('billing_info').get('failed_payments_count'),
+            'status': data.get('status')
         }
         return response_data
+
+    @staticmethod
+    def get_user_subscription_from_db(subscription_pk) -> UserSubscription | None:
+        if not UserSubscription.objects.filter(id=subscription_pk).exists():
+            return None
+        return UserSubscription.objects.get(id=subscription_pk)
 
     @staticmethod
     def get_plan_by_pp_id(plan_id) -> Plan | None:
@@ -202,19 +228,40 @@ class PayPalService(PayPalAuthMixin):
         plan_id = pp_subscription_data.get('plan_id')
         plan = self.get_plan_by_pp_id(plan_id)
 
-        subscription, _ = UserSubscription.objects.get_or_create(
-            plan=plan,
-            user=user,
-            start_time=pp_subscription_data['start_time'],
-            next_pay_time=pp_subscription_data['next_pay_time'],
-            payment_service=1,  # PAYPAL,
-            status=pp_subscription_data['status'],
-            paypal_subscription_cancel_link=pp_subscription_data['cancel_link']
-        )
-        return subscription
+        if pp_subscription_data['status'] == 'ACTIVE':
+            subscription, _ = UserSubscription.objects.get_or_create(
+                plan=plan,
+                user=user,
+                start_time=pp_subscription_data['start_time'],
+                next_pay_time=pp_subscription_data['next_pay_time'],
+                payment_service=1,  # PAYPAL,
+                status=pp_subscription_data['status'],
+                paypal_subscription_cancel_link=pp_subscription_data['cancel_link']
+            )
+            return subscription
+        return None
 
-    def cancel_subscription(self):
-        pass
+    def cancel_subscription(self, subscription_pk) -> bool:
+        subscription = self.get_user_subscription_from_db(subscription_pk)
+
+        if subscription is not None:
+            headers = {
+                'Authorization': self.auth_token,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+            data = {'reason': 'Not satisfied with the service'}
+            response = requests.post(
+                subscription.paypal_subscription_cancel_link,
+                headers=headers,
+                data=json.dumps(data)
+            )
+            if not response.status_code == 204:
+                return False
+            subscription.status = 'CANCELED'
+            subscription.save()
+            return True
+        return False
 
 
 class StripeMixin:
