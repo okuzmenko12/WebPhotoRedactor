@@ -72,6 +72,10 @@ class UserSubscription(models.Model):
     next_pay_time = models.DateTimeField(verbose_name='Subscription end date',
                                          blank=True,
                                          null=True)
+    stripe_subscription_id = models.CharField(max_length=350,
+                                              verbose_name='Stripe subscription ID',
+                                              blank=True,
+                                              null=True)
     paypal_subscription_id = models.CharField(
         max_length=450,
         verbose_name='PayPal subscription id',
@@ -99,7 +103,9 @@ class UserSubscription(models.Model):
 
 class PayPalProduct(models.Model):
     product_id = models.CharField(max_length=350,
-                                  verbose_name='PayPal product ID')
+                                  verbose_name='PayPal product ID',
+                                  blank=True,
+                                  null=True)
     name = models.CharField(max_length=350,
                             verbose_name='PayPal product name')
     description = models.TextField(verbose_name='Description')

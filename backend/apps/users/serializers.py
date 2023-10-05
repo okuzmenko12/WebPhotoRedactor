@@ -7,7 +7,8 @@ from rest_framework.authtoken.models import Token
 
 class RegistrationSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True,
-                                   validators=[UniqueValidator(queryset=User.objects.all())])
+                                   validators=[UniqueValidator(queryset=User.objects.all(),
+                                                               message='Email must be unique!')])
     password = serializers.CharField(write_only=True,
                                      required=True,
                                      validators=[validate_password])

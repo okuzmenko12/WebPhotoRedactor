@@ -8,7 +8,7 @@ fetch("/api/v1/subscriptions/config/")
 .then((data) => {
   // Initialize Stripe.js
   console.log(data)
-  const stripe = Stripe(data.publicKey);
+  const stripe = Stripe(data.public_key);
 
   // new
   // Event handler
@@ -21,7 +21,7 @@ fetch("/api/v1/subscriptions/config/")
       .then((data) => {
         console.log(data);
         // Redirect to Stripe Checkout
-        return stripe.redirectToCheckout({sessionId: data.sessionId})
+        return stripe.redirectToCheckout({sessionId: data.checkout_session_id})
       })
       .then((res) => {
         console.log(res);

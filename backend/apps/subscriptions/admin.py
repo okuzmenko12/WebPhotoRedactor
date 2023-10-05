@@ -22,3 +22,6 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
 @admin.register(PayPalProduct)
 class PayPalProductAdmin(admin.ModelAdmin):
     pass
+
+
+
