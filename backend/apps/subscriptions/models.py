@@ -1,10 +1,6 @@
-import datetime
-from datetime import timedelta
 from django.db import models
 
 from apps.users.models import User
-
-from .utils import month_total_days
 
 
 class Plan(models.Model):
@@ -13,10 +9,6 @@ class Plan(models.Model):
     price = models.IntegerField(verbose_name='Price in $')
     description = models.TextField(max_length=15000,
                                    verbose_name='Description')
-    period = models.CharField(
-        max_length=150,
-        verbose_name='Price per (month, 3 months, 6 months, year etc.)'
-    )
     period_in_months = models.IntegerField(verbose_name='Period in months (required)')
     up_scales_count = models.IntegerField(default=100,
                                           verbose_name='Up scales count')

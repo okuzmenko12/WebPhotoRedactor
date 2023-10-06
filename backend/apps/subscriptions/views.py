@@ -5,13 +5,16 @@ from django.shortcuts import render
 from apps.users.models import User
 
 from rest_framework.views import APIView
+from rest_framework.generics import ListAPIView
 from rest_framework import status
 from rest_framework.response import Response
 
+from .models import Plan
 from .services import PayPalService, StripeMixin
 from .serializers import (PayPalProductSerializer,
                           CreateUserSubscriptionSerializer,
-                          StripeCheckoutSerializer)
+                          StripeCheckoutSerializer,
+                          PlanSerializer)
 
 
 class PayPalProductAPIView(PayPalService, APIView):
@@ -96,6 +99,11 @@ class StripeWebHookAPIView(StripeMixin, APIView):
         if created:
             return Response(status=status.HTTP_201_CREATED)
         return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class SubscriptionsAPIVIew(ListAPIView):
+    queryset = Plan.objects.all()
+    serializer_class = PlanSerializer
 
 
 @login_required

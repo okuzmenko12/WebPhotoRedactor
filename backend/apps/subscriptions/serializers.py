@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import PayPalProduct, UserSubscription
+from .models import PayPalProduct, UserSubscription, Plan
 
 
 class PayPalProductSerializer(serializers.ModelSerializer):
@@ -22,3 +22,23 @@ class StripeCheckoutSerializer(serializers.Serializer):
     cancel_url = serializers.CharField(max_length=350,
                                        required=False,
                                        label='Cancel URL')
+
+
+class PlanSerializer(serializers.ModelSerializer):
+    period_in_str = serializers.SerializerMethodField(read_only=True)
+
+    class Meta:
+        model = Plan
+        fields = ['id', 'name', 'description', 'price',
+                  'up_scales_count', 'period_in_months', 'period_in_str',
+                  'bg_deletions_count', 'jpg_artifacts_deletions_count',
+                  'stripe_price_id', 'paypal_plan_id']
+
+    @staticmethod
+    def get_period_in_str(instance: Plan):
+        period = str(instance.period_in_months)
+        if instance.period_in_months <= 1:
+            period += 'month'
+        else:
+            period += 'months'
+        return period
