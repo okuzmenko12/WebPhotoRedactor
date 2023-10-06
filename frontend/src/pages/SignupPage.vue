@@ -10,6 +10,7 @@
             <input-ui maxlength="50" v-model="password" placeholder="Password"/>
             <input-ui maxlength="50" v-model="password1" placeholder="Confirm password"/>
             <button class="auth__authpage__btn" @click="sendSignUpRequest">Sign up</button>
+            <h5 id="message__auth">{{ message }}</h5>
         </form>
     </div>
 </template>
@@ -26,7 +27,8 @@
             return {
                 email: "",
                 password: "",
-                password1: ""
+                password1: "",
+                message: ""
             }
         },
         methods: {
@@ -35,6 +37,26 @@
                 "email": this.email,
                 "password": this.password,
                 "password1": this.password1
+                })
+                .then(res => {
+                    console.log(res)
+                    this.message = res.data.message
+                    const message = document.getElementById('message__auth')
+                    message.style.color = "#00FF00"
+                })
+                .catch(err => {
+                    console.log(err)
+                    if (err.response.data.email) {
+                        this.message = err.response.data.email[0]
+                    } else if (err.response.data.password) {
+                        this.message = err.response.data.password[0]
+                    } else if (err.response.data.password1) {
+                        this.message = err.response.data.password1[0]
+                    } else if (err.response.data.non_field_errors) {
+                        this.message = err.response.data.non_field_errors[0]
+                    }
+                    const message = document.getElementById('message__auth')
+                    message.style.color = "#FF0000"
                 })
             }
         },
@@ -91,6 +113,11 @@
 
 .ask__btn:hover {
     background: var(--secondary_hover_color);
+}
+
+#message__auth {
+    width: 100%;
+    text-align: center;
 }
 
 .auth-form {

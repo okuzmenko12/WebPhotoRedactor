@@ -9,6 +9,7 @@
             <input-ui maxlength="50" v-model="email" placeholder="Email"/>
             <input-ui maxlength="50" v-model="password" placeholder="Password"/>
             <button class="auth__authpage__btn" @click="sendLogInRequest">Log in</button>
+            <h5 id="message__auth">{{ message }}</h5>
         </form>
     </div>
 </template>
@@ -17,6 +18,7 @@
     import axios from 'axios';
     import InputUi from "@/components/UI/InputUi.vue";
     import handlePopState from "@/utils/index.js";
+    import router from '@/router/router';
     export default {
         components: {
             InputUi
@@ -25,6 +27,7 @@
             return {
                 email: "",
                 password: "",
+                message: ""
             }
         },
         methods: {
@@ -32,6 +35,21 @@
                 axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/auth/token/`, {
                 "email": this.email,
                 "password": this.password,
+                })
+                .then(res => {
+                    console.log(res)
+                    this.message = res.data.message
+                    const message = document.getElementById('message__auth')
+                    message.style.color = "#00FF00"
+                    router.push({ path: '/' })
+                })
+                .catch(err => {
+                    console.log(err)
+                    if (err.response.data.detail) {
+                        this.message = err.response.data.detail
+                    }
+                    const message = document.getElementById('message__auth')
+                    message.style.color = "#FF0000"
                 })
             }
         },
