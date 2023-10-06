@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import stripe
 import requests
 import json
@@ -311,13 +313,13 @@ class StripeMixin(StripeAPIMixin):
     def webhook_url(self):
         return settings.STRIPE_ENDPOINT_SECRET
 
-    @staticmethod
     def create_checkout_session(
+            self,
             client_id,
             success_url=None,
             cancel_url=None
     ):
-        stripe.api_key = settings.STRIPE_SECRET_KEY
+        self.configure_stripe()
         checkout_session = stripe.checkout.Session.create(
             client_reference_id=client_id,
             success_url=success_url if success_url is not None else settings.STRIPE_SUCCESS_URL,
@@ -326,7 +328,7 @@ class StripeMixin(StripeAPIMixin):
             mode='subscription',
             line_items=[
                 {
-                    'price': 'price_1Nxwy0GesdYQAHLi0aOUwm9W',
+                    'price': 'price_1NxyS9GesdYQAHLiLisGJGb5',
                     'quantity': 1,
                 }
             ]
@@ -338,8 +340,6 @@ class StripeMixin(StripeAPIMixin):
     def get_stripe_subscription_data(self, payload, sig_header):
         self.configure_stripe()
         endpoint_secret = self.webhook_url
-        # payload = request.body
-        # sig_header = request.META['HTTP_STRIPE_SIGNATURE']
 
         try:
             event = stripe.Webhook.construct_event(
@@ -353,17 +353,41 @@ class StripeMixin(StripeAPIMixin):
             client_reference_id = session.get('client_reference_id')
             stripe_subscription_id = session.get('subscription')
 
+            sub_detail = stripe.Subscription.retrieve(
+                stripe_subscription_id
+            )
             return {
                 'user_id': client_reference_id,
-                'subscription_id': stripe_subscription_id
+                'subscription_id': stripe_subscription_id,
+                'plan_price_id': sub_detail['items'].get('data')[0].get('price')['id'],
+                'start_time': datetime.fromtimestamp(sub_detail['current_period_start']),
+                'next_pay_time': datetime.fromtimestamp(sub_detail['current_period_end'])
             }
         return None
 
-    def create_user_subscription(self, payload, sig_header):
+    def create_user_subscription(self, payload, sig_header) -> bool:
+        self.configure_stripe()
         sub_data = self.get_stripe_subscription_data(payload, sig_header)
+
         if sub_data is None:
             return False
 
         user = get_user_by_id(sub_data.get('user_id'))
+
         if user is not None:
-            pass
+            try:
+                plan = Plan.objects.get(stripe_price_id=sub_data['plan_price_id'])
+            except (Exception,):
+                return False
+
+            UserSubscription.objects.create(
+                plan=plan,
+                user=user,
+                start_time=sub_data['start_time'],
+                next_pay_time=sub_data['next_pay_time'],
+                stripe_subscription_id=sub_data['subscription_id'],
+                status='ACTIVE',
+                payment_service=2
+            )
+            return True
+        return False
