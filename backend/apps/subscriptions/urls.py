@@ -4,18 +4,18 @@ from .views import (home,
                     StripeWebHookAPIView,
                     StripeConfigAPIView,
                     StripeCheckoutSessionAPIView,
-                    CancelUserSubscriptionAPIView,
-                    CreateUserSubscriptionAPIView,
+                    CreatePaypalUserSubscriptionAPIView,
                     PayPalProductAPIView,
-                    SubscriptionsAPIVIew)
+                    SubscriptionsAPIVIew,
+                    CancelSubscriptionAPIView)
 
 urlpatterns = [
     path('all/', SubscriptionsAPIVIew.as_view()),
     path('', home, name='subscriptions-home'),
-    path('config/', StripeConfigAPIView.as_view()),  # new
+    path('config/', StripeConfigAPIView.as_view()),
     path('create-checkout-session/', StripeCheckoutSessionAPIView.as_view()),
     path('webhook/', StripeWebHookAPIView.as_view()),
     path('products/', PayPalProductAPIView.as_view()),
-    path('create/', CreateUserSubscriptionAPIView.as_view()),
-    path('cancel/<int:subscription_pk>/', CancelUserSubscriptionAPIView.as_view())
+    path('create/', CreatePaypalUserSubscriptionAPIView.as_view()),
+    path('cancel/<int:subscription_pk>/', CancelSubscriptionAPIView.as_view())
 ]

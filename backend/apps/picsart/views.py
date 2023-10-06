@@ -8,7 +8,6 @@ from rest_framework import status
 from apps.picsart.service import PCsService
 
 from .utils import ImageEnhanceTypes
-
 from .serializers import ImageSerializer
 
 
