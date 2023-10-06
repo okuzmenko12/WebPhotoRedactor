@@ -1,11 +1,6 @@
-from datetime import datetime
-
-import stripe
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http.response import JsonResponse, HttpResponse
 from django.shortcuts import render
-from django.views.decorators.csrf import csrf_exempt
 
 from apps.users.models import User
 
@@ -13,7 +8,6 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 
-from .models import Plan, UserSubscription
 from .services import PayPalService, StripeMixin
 from .serializers import (PayPalProductSerializer,
                           CreateUserSubscriptionSerializer,
