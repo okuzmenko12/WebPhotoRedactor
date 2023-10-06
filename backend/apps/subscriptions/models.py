@@ -79,7 +79,8 @@ class UserSubscription(models.Model):
         blank=True,
         null=True
     )
-    status = models.CharField(verbose_name='Subscription status',
+    status = models.CharField(max_length=150,
+                              verbose_name='Subscription status',
                               choices=STATUSES)
     payment_service = models.IntegerField(verbose_name='Payment service',
                                           choices=PAYMENT_SERVICES)
