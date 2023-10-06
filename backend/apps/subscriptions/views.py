@@ -8,9 +8,10 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
-from .models import Plan
-from .services import PayPalService, StripeMixin
+from .models import Plan, UserSubscription
+from .services import PayPalService, StripeMixin, PaymentService
 from .serializers import (PayPalProductSerializer,
                           CreateUserSubscriptionSerializer,
                           StripeCheckoutSerializer,
@@ -19,6 +20,7 @@ from .serializers import (PayPalProductSerializer,
 
 class PayPalProductAPIView(PayPalService, APIView):
     serializer_class = PayPalProductSerializer
+    permission_classes = [IsAuthenticated]
 
     def post(self, *args, **kwargs):
         try:
@@ -32,30 +34,18 @@ class PayPalProductAPIView(PayPalService, APIView):
             return Response({'error': e}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class CreateUserSubscriptionAPIView(PayPalService, APIView):
+class CreatePaypalUserSubscriptionAPIView(PayPalService, APIView):
     serializer_class = CreateUserSubscriptionSerializer
+    permission_classes = [IsAuthenticated]
 
     def post(self, *args, **kwargs):
         serializer = self.serializer_class(data=self.request.data)
         serializer.is_valid(raise_exception=True)
-        user = User.objects.get(email='admin@gmail.com')  # USER FOR TEST
-        subscription = self.create_user_subscription(user, serializer.data.get('subscription_id'))
+        subscription = self.create_user_subscription(
+            self.request.user,
+            serializer.data.get('subscription_id')
+        )
         return Response({'STATUS': subscription.status})
-
-
-class CancelUserSubscriptionAPIView(PayPalService, APIView):
-
-    def post(self, *args, **kwargs):
-        sub_pk = self.kwargs['subscription_pk']
-        sub_canceled = self.cancel_subscription(sub_pk)
-
-        if not sub_canceled:
-            return Response({
-                'error': 'The subscription wasn\'t canceled. Please, try again.'  # noqa
-            }, status=status.HTTP_400_BAD_REQUEST)
-        return Response({
-            'success': 'The subscription was successfully canceled!'
-        }, status=status.HTTP_200_OK)
 
 
 class StripeConfigAPIView(APIView):
@@ -67,15 +57,14 @@ class StripeConfigAPIView(APIView):
 
 class StripeCheckoutSessionAPIView(StripeMixin, APIView):
     serializer_class = StripeCheckoutSerializer
+    permission_classes = [IsAuthenticated]
 
     def get(self, *args, **kwargs):
         serializer = self.serializer_class(data=self.request.data)
         serializer.is_valid(raise_exception=True)
 
-        admin = User.objects.get(email='admin@gmail.com')
-
         checkout_session_id = self.create_checkout_session(
-            admin.id,  # self.request.user.id,
+            self.request.user.id,
             serializer.data.get('success_url'),
             serializer.data.get('cancel_url')
         )
@@ -104,6 +93,30 @@ class StripeWebHookAPIView(StripeMixin, APIView):
 class SubscriptionsAPIVIew(ListAPIView):
     queryset = Plan.objects.all()
     serializer_class = PlanSerializer
+
+
+class CancelSubscriptionAPIView(PaymentService, APIView):
+
+    def post(self, *args, **kwargs):
+        try:
+            subscription = UserSubscription.objects.get(id=self.kwargs['subscription_pk'])
+        except (Exception,):
+            return Response({
+                'error': 'No such subscription with this id!'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if subscription.payment_service == 1:
+            canceled = self.paypal.cancel_subscription(subscription.id)
+        else:
+            canceled = self.stripe.cancel_subscription(subscription.id)
+
+        if not canceled:
+            return Response({
+                'error': 'Something went wrong... Please, try again.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+            'success': 'You successfully canceled this subscription!'
+        }, status=status.HTTP_200_OK)
 
 
 @login_required

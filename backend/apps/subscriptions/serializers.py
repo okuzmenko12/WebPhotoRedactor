@@ -37,8 +37,10 @@ class PlanSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_period_in_str(instance: Plan):
         period = str(instance.period_in_months)
-        if instance.period_in_months <= 1:
-            period += 'month'
+        if instance.period_in_months == 1:
+            period += ' month'
+        elif instance.period_in_months > 1 < 12:
+            period += ' months'
         else:
-            period += 'months'
+            period += ' year'
         return period

@@ -238,7 +238,8 @@ class PayPalService(PayPalAuthMixin):
                 next_pay_time=pp_subscription_data['next_pay_time'],
                 payment_service=1,  # PAYPAL,
                 status=pp_subscription_data['status'],
-                paypal_subscription_cancel_link=pp_subscription_data['cancel_link']
+                paypal_subscription_cancel_link=pp_subscription_data['cancel_link'],
+                paypal_subscription_id=subscription_id
             )
             return subscription
         return None
@@ -391,3 +392,28 @@ class StripeMixin(StripeAPIMixin):
             )
             return True
         return False
+
+    def cancel_subscription(self, sub_pk) -> bool:
+        try:
+            user_sub = UserSubscription.objects.get(id=sub_pk)
+        except (Exception,):
+            return False
+        self.configure_stripe()
+
+        if user_sub.stripe_subscription_id is None:
+            return False
+
+        response = stripe.Subscription.delete(
+            user_sub.stripe_subscription_id
+        )
+        if response.get('status') == 'canceled':
+            user_sub.status = 'CANCELED'
+            user_sub.save()
+        else:
+            return False
+        return True
+
+
+class PaymentService:
+    paypal = PayPalService()
+    stripe = StripeMixin()
