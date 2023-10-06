@@ -26,6 +26,7 @@
         </div>
       </div>
       <often-questions />
+      <slider-comp />
   </div>
   </div>
   <footer-comp />
@@ -36,13 +37,15 @@
   import OftenQuestions from "@/components/OftenQuestion.vue";
   import ToolCard from "@/components/UI/ToolCard.vue";
   import FooterComp from "@/components/FooterComp.vue";
+  import SliderComp from "@/components/SliderComp.vue";
   import handlePopState from "@/utils/index.js";
   export default {
       components: {
           NavbarComp,
           ToolCard,
           OftenQuestions,
-          FooterComp
+          FooterComp,
+          SliderComp
       },
       mounted() {
         handlePopState()
