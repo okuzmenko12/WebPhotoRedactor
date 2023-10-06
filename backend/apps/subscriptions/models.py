@@ -1,10 +1,6 @@
-import datetime
-from datetime import timedelta
 from django.db import models
 
 from apps.users.models import User
-
-from .utils import month_total_days
 
 
 class Plan(models.Model):
@@ -13,10 +9,6 @@ class Plan(models.Model):
     price = models.IntegerField(verbose_name='Price in $')
     description = models.TextField(max_length=15000,
                                    verbose_name='Description')
-    period = models.CharField(
-        max_length=150,
-        verbose_name='Price per (month, 3 months, 6 months, year etc.)'
-    )
     period_in_months = models.IntegerField(verbose_name='Period in months (required)')
     up_scales_count = models.IntegerField(default=100,
                                           verbose_name='Up scales count')
@@ -72,6 +64,10 @@ class UserSubscription(models.Model):
     next_pay_time = models.DateTimeField(verbose_name='Subscription end date',
                                          blank=True,
                                          null=True)
+    stripe_subscription_id = models.CharField(max_length=350,
+                                              verbose_name='Stripe subscription ID',
+                                              blank=True,
+                                              null=True)
     paypal_subscription_id = models.CharField(
         max_length=450,
         verbose_name='PayPal subscription id',
@@ -99,7 +95,9 @@ class UserSubscription(models.Model):
 
 class PayPalProduct(models.Model):
     product_id = models.CharField(max_length=350,
-                                  verbose_name='PayPal product ID')
+                                  verbose_name='PayPal product ID',
+                                  blank=True,
+                                  null=True)
     name = models.CharField(max_length=350,
                             verbose_name='PayPal product name')
     description = models.TextField(verbose_name='Description')

@@ -83,3 +83,11 @@ def month_total_days(month, year):
 #
 # response = requests.post(url, headers=headers_dict, data=data)
 # print(response)
+
+# import stripe
+#
+# stripe.api_key = 'sk_test_51NueGNGesdYQAHLihPJLyYD1l5XhmupWNbHYBm7xG3icVj1fmk1vFaFnXNGr5KM3jgdJ294MP4EjEgRkVP1hRKxV00Y3RdIUwQ'
+#
+# res = stripe.Subscription.list(limit=5)
+#
+# print(res)

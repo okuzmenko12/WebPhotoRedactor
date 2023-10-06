@@ -1,15 +1,18 @@
+from datetime import datetime
+
 import stripe
 import requests
 import json
 import os
 import binascii
 
+from django.conf import settings
 from typing import NamedTuple, Optional
 
-from django.conf import settings
-
 from .models import PayPalProduct, UserSubscription, Plan
+
 from apps.users.models import User
+from apps.users.services import get_user_by_id
 
 
 class PayPalPaymentData(NamedTuple):
@@ -100,7 +103,6 @@ class PayPalService(PayPalAuthMixin):
         if product_data.instance is None:
             return None
         product: PayPalProduct = product_data.instance
-        print(product.product_id)
 
         data_for_post = {
             "product_id": product.product_id,
@@ -157,7 +159,7 @@ class PayPalService(PayPalAuthMixin):
             "payment_preferences": {
                 "auto_bill_outstanding": True,
                 "setup_fee": {
-                    "value": "10",
+                    "value": "0",
                     "currency_code": "USD"
                 },
                 "setup_fee_failure_action": "CONTINUE",
@@ -264,11 +266,128 @@ class PayPalService(PayPalAuthMixin):
         return False
 
 
-class StripeMixin:
+class StripeAPIMixin:
+
+    @staticmethod
+    def configure_stripe():
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+
+    def create_price(self, data, stripe_product_id):
+        self.configure_stripe()
+        price = stripe.Price.create(
+            unit_amount=data['price'],
+            currency="usd",
+            recurring={
+                "interval": "month",
+                "interval_count": data['interval']
+            },
+            product=stripe_product_id,
+        )
+        return price
+
+    @staticmethod
+    def get_product_with_price_id(stripe_product_id, price_obj_id):
+        stripe.Product.modify(
+            stripe_product_id,
+            default_price=price_obj_id,
+        )
+        return stripe.Product.retrieve(stripe_product_id)
+
+    def create_product(self, data) -> str | None:
+        self.configure_stripe()
+        try:
+            product = stripe.Product.create(
+                name=data['name'],
+                description=data['description']
+            )
+            price_obj = self.create_price(data, product.id)
+            final_product = self.get_product_with_price_id(product.id, price_obj.id)
+            return final_product.default_price
+        except (Exception,):
+            return None
+
+
+class StripeMixin(StripeAPIMixin):
+
+    @property
+    def webhook_url(self):
+        return settings.STRIPE_ENDPOINT_SECRET
 
     def create_checkout_session(
             self,
+            client_id,
             success_url=None,
             cancel_url=None
     ):
-        pass
+        self.configure_stripe()
+        checkout_session = stripe.checkout.Session.create(
+            client_reference_id=client_id,
+            success_url=success_url if success_url is not None else settings.STRIPE_SUCCESS_URL,
+            cancel_url=cancel_url if cancel_url is not None else settings.STRIPE_CANCEL_URL,
+            payment_method_types=['card'],
+            mode='subscription',
+            line_items=[
+                {
+                    'price': 'price_1NxyS9GesdYQAHLiLisGJGb5',
+                    'quantity': 1,
+                }
+            ]
+        )
+
+        session_id = checkout_session.get('id')
+        return session_id
+
+    def get_stripe_subscription_data(self, payload, sig_header):
+        self.configure_stripe()
+        endpoint_secret = self.webhook_url
+
+        try:
+            event = stripe.Webhook.construct_event(
+                payload, sig_header, endpoint_secret
+            )
+        except (Exception,):
+            return None
+
+        if event['type'] == 'checkout.session.completed':
+            session = event['data']['object']
+            client_reference_id = session.get('client_reference_id')
+            stripe_subscription_id = session.get('subscription')
+
+            sub_detail = stripe.Subscription.retrieve(
+                stripe_subscription_id
+            )
+            return {
+                'user_id': client_reference_id,
+                'subscription_id': stripe_subscription_id,
+                'plan_price_id': sub_detail['items'].get('data')[0].get('price')['id'],
+                'start_time': datetime.fromtimestamp(sub_detail['current_period_start']),
+                'next_pay_time': datetime.fromtimestamp(sub_detail['current_period_end'])
+            }
+        return None
+
+    def create_user_subscription(self, payload, sig_header) -> bool:
+        self.configure_stripe()
+        sub_data = self.get_stripe_subscription_data(payload, sig_header)
+
+        if sub_data is None:
+            return False
+
+        user = get_user_by_id(sub_data.get('user_id'))
+
+        if user is not None:
+            try:
+                plan = Plan.objects.get(stripe_price_id=sub_data['plan_price_id'])
+            except (Exception,):
+                return False
+
+            UserSubscription.objects.create(
+                plan=plan,
+                user=user,
+                start_time=sub_data['start_time'],
+                next_pay_time=sub_data['next_pay_time'],
+                stripe_subscription_id=sub_data['subscription_id'],
+                status='ACTIVE',
+                payment_service=2
+            )
+            return True
+        return False

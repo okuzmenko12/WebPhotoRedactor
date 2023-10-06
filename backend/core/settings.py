@@ -16,7 +16,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Application definition
 
@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'corsheaders',
 
     # applications
     'apps.users',
@@ -39,6 +40,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -196,16 +198,20 @@ EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS')
 
 STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
-STRIPE_PRICE_ID = os.getenv('STRIPE_PRICE_ID')  # we can set it at model
-
-STRIPE_WEBHOOK_CODE = 'merit-ideal-enrich-fave'
-STRIPE_ENDPOINT_SECRET = 'whsec_dfa943d539b2fd1e973e1506ec5a24cdebdf0cf2cc0eaf1b35ac46121817654f'
+STRIPE_SUCCESS_URL = BACK_DOMAIN_URL
+STRIPE_CANCEL_URL = BACK_DOMAIN_URL
+STRIPE_WEBHOOK_CODE = os.getenv('STRIPE_WEBHOOK_CODE')
+STRIPE_ENDPOINT_SECRET = os.getenv('STRIPE_ENDPOINT_SECRET')
 
 # PAYPAL SETTINGS
 
 PAYPAL_CLIENT_ID = os.getenv('PAYPAL_CLIENT_ID')
 PAYPAL_SECRET = os.getenv('PAYPAL_SECRET')
-PAYPAL_SANDBOX_URLS = True
+PAYPAL_SANDBOX_URLS = os.getenv('SANDBOX_URLS') == 'True'
+
+# GLOBAL SETTINGS
+
+FRONTEND_DOMAIN = 'http://localhost:3000'
 
 # DJANGO JAZZMIN
 
@@ -336,3 +342,7 @@ JAZZMIN_SETTINGS = {
     # override change forms on a per modeladmin basis
     "changeform_format_overrides": {"auth.user": "carousel", "auth.group": "vertical_tabs"},
 }
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+]

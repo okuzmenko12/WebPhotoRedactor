@@ -5,9 +5,10 @@ from .models import Plan, UserSubscription, PayPalProduct
 
 @admin.register(Plan)
 class PlanAdmin(admin.ModelAdmin):
-    list_display = ['id', 'name', 'price', 'period']
+    list_display = ['id', 'name', 'price', 'period_in_months']
     list_display_links = ['id', 'name']
-    search_fields = ['id', 'name', 'price', 'period']
+    list_editable = ['period_in_months']
+    search_fields = ['id', 'name', 'price', 'period_in_months']
 
 
 @admin.register(UserSubscription)
