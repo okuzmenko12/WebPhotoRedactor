@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('subscriptions', '0012_alter_usersubscription_payment_service'),
     ]
@@ -13,7 +12,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='usersubscription',
             name='status',
-            field=models.CharField(choices=[('ACTIVE', 'ACTIVE'), ('SUSPENDED', 'SUSPENDED'), ('CANCELED', 'CANCELED'), ('EXPIRED', 'EXPIRED'), ('APPROVED', 'APPROVED'), ('APPROVAL_PENDING', 'APPROVAL_PENDING')], default=1, verbose_name='Subscription status'),
+            field=models.CharField(max_length=150,
+                                   choices=[('ACTIVE', 'ACTIVE'), ('SUSPENDED', 'SUSPENDED'), ('CANCELED', 'CANCELED'),
+                                            ('EXPIRED', 'EXPIRED'), ('APPROVED', 'APPROVED'),
+                                            ('APPROVAL_PENDING', 'APPROVAL_PENDING')], default=1,
+                                   verbose_name='Subscription status'),
             preserve_default=False,
         ),
     ]
