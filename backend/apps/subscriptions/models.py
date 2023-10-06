@@ -34,7 +34,7 @@ class Plan(models.Model):
         verbose_name_plural = 'Plans'
 
     def __str__(self):
-        return f'Plan {self.price}$ / {self.period}'
+        return f'Plan {self.price}$ / {self.period_in_months} month(s)'
 
 
 class UserSubscription(models.Model):
