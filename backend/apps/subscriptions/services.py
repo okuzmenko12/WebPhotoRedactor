@@ -67,14 +67,14 @@ class PayPalService(PayPalAuthMixin):
         }
         return headers_dict
 
-    def create_product(self, data: dict) -> PayPalProduct:
+    def create_product(self, product: PayPalProduct):
         data_for_post = {
-            'name': data['name'],
-            'description': data['description'],
+            'name': product.name,
+            'description': product.description,
             'type': 'SERVICE',
             'category': 'SOFTWARE',
-            'image_url': data['image_url'],
-            'home_url': data['home_url']
+            'image_url': product.image_url,
+            'home_url': product.home_url
         }
         response = requests.post(
             self.products_url,
@@ -82,12 +82,8 @@ class PayPalService(PayPalAuthMixin):
             data=json.dumps(data_for_post)
         )
         product_id = response.json().get('id')
-        data['product_id'] = product_id
-
-        product, _ = PayPalProduct.objects.get_or_create(
-            **data
-        )
-        return product
+        product.product_id = product_id
+        product.save()
 
     @property
     def current_product_data(self):

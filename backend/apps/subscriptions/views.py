@@ -12,26 +12,9 @@ from rest_framework.permissions import IsAuthenticated
 
 from .models import Plan, UserSubscription
 from .services import PayPalService, StripeMixin, PaymentService
-from .serializers import (PayPalProductSerializer,
-                          CreateUserSubscriptionSerializer,
+from .serializers import (CreateUserSubscriptionSerializer,
                           StripeCheckoutSerializer,
                           PlanSerializer)
-
-
-class PayPalProductAPIView(PayPalService, APIView):
-    serializer_class = PayPalProductSerializer
-    permission_classes = [IsAuthenticated]
-
-    def post(self, *args, **kwargs):
-        try:
-            serializer = self.serializer_class(data=self.request.data)
-            serializer.is_valid(raise_exception=True)
-
-            product = self.create_product(data=serializer.data)
-            serializer = PayPalProductSerializer(product)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        except Exception as e:
-            return Response({'error': e}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CreatePaypalUserSubscriptionAPIView(PayPalService, APIView):
