@@ -39,7 +39,12 @@ class CreatePaypalUserSubscriptionAPIView(UserSubscriptionsService,
             self.request.user,
             serializer.data.get('subscription_id')
         )
-        return Response({'STATUS': subscription.status})
+
+
+
+        return Response({
+            'success': f'You successfully bought {subscription.plan.name}!'
+        }, status=status.HTTP_201_CREATED)
 
 
 class StripeConfigAPIView(APIView):
@@ -55,7 +60,7 @@ class StripeCheckoutSessionAPIView(StripeMixin,
     serializer_class = StripeCheckoutSerializer
     permission_classes = [IsAuthenticated]
 
-    def post(self, *args, **kwargs):
+    def get(self, *args, **kwargs):
         if self.user_have_active_subscriptions(self.request.user):
             return Response({
                 'error': 'Now you have active subscriptions!'
@@ -75,6 +80,7 @@ class StripeCheckoutSessionAPIView(StripeMixin,
 
         checkout_session_id = self.create_checkout_session(
             self.request.user.id,
+            plan,
             serializer.data.get('success_url'),
             serializer.data.get('cancel_url')
         )
