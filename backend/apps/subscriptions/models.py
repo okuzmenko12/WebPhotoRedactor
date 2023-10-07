@@ -53,11 +53,11 @@ class UserSubscription(models.Model):
 
     plan = models.ForeignKey(Plan,
                              on_delete=models.CASCADE,
-                             verbose_name='Subscription')
+                             verbose_name='Plan')
     user = models.ForeignKey(User,
                              on_delete=models.CASCADE,
                              verbose_name='User',
-                             related_name='subscription')
+                             related_name='subscriptions')
     start_time = models.DateTimeField(verbose_name='Subscription starting date',
                                       blank=True,
                                       null=True)

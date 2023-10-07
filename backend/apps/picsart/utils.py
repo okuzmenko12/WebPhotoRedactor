@@ -1,5 +1,6 @@
 import os
 import binascii
+
 from enum import Enum
 
 

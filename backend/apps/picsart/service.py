@@ -51,7 +51,7 @@ class ImageFilesMixin:
         width, height = pillow_img.size
 
         for factor in factors:
-            if factor * width and factor * height < 16000:
+            if factor * width < 16000 and factor * height < 16000:
                 return factor
         return None
 
