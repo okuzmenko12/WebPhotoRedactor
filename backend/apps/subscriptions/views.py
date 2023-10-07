@@ -60,7 +60,7 @@ class StripeCheckoutSessionAPIView(StripeMixin,
     serializer_class = StripeCheckoutSerializer
     permission_classes = [IsAuthenticated]
 
-    def get(self, *args, **kwargs):
+    def post(self, *args, **kwargs):
         if self.user_have_active_subscriptions(self.request.user):
             return Response({
                 'error': 'Now you have active subscriptions!'
