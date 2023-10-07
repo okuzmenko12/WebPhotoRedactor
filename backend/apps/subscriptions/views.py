@@ -11,24 +11,40 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
 from .models import Plan, UserSubscription
-from .services import PayPalService, StripeMixin, PaymentService
+from .services import (PayPalService,
+                       StripeMixin,
+                       PaymentService,
+                       UserSubscriptionsService)
 from .serializers import (CreateUserSubscriptionSerializer,
                           StripeCheckoutSerializer,
                           PlanSerializer)
 
 
-class CreatePaypalUserSubscriptionAPIView(PayPalService, APIView):
+class CreatePaypalUserSubscriptionAPIView(UserSubscriptionsService,
+                                          PayPalService,
+                                          APIView):
     serializer_class = CreateUserSubscriptionSerializer
     permission_classes = [IsAuthenticated]
 
     def post(self, *args, **kwargs):
+        if self.user_have_active_subscriptions(self.request.user):
+            return Response({
+                'error': 'Now you have active subscriptions!'
+                         ' At the same time you can have only one.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         serializer = self.serializer_class(data=self.request.data)
         serializer.is_valid(raise_exception=True)
         subscription = self.create_user_subscription(
             self.request.user,
             serializer.data.get('subscription_id')
         )
-        return Response({'STATUS': subscription.status})
+
+
+
+        return Response({
+            'success': f'You successfully bought {subscription.plan.name}!'
+        }, status=status.HTTP_201_CREATED)
 
 
 class StripeConfigAPIView(APIView):
@@ -38,16 +54,33 @@ class StripeConfigAPIView(APIView):
         return Response(config, status=status.HTTP_200_OK)
 
 
-class StripeCheckoutSessionAPIView(StripeMixin, APIView):
+class StripeCheckoutSessionAPIView(StripeMixin,
+                                   UserSubscriptionsService,
+                                   APIView):
     serializer_class = StripeCheckoutSerializer
     permission_classes = [IsAuthenticated]
 
     def get(self, *args, **kwargs):
+        if self.user_have_active_subscriptions(self.request.user):
+            return Response({
+                'error': 'Now you have active subscriptions!'
+                         ' At the same time you can have only one.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        plan_pk = self.kwargs['plan_pk']
+        plan = self.get_plan_by_pk(plan_pk)
+
+        if plan is None:
+            return Response({
+                'error': 'No such plan with provided ID'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         serializer = self.serializer_class(data=self.request.data)
         serializer.is_valid(raise_exception=True)
 
         checkout_session_id = self.create_checkout_session(
             self.request.user.id,
+            plan,
             serializer.data.get('success_url'),
             serializer.data.get('cancel_url')
         )

@@ -1,7 +1,10 @@
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import generics, status
+from rest_framework.views import APIView
 
+from .models import User
+from .token import TokenTypes, AuthTokenMixin, get_token_data
 from .serializers import (RegistrationSerializer,
                           ChangeEmailSerializer,
                           SendPasswordResetMailSerializer,
@@ -9,9 +12,7 @@ from .serializers import (RegistrationSerializer,
                           UserSerializer)
 from .permissions import IsNotAuthenticated, IsUserOrReadOnly
 
-from rest_framework.views import APIView
-from .models import User
-from .token import TokenTypes, AuthTokenMixin, get_token_data
+from apps.picsart.models import UserFunctionsUsageCounter
 
 
 class UserRegistrationAPIView(AuthTokenMixin,
@@ -49,6 +50,8 @@ class ConfirmEmailAPIView(AuthTokenMixin,
             user.is_active = True
             user.save()
             token_data.token.delete()
+            if not UserFunctionsUsageCounter.objects.filter(user=user).exists():
+                UserFunctionsUsageCounter.objects.get_or_create(user=user)
             return Response({'success': 'You successfully registered and confirmed your email!'},
                             status=status.HTTP_200_OK)
         else:

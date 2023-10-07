@@ -1,9 +1,14 @@
 import os
+from io import BytesIO
+
+from urllib.parse import urlparse
+from urllib.request import urlopen, Request
+
 import requests
 import cv2
 import numpy as np
 
-from PIL import Image
+from PIL import Image, ImageDraw
 
 from django.conf import settings
 
@@ -51,7 +56,7 @@ class ImageFilesMixin:
         width, height = pillow_img.size
 
         for factor in factors:
-            if factor * width and factor * height < 16000:
+            if factor * width < 16000 and factor * height < 16000:
                 return factor
         return None
 
@@ -123,9 +128,59 @@ class JPEGArtifactsRemoverMixin:
 class PCsService(RequestContextMixin,
                  ImageFilesMixin,
                  JPEGArtifactsRemoverMixin):
+    free_version = True
+
+    @staticmethod
+    def _add_watermark_to_url_image(image_url):
+        hdr = {
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) '
+                          'Chrome/23.0.1271.64 Safari/537.11',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+            'Accept-Encoding': 'none',
+            'Accept-Language': 'en-US,en;q=0.8',
+            'Connection': 'keep-alive'}
+
+        req = Request(image_url, headers=hdr)
+
+        response = urlopen(req)
+        image_data = BytesIO(response.read())
+        image = Image.open(image_data)
+
+        watermark_img = Image.open('watermark/watermark.png')
+        width, height = image.size
+        watermark_img = watermark_img.resize((width, height), Image.Resampling.LANCZOS)
+
+        image.paste(watermark_img, (0, 0), watermark_img)
+
+        if not os.path.exists('media'):
+            os.makedirs('media', exist_ok=True)
+        image_token = generate_token()
+        os.mkdir(f'media/{image_token}')
+
+        parsed_url = urlparse(image_url)
+        image_name = os.path.basename(parsed_url.path).split('.')[0]
+        media_path = os.path.join('media', f'{image_token}/{image_name}.png')
+
+        image.save(media_path)
+
+        return media_path
+
+    def get_pillow_img(self, serializer_img, for_bg_remove=False):
+        image = Image.open(serializer_img)
+        if self.free_version and not for_bg_remove:
+            ImageDraw.Draw(image)
+            watermark_img = Image.open('watermark/watermark.png')
+            width, height = image.size
+            watermark_img = watermark_img.resize((width, height), Image.Resampling.LANCZOS)
+
+            position1 = (50, 50)
+            image.paste(watermark_img, position1, watermark_img)
+
+        return image
 
     def upscale(self, serializer_img):
-        pillow_img = Image.open(serializer_img)
+        pillow_img = self.get_pillow_img(serializer_img)
         image = self.get_normalized_image(pillow_img)
         payload = {'upscale_factor': self.get_upscale_factor(pillow_img)}
         response = requests.post(
@@ -137,7 +192,7 @@ class PCsService(RequestContextMixin,
         return response.json()
 
     def remove_bg(self, serializer_img):
-        pillow_img = Image.open(serializer_img)
+        pillow_img = self.get_pillow_img(serializer_img, for_bg_remove=True)
         image = self.get_normalized_image(pillow_img)
         payload = {'format': 'PNG',
                    'output_type': 'cutout'}
@@ -147,11 +202,18 @@ class PCsService(RequestContextMixin,
             headers=self.headers,
             files={'image': image}
         )
-        return response.json()
+
+        response_data = response.json()
+
+        if response.status_code == 200 and self.free_version:
+            image_url = response_data.get('data').get('url')
+            image_path = self._add_watermark_to_url_image(image_url)
+            return image_path
+        return response_data
 
     def remove_jpeg_artifacts(self, serializer_img):
         image_name: str = serializer_img.name.split('.')[0]
-        pillow_img = Image.open(serializer_img)
+        pillow_img = self.get_pillow_img(serializer_img)
         byte_image = self.get_normalized_image(pillow_img,
                                                artifacts_removing=True)
         path = self.remove_artifacts(byte_image, image_name)
@@ -174,3 +236,9 @@ class PCsService(RequestContextMixin,
             ImageEnhanceTypes.remove_bg: self.remove_bg,
             ImageEnhanceTypes.remove_jpeg_artifacts: self.remove_jpeg_artifacts
         }
+
+
+def get_count_of_enhances_for_field(user, counter_field):
+    counter_of_usage = user.counter_of_usage
+    count = getattr(counter_of_usage, counter_field)
+    return count

@@ -313,6 +313,7 @@ class StripeMixin(StripeAPIMixin):
     def create_checkout_session(
             self,
             client_id,
+            plan: Plan,
             success_url=None,
             cancel_url=None
     ):
@@ -325,7 +326,7 @@ class StripeMixin(StripeAPIMixin):
             mode='subscription',
             line_items=[
                 {
-                    'price': 'price_1NxyS9GesdYQAHLiLisGJGb5',
+                    'price': plan.stripe_price_id,
                     'quantity': 1,
                 }
             ]
@@ -413,3 +414,37 @@ class StripeMixin(StripeAPIMixin):
 class PaymentService:
     paypal = PayPalService()
     stripe = StripeMixin()
+
+
+class UserSubscriptionsService:
+
+    @staticmethod
+    def get_plan_by_pk(plan_pk):
+        if Plan.objects.filter(id=plan_pk).exists():
+            return Plan.objects.get(id=plan_pk)
+        return None
+
+    @staticmethod
+    def user_have_active_subscriptions(user: User) -> bool:
+        if user.subscriptions.filter(status='ACTIVE').exists():
+            return True
+        return False
+
+    @staticmethod
+    def get_active_subscription(user_pk):
+        """
+        If user have more than one active
+        subscription, method will return None.
+        In the other case, it will return
+        user subscription instance.
+        """
+        user = get_user_by_id(user_pk)
+        if user is None:
+            return None
+
+        user_active_subs = user.subscriptions.filter(status='ACTIVE')
+
+        if user_active_subs.exists() and user_active_subs.count() == 1:
+            subscription = user.subscriptions.get(status='ACTIVE')
+            return subscription
+        return None

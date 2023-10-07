@@ -3,7 +3,7 @@
 console.log("Sanity check!");
 
 // Get Stripe publishable key
-fetch("/api/v1/subscriptions/config/")
+fetch("/api/v1/subscriptions/stripe/config/")
 .then((result) => { return result.json(); })
 .then((data) => {
   // Initialize Stripe.js
@@ -16,7 +16,7 @@ fetch("/api/v1/subscriptions/config/")
   if (submitBtn !== null) {
     submitBtn.addEventListener("click", () => {
     // Get Checkout Session ID
-    fetch("/api/v1/subscriptions/create-checkout-session/")
+    fetch("/api/v1/subscriptions/stripe/create_checkout_session/15/")
       .then((result) => { return result.json(); })
       .then((data) => {
         console.log(data);
