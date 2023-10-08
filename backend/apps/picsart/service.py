@@ -14,6 +14,8 @@ from django.conf import settings
 
 from .models import JPEGArtifactsImages
 from .utils import generate_token, ImageEnhanceTypes
+from apps.subscriptions.models import Plan
+from apps.users.models import User
 
 
 class RequestContextMixin:
@@ -242,3 +244,27 @@ def get_count_of_enhances_for_field(user, counter_field):
     counter_of_usage = user.counter_of_usage
     count = getattr(counter_of_usage, counter_field)
     return count
+
+
+def decrease_count_of_enhances_for_field(
+        user,
+        counter_field,
+        value
+):
+    counter_of_usage = user.counter_of_usage
+    old_value = getattr(counter_of_usage, counter_field)
+    if old_value != 0:
+        new_value = old_value - value
+    else:
+        new_value = 0
+    setattr(counter_of_usage, counter_field, new_value)
+    counter_of_usage.save()
+
+
+def add_count_of_usage_for_user(user: User, plan: Plan):
+    counter_of_usage = user.counter_of_usage
+
+    counter_of_usage.up_scales_count += plan.up_scales_count
+    counter_of_usage.bg_deletions_count += plan.bg_deletions_count
+    counter_of_usage.jpg_artifacts_deletions_count += plan.jpg_artifacts_deletions_count
+    counter_of_usage.save()

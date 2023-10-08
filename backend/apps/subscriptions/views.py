@@ -18,6 +18,7 @@ from .services import (PayPalService,
 from .serializers import (CreateUserSubscriptionSerializer,
                           StripeCheckoutSerializer,
                           PlanSerializer)
+from apps.picsart.service import add_count_of_usage_for_user
 
 
 class CreatePaypalUserSubscriptionAPIView(UserSubscriptionsService,
@@ -40,7 +41,7 @@ class CreatePaypalUserSubscriptionAPIView(UserSubscriptionsService,
             serializer.data.get('subscription_id')
         )
 
-
+        add_count_of_usage_for_user(self.request.user, subscription.plan)
 
         return Response({
             'success': f'You successfully bought {subscription.plan.name}!'
