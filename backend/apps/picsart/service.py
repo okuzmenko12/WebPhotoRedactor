@@ -183,6 +183,18 @@ class PCsService(RequestContextMixin,
 
         return image
 
+    @staticmethod
+    def get_normalized_data_from_api_service(
+            response_data
+    ) -> dict | None:
+        data = None
+        if response_data.get('status') == 'success':
+            resp_data = response_data.get('data')
+            data = {
+                'image': resp_data.get('url')
+            }
+        return data
+
     def upscale(self, serializer_img):
         pillow_img = self.get_pillow_img(serializer_img)
         image = self.get_normalized_image(pillow_img)
@@ -193,7 +205,8 @@ class PCsService(RequestContextMixin,
             headers=self.headers,
             files={'image': image}
         )
-        return response.json()
+        data = self.get_normalized_data_from_api_service(response.json())
+        return data
 
     def remove_bg(self, serializer_img):
         pillow_img = self.get_pillow_img(serializer_img, for_bg_remove=True)
@@ -209,11 +222,15 @@ class PCsService(RequestContextMixin,
 
         response_data = response.json()
 
+        data = self.get_normalized_data_from_api_service(response.json())
+
         if response.status_code == 200 and self.free_version:
             image_url = response_data.get('data').get('url')
             image_path = self._add_watermark_to_url_image(image_url)
-            return image_path
-        return response_data
+            return {
+                'image': f'{settings.BACK_DOMAIN_URL}/{image_path}'
+            }
+        return data
 
     def remove_jpeg_artifacts(self, serializer_img):
         image_name: str = serializer_img.name.split('.')[0]
@@ -221,7 +238,9 @@ class PCsService(RequestContextMixin,
         byte_image = self.get_normalized_image(pillow_img,
                                                artifacts_removing=True)
         path = self.remove_artifacts(byte_image, image_name)
-        return f'{settings.BACK_DOMAIN_URL}/{path}'
+        return {
+            'image': f'{settings.BACK_DOMAIN_URL}/{path}'
+        }
 
     @classmethod
     def validate_image_format(cls, serializer_img):
