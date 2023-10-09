@@ -20,38 +20,54 @@
                 </router-link>
             </div>
         </div>
-        <div class="nav__auth-btn white">
-            <router-link to="/login" class="auth link">Log in</router-link >
-            <router-link to="/signup" class="log-in__btn auth link">Sign up</router-link >
-        </div>
+
+        <template v-if="!isAuthenticated">
+            <div class="nav__auth-btn white">
+                <router-link to="/login" class="auth link">Log in</router-link>
+                <router-link to="/signup" class="log-in__btn auth link">Sign up</router-link>
+            </div>
+        </template>
+        <template v-else>
+            <router-link to="/profile" class="auth link">Profile</router-link>
+        </template>
         <router-view/>
     </nav>
 </template>
 
 <script>
-export default {
-    mounted() {
-        const navBar = document.getElementById('navbar-nav');
+    import { fetchToken } from '@/Auth.js';
+    export default {
+        mounted() {
+            const navBar = document.getElementById('navbar-nav');
 
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 0) {
-                navBar.classList.add('scrolled');
-            } else {
-                navBar.classList.remove('scrolled');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 0) {
+                    navBar.classList.add('scrolled');
+                } else {
+                    navBar.classList.remove('scrolled');
+                }
+            });
+        },
+        data() {
+            return {
+                isAuthenticated: false
             }
-        });
-    },
-    methods: {
-        navbarToggle() {
-            const navbar = document.getElementById('navbar-nav')
-            const button = document.getElementById('mobile__btn')
-            const closeButton = document.getElementById('mobile__btn_close')
-            navbar.classList.toggle('visible')
-            closeButton.classList.toggle('visible')
-            button.classList.toggle('hide')
+        },
+        async created() {
+            const result = await fetchToken();
+            this.isAuthenticated = result;
+        },
+        methods: {
+            navbarToggle() {
+                const navbar = document.getElementById('navbar-nav')
+                const button = document.getElementById('mobile__btn')
+                const closeButton = document.getElementById('mobile__btn_close')
+                navbar.classList.toggle('visible')
+                closeButton.classList.toggle('visible')
+                button.classList.toggle('hide')
+            }
         }
     }
-}
 </script>
 
 <style>

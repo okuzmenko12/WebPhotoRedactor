@@ -16,7 +16,6 @@ from .services import (PayPalService,
                        PaymentService,
                        UserSubscriptionsService)
 from .serializers import (CreateUserSubscriptionSerializer,
-                          StripeCheckoutSerializer,
                           PlanSerializer)
 from apps.picsart.service import add_count_of_usage_for_user
 
@@ -58,7 +57,6 @@ class StripeConfigAPIView(APIView):
 class StripeCheckoutSessionAPIView(StripeMixin,
                                    UserSubscriptionsService,
                                    APIView):
-    serializer_class = StripeCheckoutSerializer
     permission_classes = [IsAuthenticated]
 
     def post(self, *args, **kwargs):
@@ -76,14 +74,9 @@ class StripeCheckoutSessionAPIView(StripeMixin,
                 'error': 'No such plan with provided ID'
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = self.serializer_class(data=self.request.data)
-        serializer.is_valid(raise_exception=True)
-
         checkout_session_id = self.create_checkout_session(
             self.request.user.id,
-            plan,
-            serializer.data.get('success_url'),
-            serializer.data.get('cancel_url')
+            plan
         )
         if checkout_session_id is None:
             return Response({

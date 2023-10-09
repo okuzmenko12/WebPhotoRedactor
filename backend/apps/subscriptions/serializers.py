@@ -15,15 +15,6 @@ class CreateUserSubscriptionSerializer(serializers.Serializer):
                                             max_length=250)
 
 
-class StripeCheckoutSerializer(serializers.Serializer):
-    success_url = serializers.CharField(max_length=350,
-                                        required=False,
-                                        label='Success URL')
-    cancel_url = serializers.CharField(max_length=350,
-                                       required=False,
-                                       label='Cancel URL')
-
-
 class PlanSerializer(serializers.ModelSerializer):
     period_in_str = serializers.SerializerMethodField(read_only=True)
 

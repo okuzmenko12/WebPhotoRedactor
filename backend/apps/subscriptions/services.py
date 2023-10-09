@@ -313,15 +313,13 @@ class StripeMixin(StripeAPIMixin):
     def create_checkout_session(
             self,
             client_id,
-            plan: Plan,
-            success_url=None,
-            cancel_url=None
+            plan: Plan
     ):
         self.configure_stripe()
         checkout_session = stripe.checkout.Session.create(
             client_reference_id=client_id,
-            success_url=success_url if success_url is not None else settings.STRIPE_SUCCESS_URL,
-            cancel_url=cancel_url if cancel_url is not None else settings.STRIPE_CANCEL_URL,
+            success_url=settings.STRIPE_SUCCESS_URL,
+            cancel_url=settings.STRIPE_CANCEL_URL,
             payment_method_types=['card'],
             mode='subscription',
             line_items=[

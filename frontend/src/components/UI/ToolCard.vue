@@ -3,6 +3,7 @@
         <div class="tool-card-top no-margin">
             <p class="fs--25 fw--900 no-margin">{{ name }}</p>
         </div>
+        <slider-comp :before_img="before_img" :after_img="after_img" />
         <div class="tool-card-desc no-margin">
             <p class="small_text fs--15 fw--700 no-margin tool-desc-elem">
                 {{ description }}
@@ -13,10 +14,16 @@
 </template>
 
 <script>
+    import SliderComp from "@/components/SliderComp.vue";
     export default {
+        components: {
+            SliderComp
+        },
         props: {
             name: String,
-            description: String
+            description: String,
+            before_img: String,
+            after_img: String
         },
         data() {
             return {
@@ -39,6 +46,7 @@
     flex-direction: column;
     align-items: center;
     padding: 20px 0;
+    gap: 20px;
     box-sizing: border-box;
     border: 4px solid transparent;
     z-index: 1;
@@ -80,7 +88,7 @@
 
 .readmore__btn {
     width: 100px;
-    height: 45px;
+    height: 90px;
     border: 0;
     display: flex;
     align-items: center;
@@ -97,5 +105,12 @@
 
 .readmore__btn:hover {
     background-position: 100% 50%;
+}
+
+@media (max-width: 480px) {
+    .tool-card {
+        width: 95%;
+        height: 400px;       
+    }
 }
 </style>

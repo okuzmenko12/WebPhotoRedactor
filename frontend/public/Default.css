@@ -11,6 +11,7 @@ body {
     --secondary_color: #d091fa;
     --secondary_hover_color: #9069aa;
     --first_darker_color: #7273a3;
+    --brand-gradient: -webkit-linear-gradient(10deg,#902EF2 0%,#FF62B7 100%);
 
 }
 
@@ -29,9 +30,20 @@ body {
     margin: 0;
 }
 
-.headet_text {
+.no-top {
+    margin-top: 0
+}
+
+.header_text {
     -webkit-text-fill-color: transparent;
     background: -webkit-linear-gradient(-56deg, rgb(248, 248, 249), rgb(144, 145, 154));
+    -webkit-background-clip: text;
+    text-align: center;
+}
+
+.brand_text {
+    -webkit-text-fill-color: transparent;
+    background: var(--brand-gradient);
     -webkit-background-clip: text;
 }
 
@@ -46,6 +58,11 @@ body {
 .fs--40 {
     font-size: 40px;
 }
+
+.fs--33 {
+    font-size: 33px;
+}
+
 
 .fs--25 {
     font-size: 25px;
@@ -95,6 +112,23 @@ body {
 
 .green-circle {
     background-color: var(--secondary_color);
+}
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #020414;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #353535;
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #333333;
 }
 
 @media (min-width: 1400px) and (max-width: 1599px) {
