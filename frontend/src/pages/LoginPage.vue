@@ -6,8 +6,8 @@
         </div>
         <form class="auth-form" @submit.prevent>
             <h1>Log In</h1>
-            <input-ui maxlength="50" v-model="email" placeholder="Email"/>
-            <input-ui maxlength="50" v-model="password" placeholder="Password"/>
+            <input-ui maxlength="50" v-model="email" pr="Email"/>
+            <input-ui maxlength="50" v-model="password" :passwordType="true" pr="Password"/>
             <button class="auth__authpage__btn" @click="sendLogInRequest">Log in</button>
             <h5 id="message__auth">{{ message }}</h5>
         </form>
@@ -19,6 +19,7 @@
     import InputUi from "@/components/UI/InputUi.vue";
     import handlePopState from "@/utils/index.js";
     import router from '@/router/router';
+    import { setLocalToken, setLocalRefreshToken, fetchToken } from '@/Auth.js';
     export default {
         components: {
             InputUi
@@ -37,24 +38,31 @@
                 "password": this.password,
                 })
                 .then(res => {
-                    console.log(res)
                     this.message = res.data.message
                     const message = document.getElementById('message__auth')
                     message.style.color = "#00FF00"
+                    setLocalToken(res.data.access)
+                    setLocalRefreshToken(res.data.refresh)
                     router.push({ path: '/' })
                 })
                 .catch(err => {
-                    console.log(err)
                     if (err.response.data.detail) {
                         this.message = err.response.data.detail
                     }
                     const message = document.getElementById('message__auth')
                     message.style.color = "#FF0000"
                 })
+            },
+            async checkToken() {
+                if (await fetchToken()) {
+                    router.push({ path: '/' })
+                }
             }
         },
         mounted() {
-            handlePopState()
+            handlePopState(),
+            this.checkToken(),
+            document.title = `FlexFi Upscale - Log In`
         }
     }
 </script>

@@ -13,7 +13,7 @@
 export default {
     props: {
         question: String,
-        answear: String
+        answear: String,
     },
     data() {
         return {

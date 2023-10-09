@@ -3,13 +3,19 @@
   <div class="pricing-container">
     <div class="pricing-block">
         <div class="tarrifs-row">
-            <card Upcount="100" BgRemcount="100" JPEGcount="100" name="Starter plan" price="12$" time="month" v-model="modalVisible"/>
-            <card Upcount="300" BgRemcount="300" JPEGcount="300" name="Smart plan" price="30$" time="3 monthes" v-model="modalVisible"/>
-            <card Upcount="600" BgRemcount="600" JPEGcount="600" name="Pro plan" price="50$" time="6 monthes" v-model="modalVisible"/>
-            <card Upcount="1000" BgRemcount="1000" JPEGcount="1000" name="Fancy plan" price="90$" time="year" v-model="modalVisible"/>
+          <card v-for="(plan) in plans"
+              :key="plan.id"
+              :sub_id="plan.id"
+              :Upcount="plan.up_scales_count"
+              :BgRemcount="plan.bg_deletions_count"
+              :JPEGcount="plan.jpg_artifacts_deletions_count"
+              :name="plan.name"
+              :price="plan.price + '$'"
+              :time="plan.period_in_str"
+              :PayPal="plan.paypal_plan_id"
+          />
         </div>
     </div>
-    <sub-modal-wind v-if="modalVisible" v-model="modalVisible" />
   </div>
   <footer-comp />
 </template>
@@ -19,20 +25,24 @@
   import NavbarComp from "@/components/NavbarComp.vue";
   import FooterComp from "@/components/FooterComp.vue";
   import handlePopState from "@/utils/index.js";
-  import SubModalWind from "@/components/SubscriptionModalWindow.vue"
+  import axios from 'axios';
   export default {
     components: {
       Card,
       NavbarComp,
-      FooterComp,
-      SubModalWind
+      FooterComp
     },
     mounted() {
-      handlePopState()
+      handlePopState(),
+      axios.get(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/subscriptions/all`)
+      .then(res => {
+        this.plans = res.data
+      })
+      document.title = `FlexFi Upscale - Pricing`
     },
     data() {
       return {
-          modalVisible: false
+          plans: []
       };
     }
   }
