@@ -24,11 +24,7 @@ class JPEGArtifactsImages(models.Model):
         return binascii.hexlify(os.urandom(16)).decode()
 
 
-class UserFunctionsUsageCounter(models.Model):
-    user = models.OneToOneField(User,
-                                on_delete=models.CASCADE,
-                                verbose_name='User',
-                                related_name='counter_of_usage')
+class AbstractFunctionsUsageCounter(models.Model):
     up_scales_count = models.IntegerField(
         default=0,
         verbose_name='Up scales count'
@@ -43,9 +39,45 @@ class UserFunctionsUsageCounter(models.Model):
     )
 
     class Meta:
-        db_table = 'user_functions_usage_counter'
+        abstract = True
         verbose_name = 'counter'
-        verbose_name_plural = 'Usage counters'
+
+
+class UserFunctionsUsageCounter(AbstractFunctionsUsageCounter):
+    user = models.OneToOneField(User,
+                                on_delete=models.CASCADE,
+                                verbose_name='User',
+                                related_name='counter_of_usage')
+
+    class Meta:
+        db_table = 'user_functions_usage_counter'
+        verbose_name_plural = 'Usage counters (Authenticated users)'
 
     def __str__(self):
-        return f'Counter for {self.user}'
+        return f'Counter for: {self.user.username}'
+
+
+class AnonymousUserFunctionsUsageCounter(AbstractFunctionsUsageCounter):
+    ip_address = models.GenericIPAddressField(max_length=25,
+                                              verbose_name='IP Address',
+                                              unique=True)
+
+    class Meta:
+        db_table = 'ip_functions_usage_counter'
+        verbose_name_plural = 'Usage counters (Anonymous users)'
+
+    def __str__(self):
+        return f'Counter for: {self.ip_address}'
+
+
+class FreeEnhancesLimit(models.Model):
+    limit = models.IntegerField(default=5,
+                                verbose_name='Limit for free using of all features')
+
+    class Meta:
+        db_table = 'free_enhances_limit'
+        verbose_name = 'limit'
+        verbose_name_plural = 'Free enhances limit'
+
+    def __str__(self):
+        return f'Limit: {str(self.limit)}'

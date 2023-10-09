@@ -12,8 +12,10 @@ from PIL import Image, ImageDraw
 
 from django.conf import settings
 
-from .models import JPEGArtifactsImages
-from .utils import generate_token, ImageEnhanceTypes
+from .models import (JPEGArtifactsImages,
+                     AnonymousUserFunctionsUsageCounter,
+                     FreeEnhancesLimit)
+from .utils import generate_token, ImageEnhanceTypes, CounterModelEnhanceFields
 from apps.subscriptions.models import Plan
 from apps.users.models import User
 
@@ -238,6 +240,55 @@ class PCsService(RequestContextMixin,
             ImageEnhanceTypes.remove_bg: self.remove_bg,
             ImageEnhanceTypes.remove_jpeg_artifacts: self.remove_jpeg_artifacts
         }
+
+
+class IPAddressesUsageCountMixin:
+
+    @staticmethod
+    def get_features_max_value_of_free_usage():
+        default_limit = 5
+        limit_instance = FreeEnhancesLimit.objects.first()
+        if limit_instance is None:
+            return default_limit
+        return limit_instance.limit
+
+    @staticmethod
+    def get_or_create_ip(ip_address):
+        if ip_address is not None:
+            model_objects = AnonymousUserFunctionsUsageCounter.objects
+            data = {
+                'ip_address': ip_address
+            }
+            if not model_objects.filter(
+                    **data
+            ).exists():
+                return model_objects.create(
+                    **data
+                )
+            return model_objects.get(
+                **data
+            )
+        return None
+
+    def ip_attempts_for_field(
+            self,
+            ip_address,
+            enhance_field
+    ):
+        ip = self.get_or_create_ip(ip_address)
+        field_value_count = getattr(ip, enhance_field)
+        return field_value_count
+
+    def ip_increase_field_usage_count(
+            self,
+            ip_address,
+            enhance_field
+    ):
+        ip = self.get_or_create_ip(ip_address)
+        old_value = getattr(ip, enhance_field)
+        new_value = old_value + 1
+        setattr(ip, enhance_field, new_value)
+        ip.save()
 
 
 def get_count_of_enhances_for_field(user, counter_field):
