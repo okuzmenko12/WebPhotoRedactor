@@ -1,5 +1,5 @@
 <template>
-    <div id="slider" class="slider">
+    <div :id="div_id" class="slider">
         <div class="before-slider">
             <div class="slider-resize" data-type="resize"></div>
         </div>
@@ -8,77 +8,100 @@
 </template>
 
 <script>
-    const getTemplate = (state) => {
-        return `
-            <div class="before-slider" style='width: ${state.width}; background-image: url(${state.before})'>
-                <div class="slider-resize" data-type="resize"></div>
-            </div>
-            <div class="after-slider" style='background-image: url(${state.after})'></div>
-            `
-    }
+const getTemplate = (state) => {
+    return `
+        <div class="before-slider" style='width: ${state.width}; background-image: url(${state.before})'>
+            <div class="slider-resize" data-type="resize"></div>
+        </div>
+        <div class="after-slider" style='background-image: url(${state.after})'></div>
+    `;
+}
 
-    class Slider {
-        constructor(selector, state) {
-            this.$slider = document.getElementById(selector)
+class Slider {
+    constructor(element, state) {
+        setTimeout(() => {
+            this.$slider = document.getElementById(element)
             this.state = {
                 ...state,
-                width: state.width || '512px'
-            }
-            this.#render(this.state)
-            this.#listen()
-        }
+                width: state.width || `${this.$slider.parentNode.clientWidth / 2}px`
+            };
+            this.#render(this.state);
+            this.#listen();
+        }, 0)
+    }
 
-        #render() {
-            this.$slider.innerHTML = getTemplate(this.state)
-        }
+    #render(state) {
+        this.$slider.innerHTML = getTemplate(state);
+    }
 
-        #update(props) {
-            this.state = {
-                ...this.state,
-                ...props
-            }
-            this.#render(this.state)
-        }
+    #update(props) {
+        this.state = {
+            ...this.state,
+            ...props
+        };
+        this.#render(this.state);
+    }
 
-        #listen() {
-            this.mouseDownHandler = this.mouseDownHandler.bind(this)
-            this.mouseUpHandler = this.mouseUpHandler.bind(this)
-            this.moveHandler = this.moveHandler.bind(this)
-            this.$slider.addEventListener('mousedown', this.mouseDownHandler)
-            this.$slider.addEventListener('mouseup', this.mouseUpHandler)
-        }
+    #listen() {
+        this.mouseDownHandler = this.mouseDownHandler.bind(this);
+        this.mouseUpHandler = this.mouseUpHandler.bind(this);
+        this.moveHandler = this.moveHandler.bind(this);
+        this.$slider.addEventListener('mousedown', this.mouseDownHandler);
+        this.$slider.addEventListener('mouseup', this.mouseUpHandler);
+    }
 
-        mouseDownHandler(event) {
-            if (event.target.dataset.type === 'resize') {
-                this.currentX = event.clientX;
-                this.$slider.addEventListener('mousemove', this.moveHandler);
-            }
-        }
-
-        mouseUpHandler() {
-            this.$slider.removeEventListener('mousemove', this.moveHandler);
-        }
-
-        moveHandler(event) {
-            let newX = this.currentX - event.clientX;
-            let newWidth = `${parseInt(this.state.width) - newX}px`;
-            this.#update({ width: newWidth });
+    mouseDownHandler(event) {
+        if (event.target.dataset.type === 'resize') {
             this.currentX = event.clientX;
+            this.$slider.addEventListener('mousemove', this.moveHandler);
         }
     }
-    
-    export default {
-        mounted() {
-            const slider = new Slider('slider', {
-                after: 'https://static3.banki.ru/ugc/90/2c/3f/fe/10991560.jpg',
-                before: 'https://exo.in.ua/images/news/2022/03/new-56641.jpg'
-            })
-        }
+
+    mouseUpHandler() {
+        this.$slider.removeEventListener('mousemove', this.moveHandler);
     }
+
+    moveHandler(event) {
+        let newX = this.currentX - event.clientX;
+        let newWidth = `${parseInt(this.state.width) - newX}px`;
+        this.#update({ width: newWidth });
+        this.currentX = event.clientX;
+    }
+}
+
+export default {
+    props: {
+        before_img: String,
+        after_img: String
+    },
+    data() {
+        return {
+            div_id: '',
+        }
+    },
+    methods: {
+        generateId(length) {
+            const characters = 'abcdefghijklmnopqrstuvwxyz0123456789'; // Pool of characters
+            let id = '';
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * characters.length);
+                id += characters[randomIndex];
+            }
+            return id;
+        }
+    },
+    mounted() {
+        this.div_id = this.generateId(6);
+        const slider = new Slider(this.div_id, { // eslint-disable-line
+            after: this.after_img,
+            before: this.before_img
+        });
+    }
+}
 </script>
 
 <style>
-#slider {
+.slider {
     position: relative;
     width: 90%;
     height: 400px;
@@ -92,6 +115,8 @@
     z-index: 2;
     background: no-repeat center center fixed;
     background-size: cover;
+    max-width: 90%;
+    min-width: 10%;
     border-radius: 20px 0 0 20px;
 }
 
@@ -121,6 +146,7 @@
     font-size: 30px;
     top: 50%;
     right: 5px;
+    color: #000;
 }
 
 .slider-resize::after {
@@ -129,5 +155,6 @@
     font-size: 30px;
     top: 50%;
     left: 5px;
+    color: #000;
 }
 </style>

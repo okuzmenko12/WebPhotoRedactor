@@ -1,16 +1,63 @@
 <template>
-    <input :value="modelValue" @input="updateValue" />
-  </template>
-  
-  <script>
-  export default {
-    props: {
-      modelValue: String
+  <div class="input-container">
+    <input v-if="passwordType" :type="showPassword ? 'text' : 'password'" :placeholder="pr" :value="modelValue" @input="updateValue" />
+    <input v-else type="text" :value="modelValue" @input="updateValue" :placeholder="pr" />
+    <span v-if="passwordType" class="eye-icon" @click="toggleVisibility">{{ showPassword ? '👁️' : '👁️‍🗨️' }}</span>
+  </div>
+</template>
+
+<script>
+export default {
+  props: {
+    modelValue: String,
+    passwordType: Boolean,
+    pr: String
+  },
+  data() {
+    return {
+      showPassword: false
+    };
+  },
+  methods: {
+    updateValue(event) {
+      this.$emit('update:modelValue', event.target.value);
     },
-    methods: {
-      updateValue(event) {
-        this.$emit('update:modelValue', event.target.value);
-      }
+    toggleVisibility() {
+      this.showPassword = !this.showPassword;
     }
   }
-  </script>
+};
+</script>
+
+<style>
+
+
+.input-container {
+  position: relative;
+  width: 100%;
+}
+
+.input-container input:focus {
+  width: 100%;
+  height: 35px;
+  background: transparent;
+  padding-left: 20px;
+  box-sizing: border-box;
+  border: 1px #2e2f35 solid;
+  outline: none;
+  border-radius: 10px;
+  transition: .3s;
+}
+
+.input-container input:focus {
+	scale: 110%;
+}
+
+.eye-icon {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+</style>

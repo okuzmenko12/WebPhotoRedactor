@@ -5,6 +5,8 @@ import PricingPage from "@/pages/PricingPage"
 import FeaturesPage from "@/pages/FeaturesPage"
 import LoginPage from "@/pages/LoginPage"
 import SignupPage from "@/pages/SignupPage"
+import ProfilePage from "@/pages/ProfilePage"
+import PaymentPage from "@/pages/PaymentPage"
 
 
 const routes = [
@@ -32,6 +34,16 @@ const routes = [
         path: '/signup',
         name: 'Sign Up',
         component: SignupPage
+    },
+    {
+        path: '/profile',
+        name: 'Profile',
+        component: ProfilePage
+    },
+    {
+        path: '/payment',
+        name: 'Payment',
+        component: PaymentPage
     },
 ]
 

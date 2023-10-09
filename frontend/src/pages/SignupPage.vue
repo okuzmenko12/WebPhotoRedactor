@@ -6,9 +6,9 @@
         </div>
         <form class="auth-form" @submit.prevent>
             <h1>Sign Up</h1>
-            <input-ui maxlength="50" v-model="email" placeholder="Email"/>
-            <input-ui maxlength="50" v-model="password" placeholder="Password"/>
-            <input-ui maxlength="50" v-model="password1" placeholder="Confirm password"/>
+            <input-ui maxlength="50" v-model="email" pr="Email"/>
+            <input-ui maxlength="50" v-model="password" :passwordType="true" :type="showPassword ? 'text' : 'password'" pr="Password"/>
+            <input-ui maxlength="50" v-model="password1" :passwordType="true" :type="showPassword ? 'text' : 'password'" pr="Confirm password"/>
             <button class="auth__authpage__btn" @click="sendSignUpRequest">Sign up</button>
             <h5 id="message__auth">{{ message }}</h5>
         </form>
@@ -19,6 +19,8 @@
     import axios from 'axios';
     import InputUi from "@/components/UI/InputUi.vue";
     import handlePopState from "@/utils/index.js";
+    import router from '@/router/router';
+    import { fetchToken } from '@/Auth.js';
     export default {
         components: {
             InputUi
@@ -28,7 +30,8 @@
                 email: "",
                 password: "",
                 password1: "",
-                message: ""
+                message: "",
+                showPassword: false
             }
         },
         methods: {
@@ -39,13 +42,11 @@
                 "password1": this.password1
                 })
                 .then(res => {
-                    console.log(res)
                     this.message = res.data.message
                     const message = document.getElementById('message__auth')
                     message.style.color = "#00FF00"
                 })
                 .catch(err => {
-                    console.log(err)
                     if (err.response.data.email) {
                         this.message = err.response.data.email[0]
                     } else if (err.response.data.password) {
@@ -58,10 +59,20 @@
                     const message = document.getElementById('message__auth')
                     message.style.color = "#FF0000"
                 })
+            },
+            togglePasswordVisibility() {
+                this.showPassword = !this.showPassword;
+            },
+            async checkToken() {
+                if (await fetchToken()) {
+                    router.push({ path: '/' })
+                }
             }
         },
         mounted() {
-        handlePopState()
+            document.title = `FlexFi Upscale - Sign Up`
+            handlePopState(),
+            this.checkToken()
         }
     }
 </script>
@@ -127,22 +138,6 @@
     flex-direction: column;
     color: #fff;
     gap: 20px;
-}
-
-.auth-form input {
-	width: 100%;
-    height: 35px;
-    background: transparent;
-    padding-left: 20px;
-    box-sizing: border-box;
-    border: 1px #2e2f35 solid;
-    outline: none;
-    border-radius: 10px;
-    transition: .3s;
-}
-
-.auth-form input:focus {
-	scale: 110%;
 }
 
 .auth__authpage__btn {

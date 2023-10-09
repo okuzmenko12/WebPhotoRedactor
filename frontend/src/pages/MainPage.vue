@@ -3,30 +3,41 @@
   <div class="main-container">
     <div class="main-page">
       <div class="whatis-block white">
-        <h1 class="fs--50 fw--700 headet_text">What is FlexFi Upscale?</h1>
+        <p class="brand_text">About us</p>
+        <p class="fs--50 fw--700 header_text no-top">What is FlexFi Upscale?</p>
         <div class="whatis-about">
           <h1 class="fs--25 fw--400 whatis-text-desc small_text">It's a website where you have all tools in your hand. From upscaling to removing bacgkrounds.</h1>
           <div class="whatis-block-block">
-            <router-link class="main_signup_btn" to="/signup">Start upscaling</router-link>
+            <router-link v-if="!isAuthenticated" class="main_signup_btn" to="/signup">Start upscaling</router-link>
+            <router-link v-else class="main_signup_btn" to="/pricing">Buy tarrif</router-link>
           </div>
         </div>
       </div>
       <div class="tools-usage-block">
-        <h1 class="fs--50 fw--700 headet_text">We have many tools for your usage</h1>
+        <p class="brand_text">Our tools</p>
+        <p class="fs--50 fw--700 header_text no-top">We have many tools for your usage</p>
         <div class="tools-cards-block">
           <tool-card name="Upscaling" description="
           Upscale your image resolution and quality just in one click
-          "/>
+          "
+          :before_img="Img"
+          after_img="https://www.meme-arsenal.com/memes/213ea9152c9a595540eed7c536a2d7b5.jpg"
+          />
           <tool-card name="Background remove" description="
           Upscale your image resolution and quality just in one click
-          "/>
+          "
+          before_img="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6ddNfEfwkWVEnC0vExOw8OABWGgDIcWGNig&usqp=CAU"
+          after_img="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ6ddNfEfwkWVEnC0vExOw8OABWGgDIcWGNig&usqp=CAU"
+          />
           <tool-card name="Remove JPEG Artifacts" description="
           Upscale your image resolution and quality just in one click
-          "/>
+          "
+          before_img="https://ichef.bbci.co.uk/news/640/cpsprodpb/1685B/production/_113015229_8.png"
+          after_img="https://ichef.bbci.co.uk/news/640/cpsprodpb/1685B/production/_113015229_8.png"
+          />
         </div>
       </div>
       <often-questions />
-      <slider-comp />
   </div>
   </div>
   <footer-comp />
@@ -37,18 +48,28 @@
   import OftenQuestions from "@/components/OftenQuestion.vue";
   import ToolCard from "@/components/UI/ToolCard.vue";
   import FooterComp from "@/components/FooterComp.vue";
-  import SliderComp from "@/components/SliderComp.vue";
   import handlePopState from "@/utils/index.js";
+  import { fetchToken } from '@/Auth.js';
   export default {
       components: {
           NavbarComp,
           ToolCard,
           OftenQuestions,
           FooterComp,
-          SliderComp
+      },
+      data() {
+        return {
+          Img: require('@/assets/crystal.jpg'),
+          isAuthenticated: false
+        }
+      },
+      async created() {
+        const result = await fetchToken();
+        this.isAuthenticated = result;
       },
       mounted() {
         handlePopState()
+        document.title = `FlexFi Upscale - Main`
       }
   }
 </script>
@@ -68,7 +89,7 @@
   display: flex;
   align-items: center;
   flex-direction: column;
-  gap: 200px;
+  gap: 250px;
   z-index: 1;
 }
 
@@ -198,6 +219,10 @@
 }
 
 @media (max-width: 480px) {
+  .main-page {
+    padding: 20px
+  }
+
   .whatis-block h1 {
     margin: 0;
   }
