@@ -211,6 +211,7 @@ class PCsService(RequestContextMixin,
             headers=self.headers,
             files={'image': image}
         )
+        image.close()
         os.remove(f'media/{image_dict["image_token"]}/{image_dict["image_name"]}.{image_dict["img_format"]}')
         os.rmdir(f'media/{image_dict["image_token"]}')
         data = self.get_normalized_data_from_api_service(response.json())
@@ -232,6 +233,7 @@ class PCsService(RequestContextMixin,
 
         response_data = response.json()
 
+        image.close()
         os.remove(f'media/{image_dict["image_token"]}/{image_dict["image_name"]}.{image_dict["img_format"]}')
         os.rmdir(f'media/{image_dict["image_token"]}')
 
@@ -254,6 +256,7 @@ class PCsService(RequestContextMixin,
 
         path = self.remove_artifacts(byte_image, image_name)
 
+        byte_image.close()
         os.remove(f'media/{image_dict["image_token"]}/{image_dict["image_name"]}.{image_dict["img_format"]}')
         os.rmdir(f'media/{image_dict["image_token"]}')
 
