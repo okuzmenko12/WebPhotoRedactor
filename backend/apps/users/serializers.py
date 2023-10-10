@@ -1,6 +1,8 @@
 from django.contrib.auth.password_validation import validate_password
+
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+
 from .models import User
 from rest_framework.authtoken.models import Token
 
@@ -104,6 +106,28 @@ class PasswordResetSerializer(serializers.Serializer):
                 'New password must not be the same as the old one')
         user.set_password(password)
         user.save()
+        return attrs
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True,
+                                         label='Old password')
+    new_password = serializers.CharField(required=True,
+                                         validators=[validate_password],
+                                         label='New password')
+    new_password_confirm = serializers.CharField(required=True,
+                                                 validators=[validate_password],
+                                                 label='New password confirmation')
+
+    def validate(self, attrs):
+        new_password = attrs['new_password']
+        new_password_confirm = attrs['new_password_confirm']
+
+        if new_password_confirm != new_password:
+            raise serializers.ValidationError(
+                'The new password confirmation is not equals to new password!'
+            )
+
         return attrs
 
 

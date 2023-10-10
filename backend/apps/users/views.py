@@ -9,7 +9,8 @@ from .serializers import (RegistrationSerializer,
                           ChangeEmailSerializer,
                           SendPasswordResetMailSerializer,
                           PasswordResetSerializer,
-                          UserSerializer)
+                          UserSerializer,
+                          ChangePasswordSerializer)
 from .permissions import IsNotAuthenticated, IsUserOrReadOnly
 from .services import get_jwt_tokens_for_user
 
@@ -131,6 +132,34 @@ class PasswordResetAPIView(AuthTokenMixin,
         else:
             return Response({'error': token_data.error},
                             status=status.HTTP_400_BAD_REQUEST)
+
+
+class ChangePasswordAPIView(APIView):
+    serializer_class = ChangePasswordSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, *args, **kwargs):
+        serializer = self.serializer_class(data=self.request.data)
+        serializer.is_valid(raise_exception=True)
+
+        if not self.request.user.check_password(
+                serializer.data.get('old_password')
+        ):
+            return Response({
+                'error': 'The old password is wrong! Check it and try again.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if serializer.data['old_password'] == serializer.data['new_password']:
+            return Response({
+                'error': 'The new password must be different from the old one!'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        self.request.user.set_password(serializer.data['new_password'])
+        self.request.user.save()
+
+        return Response({
+            'success': 'You successfully changed your password!'
+        }, status=status.HTTP_200_OK)
 
 
 class UserAPIView(generics.RetrieveUpdateDestroyAPIView):
