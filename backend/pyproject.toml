@@ -18,6 +18,7 @@ requests = "^2.31.0"
 djangorestframework-simplejwt = "^5.3.0"
 stripe = "^6.6.0"
 django-cors-headers = "^4.2.0"
+drf-spectacular = "^0.26.5"
 
 
 [build-system]

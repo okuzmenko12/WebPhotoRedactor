@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
+    'drf_spectacular',
 
     # applications
     'apps.users',
@@ -140,7 +141,22 @@ BACK_DOMAIN_URL = 'http://localhost:8000'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+# DRF SPECTACULAR
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'FlexFi',
+    'DESCRIPTION': 'Web site for images upscaling, '
+                   'removing jpeg artifacts, removing backgrounds etc.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'CONTACT': {
+        'name': 'VentureX',
+        'url': 'https://t.me/venture_xx'
+    }
 }
 
 # SIMPLE JWT SETTINGS
@@ -342,6 +358,8 @@ JAZZMIN_SETTINGS = {
     # override change forms on a per modeladmin basis
     "changeform_format_overrides": {"auth.user": "carousel", "auth.group": "vertical_tabs"},
 }
+
+# CORS
 
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
