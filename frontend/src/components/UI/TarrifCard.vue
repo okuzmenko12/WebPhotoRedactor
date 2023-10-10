@@ -58,7 +58,7 @@
             BgRemcount: Number,
             JPEGcount: Number,
             PayPal: String,
-            sub_id: String
+            sub_id: Number
         },
         data() {
             return {

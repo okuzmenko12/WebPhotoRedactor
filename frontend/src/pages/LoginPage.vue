@@ -6,8 +6,8 @@
         </div>
         <form class="auth-form" @submit.prevent>
             <h1>Log In</h1>
-            <input-ui maxlength="50" v-model="email" pr="Email"/>
-            <input-ui maxlength="50" v-model="password" :passwordType="true" pr="Password"/>
+            <input-ui max="50" v-model="email" pr="Email"/>
+            <input-ui max="50" v-model="password" :passwordType="true" pr="Password"/>
             <button class="auth__authpage__btn" @click="sendLogInRequest">Log in</button>
             <h5 id="message__auth">{{ message }}</h5>
         </form>

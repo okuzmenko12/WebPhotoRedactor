@@ -113,7 +113,6 @@ export default {
     width: 50%;
     height: 100%;
     z-index: 2;
-    background: no-repeat center center fixed;
     background-size: cover;
     max-width: 90%;
     min-width: 10%;
@@ -125,7 +124,6 @@ export default {
     width: 100%;
     height: 100%;
     z-index: 1;
-    background: no-repeat center center fixed;
     background-size: cover;
     border-radius: 20px;
 }

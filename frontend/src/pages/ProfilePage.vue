@@ -1,48 +1,87 @@
 <template>
-    <navbar-comp />
     <div class="profile-container">
-        <div class="user-info white">
-            <p class="brand_text no-margin">Username</p>
-            <p class="fs--40 fw--900">{{ username }}</p>
-            <p class="brand_text no-margin">Email</p>
-            <p class="fs--40 fw--900">{{ email }}</p>
-            <h5>Ну короче эта фигня ниже будет появляться когда у нашего юзера будет тариф и там нопка будет отменить тариф или как-то так</h5>
+        <div @click="redirectToMain" id="close_modal">
+            <svg height="15px" style="transform: rotate(180deg);" viewBox="0 0 5 9">
+                <path d="M0.419,9.000 L0.003,8.606 L4.164,4.500 L0.003,0.394 L0.419,0.000 L4.997,4.500 L0.419,9.000 Z" ></path>
+            </svg>
+            To Main
         </div>
-        <div class="user-sub-info">
-            <div class="user-left-data white">
-                <p class="brand_text no-margin">Tries left</p>
-                <p class="fs--33 fw--900 no-margin">Upscales: 100</p>
-                <p class="fs--33 fw--900 no-margin">Upscales: 100</p>
-                <p class="fs--33 fw--900 no-margin">Upscales: 100</p>
+        <div class="profile_bar">
+            <div class="white user_info">
+                <p class="no-margin">Hello,</p>
+                <p class="no-margin" style="overflow-wrap: anywhere;">{{ username }}!</p>
             </div>
-            <div class="tarrif-data white">
-                <div>
-                    <p class="brand_text no-margin">Your tarrif:</p>
-                    <p class="fs--40 fw--900 no-margin">Basic plan</p>
+            <div class="profile_buttons">
+                <router-link id="prbtn-1" class="profile_button" :class="{ 'active': isActive('#profile') }" to="#profile">
+                    Profile
+                </router-link>
+                <router-link id="prbtn-2" class="profile_button" :class="{ 'active': isActive('#credits') }" to="#credits">
+                    Credits
+                </router-link>
+                <router-link id="prbtn-3" class="profile_button" :class="{ 'active': isActive('#tarrif') }" to="#tarrif">
+                    Tarrif
+                </router-link>
+            </div>
+        </div>
+        <div class="tab_info-block">
+            <template v-if="$route.hash === '#profile'">
+                <div class="basic_user_info white">
+                    <div class="flex-block column gp--15">
+                        <div class="flex-block baseline gp--15">
+                            <h1 class="fs--25 header_text fw--900">Personal information</h1>
+                            <h5 class="edit_button" @click="changeInputStatus('username-profile-info')">Edit</h5>
+                        </div>
+                        <input-ui max="25" enableReadonly="true" inputId="username-profile-info" @change="handleUsernameChange" v-model="username" />
+                        <button v-if="showUsernameButton" class="change-pass-btn" @click="changeUsername">Change username</button>
+                        <p id="user_message" class="fs--15">{{ user_message }}</p>
+                    </div>
+                    <div class="flex-block column gp--15">
+                        <div class="flex-block baseline gp--15">
+                            <h1 class="fs--25 header_text fw--900">Email</h1>
+                            <h5 class="edit_button" @click="changeInputStatus('email-profile-info')">Edit</h5>
+                        </div>
+                        <input-ui max="50" @change="handleEmailChange" enableReadonly="true" inputId="email-profile-info" v-model="email" />
+                        <button v-if="showEmailButton" class="change-pass-btn" @click="changeEmail">Change email</button>
+                        <p id="email_message" class="fs--15">{{ email_message }}</p>
+                    </div>
+                    <div class="flex-block column gp--15">
+                        <h1 class="fs--25 header_text fw--900">Password reset</h1>
+                        <button class="change-pass-btn" @click="sendChangePasswordRequest">Reset password</button>
+                        <p id="pass_message" class="fs--15">{{ pass_message }}</p>
+                    </div>
                 </div>
-                <button class="cancel-tarrif__btn fw--25 fw--700 white">Cancel tarrif</button>
-                <button class="change-tarrif__btn fw--25 fw--700 white">Change tarrif</button>
-            </div>
+            </template>
+            <template v-else-if="$route.hash === '#credits'">
+                <div></div>
+            </template>
+            <template v-else-if="$route.hash === '#tarrif'">
+                <div></div>
+            </template>
         </div>
     </div>
-    <footer-comp />
 </template>
 
 <script>
-    import axios from 'axios'
+    import axios from 'axios';
     import { getHeaders } from '@/Auth.js';
-    import NavbarComp from "@/components/NavbarComp.vue";
-    import FooterComp from "@/components/FooterComp.vue";
     import handlePopState from "@/utils/index.js";
+    import router from "@/router/router.js";
+    import InputUi from "@/components/UI/InputUi.vue";
     export default {
         components: {
-            NavbarComp,
-            FooterComp
+            InputUi
         },
         data() {
             return {
                 username: "",
-                email: ""
+                email: "",
+                Stusername: "",
+                Stemail: "",
+                user_message: "",
+                email_message: "",
+                pass_message: "",
+                showEmailButton: false,
+                showUsernameButton: false,
             }
         },
         async mounted() {
@@ -51,127 +90,239 @@
                 document.title = `FlexFi Upscale - ${res.data.username}`
                 this.username = res.data.username
                 this.email = res.data.email
-            }),
+                this.Stusername = res.data.username
+                this.Stemail = res.data.email
+            })
+            .catch(() => {
+                router.push({ path: "/" })
+            })
             handlePopState()
+        },
+        methods: {
+            sendChangePasswordRequest() {
+                axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/auth/password_reset/`, { 'email': this.email }, { headers: getHeaders() })
+                .then(res => {
+                    this.pass_message = res.data.success
+                    const passObj = document.getElementById('pass_message')
+                    passObj.style.color = "#00FF00"
+                })
+            },
+            redirectToMain() {
+                router.push({ path: "/" })
+            },
+            handleEmailChange() {
+                if (this.Stemail == this.email) {
+                    this.showEmailButton = false;
+                } else {
+                    this.showEmailButton = true;
+                }
+            },
+            handleUsernameChange() {
+                if (this.Stusername == this.username) {
+                    this.showUsernameButton = false;
+                } else {
+                    this.showUsernameButton = true;
+                }
+            },
+            changeEmail() {
+                axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/auth/change_email/`, { 'email': this.email }, { headers: getHeaders() })
+                .then(res => {
+                    this.email_message = res.data.success
+                    const passObj = document.getElementById('email_message')
+                    passObj.style.color = "#00FF00"
+                })
+                .catch(() => {
+                    if (this.Stemail == this.email) {
+                        this.showEmailButton = false;
+                        this.email_message = 'Please write a new one!'
+                        const passObj = document.getElementById('email_message')
+                        passObj.style.color = "#FF0000"
+                    }
+                })
+            },
+            changeUsername() {
+                axios.patch(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/auth/user/`, { 'username': this.validateUsername() }, { headers: getHeaders() })
+                .then(res => {
+                    console.log(res);
+                    this.user_message = `Username was successfuly change to ${res.data.username}`
+                    this.Stusername = res.data.username
+                    const passObj = document.getElementById('user_message')
+                    passObj.style.color = "#00FF00"
+                })
+                .catch(() => {
+                    if (this.Stusername == this.username) {
+                        this.showUsernameButton = false;
+                        this.user_message = 'Please write a new one!'
+                        const passObj = document.getElementById('user_message')
+                        passObj.style.color = "#FF0000"
+                    }
+                })
+            },
+            changeInputStatus(id) {
+                const input = document.getElementById(id);
+                console.log(input.readOnly);
+                if (input.hasAttribute('readonly')) {
+                    input.removeAttribute('readonly');
+                } else {
+                    input.setAttribute('readonly', true);
+                }
+            },
+            generateId(length) {
+                const characters = 'abcdefghijklmnopqrstuvwxyz0123456789';
+                let id = '';
+                for (let i = 0; i < length; i++) {
+                    const randomIndex = Math.floor(Math.random() * characters.length);
+                    id += characters[randomIndex];
+                }
+                return id;
+            },
+            validateUsername() {
+                const usrnm = this.username.split("")
+                if (usrnm[0] !== "@") {
+                    return "@" + usrnm.join("")
+                } else if (usrnm.length < 4) {
+                    return "@user"
+                } else {
+                    return usrnm.join("")
+                }
+            },
+            isActive(hash) {
+                return this.$route.hash === hash;
+            }
         }
     }
 </script>
 
 <style>
 .profile-container {
-    position: relative;
+    position: fixed;
     width: 100%;
     height: auto;
     display: flex;
-    padding-top: 200px;
     box-sizing: border-box;
-    justify-content: center;
+    justify-content: left;
     align-items: center;
-    flex-direction: column;
     z-index: 1;
-    gap: 20px;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background-color: #171921;
 }
 
-.user-sub-info {
-    width: 90%;
-    height: 250px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 20px;
-}
-
-.tarrif-data {
-    border-radius: 20px;
-    width: 50%;
-    height: 100%;
-    box-sizing: border-box;
-    background: linear-gradient(#171921, #171921) padding-box,
-    linear-gradient(to right, var(--first_color), var(--secondary_color)) border-box;
-    border: 4px solid transparent;
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    gap: 20px
-}
-
-.user-left-data {
-    border-radius: 20px;
-    width: 50%;
-    height: 100%;
-    box-sizing: border-box;
-    background: linear-gradient(#171921, #171921) padding-box,
-    linear-gradient(to right, var(--first_color), var(--secondary_color)) border-box;
-    border: 4px solid transparent;
-    padding: 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    gap: 20px
-}
-
-.cancel-tarrif__btn {
-    width: 150px;
-    background-color: #FF0066;
-    border-radius: 4px;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: .3s;
-}
-
-.cancel-tarrif__btn:hover {
-    background-color: #ba044d;
-}
-
-.change-tarrif__btn {
-    width: 150px;
-    background-color: #74f77d;
-    border-radius: 4px;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    transition: .3s;
-}
-
-.change-tarrif__btn:hover {
-    background-color: #51bd59;
-}
-
-.user-info {
+.profile_bar {
     position: relative;
-    width: 90%;
-    height: auto;
-    border-radius: 20px;
-    background: linear-gradient(#171921, #171921) padding-box,
-    linear-gradient(to right, var(--first_color), var(--secondary_color)) border-box;
+    width: 300px;
+    height: 100%;
     display: flex;
-    justify-content: space-between;
+    align-items: center;
+    flex-direction: column;
+    gap: 50px;
+    background-color: #1b1e29;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.user_info {
+    display: flex;
+    justify-content: start;
+    flex-direction: column;
+    padding: 70px 20px 20px 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.profile_buttons {
+    width: 50%;
+    display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
+    justify-content: center;
+    gap: 20px;
+}
+
+.profile_button {
+    color: #fff;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    text-decoration: none;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.profile_button.active {
+    background-color: #0000006b;
+    scale: 110%
+}
+
+.profile_button:hover {
+    background-color: #0000006b;
+    scale: 110%
+}
+
+.tab_info-block {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.basic_user_info {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 100px;
     box-sizing: border-box;
-    border: 4px solid transparent;
+    gap: 50px;
 }
 
-@media (min-width: 651px) and (max-width: 767px) {
-    .user-info .fs--40 {
-        font-size: 25px;
-    }
+.basic_user_info input {
+	width: 200px;
+    max-width: 200px;
+    height: 35px;
+    background: transparent;
+    padding-left: 20px;
+    box-sizing: border-box;
+    border: 1px #2e2f35 solid;
+    color: #fff;
+    outline: none;
+    border-radius: 10px;
+    transition: .3s;
 }
 
-@media (min-width: 481px) and (max-width: 650px) {
-    .user-info .fs--40 {
-        font-size: 25px;
-    }
+.basic_user_info input:focus {
+	scale: 105%;
 }
 
-@media (max-width: 480px) {
-    .user-info .fs--40 {
-        font-size: 17px;
-    }
+.edit_button {
+    color: var(--secondary_color);
+    cursor: pointer;
+    transition: .3s;
+}
+
+.edit_button:hover {
+    color: var(--secondary_hover_color)
+}
+
+.change-pass-btn {
+    color: #fff;
+    width: 150px;
+    height: 35px;
+    background-color: #242B38;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.change-pass-btn:hover {
+    background-color: #181c24;
 }
 </style>

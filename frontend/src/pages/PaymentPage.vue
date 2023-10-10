@@ -47,8 +47,13 @@
                         </svg>
                     </p>
                 </div>
+                <div class="hor-line payment_desc_hor_line"></div>
+                <div class="total_price_block fs--25">
+                    <p class="brand_text fw--900 no-margin">Total:</p>
+                    <p class="fw--900 no-margin">{{ plan.price }}$</p>
+                </div>
             </div>
-            </div>
+        </div>
         </div>
         <div v-show="!isLoaded" class="fs--50 fw--900 header_text">Loading page</div>
     </div>
@@ -56,7 +61,7 @@
 
 <script>
 import axios from 'axios';
-import { getLocalToken } from '@/Auth';
+import { getHeaders, fetchToken } from '@/Auth';
 import router from '@/router/router';
 import handlePopState from "@/utils/index.js";
 import PaymentModel from "@/components/UI/PaymentModel"
@@ -67,7 +72,7 @@ export default {
     components: {
         PaymentModel
     },
-    mounted() {
+    async mounted() {
         this.loadPayPalSDK().then(() => {
             this.setupPayPalButtons();
         });
@@ -82,7 +87,12 @@ export default {
             this.paypalId = this.plan.paypal_plan_id
             this.sub_id = this.plan.id
         });
-        window.addEventListener('load', this.handlePageLoad(true));
+        if (await fetchToken()) {
+            window.addEventListener('load', this.handlePageLoad(true));
+        } else {
+            router.push({ path: "/signup" })
+        }
+        // console.log(axios.get(`${process.env.VUE_APP_BACKEND_DOMAIN + this.paypalCreateOrderLink}`, { headers: getHeaders() }))
     },
     data() {
         return {
@@ -99,9 +109,8 @@ export default {
     },
     methods: {
     stripeRedirect() {
-        const headers = { 'Authorization': `Bearer ${getLocalToken()}` };
         console.log(headers);
-        axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN + this.stripeCreateOrderLinl + this.sub_id}/`, {}, { headers: headers })
+        axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN + this.stripeCreateOrderLinl + this.sub_id}/`, {}, { headers: getHeaders() })
         .then(res => {
             return this.stripe.redirectToCheckout({sessionId: res.data.checkout_session_id})
         })
@@ -167,15 +176,12 @@ export default {
             this.message = 'You have bought a tarrif!'
             const success_window = document.getElementById('success');
             const payment_block = document.getElementById('payment-block');
-            const headers = {
-                'Authorization': `Bearer ${getLocalToken()}`,
-            };
             success_window.style.backgroundColor = 'rgb(125, 252, 121)'
             success_window.classList.add('visible');
             payment_block.classList.add('hide');
             axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN + this.paypalCreateOrderLink}`, {
                 'subscription_id': data.subscriptionID,
-            }, { headers: headers })
+            }, { headers: getHeaders() })
             .then(() => {
                 setTimeout(() => {
                 success_window.classList.remove('visible');
@@ -184,6 +190,7 @@ export default {
                 }, 2000);
             })
             .catch(error => {
+                console.log(getHeaders());
                 this.message = 'Transaction failure. ' + (error.response.data.error ? error.response.data.error : error.response.data.detail)
                 success_window.style.backgroundColor = 'rgb(255, 000, 121)'
                 setTimeout(() => {
@@ -197,9 +204,6 @@ export default {
             this.message = 'Transaction was canceled'
             const success_window = document.getElementById('success');
             const payment_block = document.getElementById('payment-block');
-            const headers = {
-                'Authorization': `Bearer ${getLocalToken()}`,
-            };
             success_window.style.backgroundColor = 'rgb(255, 000, 121)'
             success_window.classList.add('visible');
             payment_block.classList.add('hide');
@@ -214,9 +218,6 @@ export default {
             this.message = 'Transaction failure. ' + (err.response.data.error ? err.response.data.error : err.response.data.detail)
             const success_window = document.getElementById('success');
             const payment_block = document.getElementById('payment-block');
-            const headers = {
-                'Authorization': `Bearer ${getLocalToken()}`,
-            };
             success_window.style.backgroundColor = 'rgb(255, 000, 121)'
             success_window.classList.add('visible');
             payment_block.classList.add('hide');
@@ -309,6 +310,13 @@ export default {
     flex-direction: column;
 }
 
+.total_price_block {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+}
+
 .payment_info_block p {
     text-align: start !important;
 }
@@ -334,6 +342,7 @@ export default {
     font-size: 20px;
     font-weight: 900;
     cursor: pointer;
+    z-index: 2;
     transition: .3s;
 }
 
@@ -460,6 +469,10 @@ export default {
 
     #success {
         width: 75%;
+    }
+
+    .total_price_block p {
+        font-size: 15px;
     }
 }
 </style>

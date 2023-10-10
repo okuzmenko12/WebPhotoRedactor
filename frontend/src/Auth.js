@@ -1,18 +1,12 @@
 import axios from "axios"
 
-export const fetchToken = async (func) => {
+export const fetchToken = async () => {
     try {
         await axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/auth/token/verify/`, { 'token': localStorage.getItem('AuthToken') });
-        if (func !== undefined) {
-            func();
-        }
         return true;
     } catch {
         try {
             await setNewToken();
-            if (func !== undefined) {
-                func();
-            }
             return true;
         } catch {
             return false;
@@ -46,6 +40,6 @@ export const getLocalRefreshToken = () => {
 
 //headers
 
-export const getHeaders = async () => {
+export const getHeaders = () => {
     return { 'Authorization': `Bearer ${getLocalToken()}` }
 };

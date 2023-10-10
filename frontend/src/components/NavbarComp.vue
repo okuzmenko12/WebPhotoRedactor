@@ -28,7 +28,7 @@
             </div>
         </template>
         <template v-else>
-            <router-link to="/profile" class="auth link">Profile</router-link>
+            <router-link to="/profile#profile" class="auth link">Profile</router-link>
         </template>
         <router-view/>
     </nav>

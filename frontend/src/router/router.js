@@ -1,12 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-import MainPage from "@/pages/MainPage"
-import PricingPage from "@/pages/PricingPage"
-import FeaturesPage from "@/pages/FeaturesPage"
-import LoginPage from "@/pages/LoginPage"
-import SignupPage from "@/pages/SignupPage"
-import ProfilePage from "@/pages/ProfilePage"
-import PaymentPage from "@/pages/PaymentPage"
+import MainPage from "@/pages/MainPage";
+import PricingPage from "@/pages/PricingPage";
+import FeaturesPage from "@/pages/FeaturesPage";
+import LoginPage from "@/pages/LoginPage";
+import SignupPage from "@/pages/SignupPage";
+import ProfilePage from "@/pages/ProfilePage";
+import PaymentPage from "@/pages/PaymentPage";
+import ConfirmPage from "@/pages/ConfirmPage";
+import ChangePassword from "@/pages/ChangePassword";
+import ChangeEmail from "@/pages/ChangeEmail";
 
 
 const routes = [
@@ -44,6 +47,21 @@ const routes = [
         path: '/payment',
         name: 'Payment',
         component: PaymentPage
+    },
+    {
+        path: '/email_confirmation',
+        name: 'Email confirmation',
+        component: ConfirmPage
+    },
+    {
+        path: '/reset_password_confimation',
+        name: 'Resseting password confirmation',
+        component: ChangePassword
+    },
+    {
+        path: '/change_email_confirmation',
+        name: 'Change email confirmation',
+        component: ChangeEmail
     },
 ]
 

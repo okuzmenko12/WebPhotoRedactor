@@ -34,11 +34,39 @@ body {
     margin-top: 0
 }
 
+.align_center_text {
+    text-align: center;
+}
+
+.flex-block {
+    display: flex;
+}
+
+.column {
+    flex-direction: column;
+}
+
+.center {
+    align-items: center;
+    justify-content: center;
+}
+
+.baseline {
+    align-items: baseline;
+}
+
+.gp--15 {
+    gap: 15px;
+}
+
 .header_text {
     -webkit-text-fill-color: transparent;
     background: -webkit-linear-gradient(-56deg, rgb(248, 248, 249), rgb(144, 145, 154));
     -webkit-background-clip: text;
-    text-align: center;
+}
+
+.width-auto {
+    width: auto !important;
 }
 
 .brand_text {
