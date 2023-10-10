@@ -6,9 +6,9 @@
         </div>
         <form class="auth-form" @submit.prevent>
             <h1>Sign Up</h1>
-            <input-ui maxlength="50" v-model="email" pr="Email"/>
-            <input-ui maxlength="50" v-model="password" :passwordType="true" :type="showPassword ? 'text' : 'password'" pr="Password"/>
-            <input-ui maxlength="50" v-model="password1" :passwordType="true" :type="showPassword ? 'text' : 'password'" pr="Confirm password"/>
+            <input-ui max="50" v-model="email" pr="Email"/>
+            <input-ui max="50" v-model="password" :passwordType="true" :type="showPassword ? 'text' : 'password'" pr="Password"/>
+            <input-ui max="50" v-model="password1" :passwordType="true" :type="showPassword ? 'text' : 'password'" pr="Confirm password"/>
             <button class="auth__authpage__btn" @click="sendSignUpRequest">Sign up</button>
             <h5 id="message__auth">{{ message }}</h5>
         </form>

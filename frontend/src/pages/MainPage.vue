@@ -4,7 +4,7 @@
     <div class="main-page">
       <div class="whatis-block white">
         <p class="brand_text">About us</p>
-        <p class="fs--50 fw--700 header_text no-top">What is FlexFi Upscale?</p>
+        <p class="fs--50 fw--700 header_text align_center_text no-top">What is FlexFi Upscale?</p>
         <div class="whatis-about">
           <h1 class="fs--25 fw--400 whatis-text-desc small_text">It's a website where you have all tools in your hand. From upscaling to removing bacgkrounds.</h1>
           <div class="whatis-block-block">
@@ -15,7 +15,7 @@
       </div>
       <div class="tools-usage-block">
         <p class="brand_text">Our tools</p>
-        <p class="fs--50 fw--700 header_text no-top">We have many tools for your usage</p>
+        <p class="fs--50 fw--700 header_text no-top align_center_text">We have many tools for your usage</p>
         <div class="tools-cards-block">
           <tool-card name="Upscaling" description="
           Upscale your image resolution and quality just in one click
@@ -32,8 +32,8 @@
           <tool-card name="Remove JPEG Artifacts" description="
           Upscale your image resolution and quality just in one click
           "
-          before_img="https://ichef.bbci.co.uk/news/640/cpsprodpb/1685B/production/_113015229_8.png"
-          after_img="https://ichef.bbci.co.uk/news/640/cpsprodpb/1685B/production/_113015229_8.png"
+          :before_img="Img"
+          after_img="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRY_uvokgQMlDBECicro1nnQjkjiKobMlHR-iYjnSVjjB33lcNcq-Ea-qtmhWjiKWsewIY&usqp=CAU"
           />
         </div>
       </div>
@@ -59,7 +59,7 @@
       },
       data() {
         return {
-          Img: require('@/assets/crystal.jpg'),
+          Img: require('@/assets/temp_image.jpeg'),
           isAuthenticated: false
         }
       },

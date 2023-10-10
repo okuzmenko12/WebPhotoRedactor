@@ -3,7 +3,7 @@
   <div class="pricing-container">
     <div class="pricing-block">
         <div class="tarrifs-row">
-          <card v-for="(plan) in plans"
+          <card v-for="plan in plans"
               :key="plan.id"
               :sub_id="plan.id"
               :Upcount="plan.up_scales_count"
@@ -36,6 +36,7 @@
       handlePopState(),
       axios.get(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/subscriptions/all`)
       .then(res => {
+        console.log(res);
         this.plans = res.data
       })
       document.title = `FlexFi Upscale - Pricing`

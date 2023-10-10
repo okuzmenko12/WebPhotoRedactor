@@ -1,7 +1,7 @@
 <template>
   <div class="input-container">
-    <input v-if="passwordType" :type="showPassword ? 'text' : 'password'" :placeholder="pr" :value="modelValue" @input="updateValue" />
-    <input v-else type="text" :value="modelValue" @input="updateValue" :placeholder="pr" />
+    <input v-if="passwordType" :id="inputId" :maxlength="max" :type="showPassword ? 'text' : 'password'" :placeholder="pr" :value="modelValue" @input="updateValue" />
+    <input v-else type="text" :id="inputId" :readonly="enableReadonly" :maxlength="max" :value="modelValue" @input="updateValue" :placeholder="pr" />
     <span v-if="passwordType" class="eye-icon" @click="toggleVisibility">{{ showPassword ? '👁️' : '👁️‍🗨️' }}</span>
   </div>
 </template>
@@ -11,7 +11,10 @@ export default {
   props: {
     modelValue: String,
     passwordType: Boolean,
-    pr: String
+    pr: String,
+    max: String,
+    enableReadonly: Boolean,
+    inputId: String
   },
   data() {
     return {
@@ -51,6 +54,11 @@ export default {
 
 .input-container input:focus {
 	scale: 110%;
+}
+
+.input-container input[readonly] {
+  color: #808080;
+  transition: .3s;
 }
 
 .eye-icon {
