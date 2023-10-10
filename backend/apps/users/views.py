@@ -11,6 +11,7 @@ from .serializers import (RegistrationSerializer,
                           PasswordResetSerializer,
                           UserSerializer)
 from .permissions import IsNotAuthenticated, IsUserOrReadOnly
+from .services import get_jwt_tokens_for_user
 
 from apps.picsart.models import UserFunctionsUsageCounter
 
@@ -52,8 +53,9 @@ class ConfirmEmailAPIView(AuthTokenMixin,
             token_data.token.delete()
             if not UserFunctionsUsageCounter.objects.filter(user=user).exists():
                 UserFunctionsUsageCounter.objects.get_or_create(user=user)
-            return Response({'success': 'You successfully registered and confirmed your email!'},
-                            status=status.HTTP_200_OK)
+            return Response({
+                'data': get_jwt_tokens_for_user(user)
+            }, status=status.HTTP_200_OK)
         else:
             return Response({'error': token_data.error}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -64,7 +66,7 @@ class ChangeEmailAPIView(AuthTokenMixin,
     permission_classes = [IsAuthenticated]
     token_type = TokenTypes.CHANGE_EMAIL
     html_message_template = 'users/confirm_email_changing.html'
-    mail_with_celery = True
+    mail_with_celery = False
 
     def post(self, *args, **kwargs):
         serializer = ChangeEmailSerializer(data=self.request.data)

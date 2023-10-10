@@ -97,7 +97,7 @@ class BaseImageAPIView(IPAddressesUsageCountMixin,
             return format_error_response
 
         serializer = ImageSerializer(data=self.request.data)
-        if serializer.is_valid():
+        if serializer.is_valid(raise_exception=True):
             image = serializer.validated_data.get('image')
 
             enhances_mapping = self.psc.get_enhances_mapping()
