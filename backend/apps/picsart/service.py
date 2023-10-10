@@ -50,9 +50,13 @@ class ImageFilesMixin:
         os.mkdir(f'media/{image_token}')
         pillow_img.save(f'media/{image_token}/{image_name}.{img_format}')
         image = open(f'media/{image_token}/{image_name}.{img_format}', 'rb')
-        os.remove(f'media/{image_token}/{image_name}.{img_format}')
-        os.rmdir(f'media/{image_token}')
-        return image
+
+        return {
+            'image': image,
+            'image_token': image_token,
+            'image_name': image_name,
+            'img_format': img_format
+        }
 
     @staticmethod
     def get_upscale_factor(pillow_img):
@@ -197,7 +201,9 @@ class PCsService(RequestContextMixin,
 
     def upscale(self, serializer_img):
         pillow_img = self.get_pillow_img(serializer_img)
-        image = self.get_normalized_image(pillow_img)
+        image_dict = self.get_normalized_image(pillow_img)
+        image = image_dict.get('image')
+
         payload = {'upscale_factor': self.get_upscale_factor(pillow_img)}
         response = requests.post(
             self.upscale_url,
@@ -205,12 +211,16 @@ class PCsService(RequestContextMixin,
             headers=self.headers,
             files={'image': image}
         )
+        os.remove(f'media/{image_dict["image_token"]}/{image_dict["image_name"]}.{image_dict["img_format"]}')
+        os.rmdir(f'media/{image_dict["image_token"]}')
         data = self.get_normalized_data_from_api_service(response.json())
         return data
 
     def remove_bg(self, serializer_img):
         pillow_img = self.get_pillow_img(serializer_img, for_bg_remove=True)
-        image = self.get_normalized_image(pillow_img)
+        image_dict = self.get_normalized_image(pillow_img)
+        image = image_dict.get('image')
+
         payload = {'format': 'PNG',
                    'output_type': 'cutout'}
         response = requests.post(
@@ -221,6 +231,9 @@ class PCsService(RequestContextMixin,
         )
 
         response_data = response.json()
+
+        os.remove(f'media/{image_dict["image_token"]}/{image_dict["image_name"]}.{image_dict["img_format"]}')
+        os.rmdir(f'media/{image_dict["image_token"]}')
 
         data = self.get_normalized_data_from_api_service(response.json())
 
@@ -235,9 +248,15 @@ class PCsService(RequestContextMixin,
     def remove_jpeg_artifacts(self, serializer_img):
         image_name: str = serializer_img.name.split('.')[0]
         pillow_img = self.get_pillow_img(serializer_img)
-        byte_image = self.get_normalized_image(pillow_img,
+        image_dict = self.get_normalized_image(pillow_img,
                                                artifacts_removing=True)
+        byte_image = image_dict.get('image')
+
         path = self.remove_artifacts(byte_image, image_name)
+
+        os.remove(f'media/{image_dict["image_token"]}/{image_dict["image_name"]}.{image_dict["img_format"]}')
+        os.rmdir(f'media/{image_dict["image_token"]}')
+
         return {
             'image': f'{settings.BACK_DOMAIN_URL}/{path}'
         }

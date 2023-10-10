@@ -66,7 +66,7 @@ class ChangeEmailAPIView(AuthTokenMixin,
     permission_classes = [IsAuthenticated]
     token_type = TokenTypes.CHANGE_EMAIL
     html_message_template = 'users/confirm_email_changing.html'
-    mail_with_celery = True
+    mail_with_celery = False
 
     def post(self, *args, **kwargs):
         serializer = ChangeEmailSerializer(data=self.request.data)
