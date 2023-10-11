@@ -14,10 +14,42 @@ from .models import Plan, UserSubscription
 from .services import (PayPalService,
                        StripeMixin,
                        PaymentService,
-                       UserSubscriptionsService)
+                       UserSubscriptionsService,
+                       UserCreateForSubscriptionMixin)
 from .serializers import (CreateUserSubscriptionSerializer,
-                          PlanSerializer)
+                          PlanSerializer,
+                          CreateUserForSubscriptionMixin)
+
+from apps.users.services import get_jwt_tokens_for_user
 from apps.picsart.service import add_count_of_usage_for_user
+
+
+class CreateUserToBuySubscription(UserCreateForSubscriptionMixin,
+                                  APIView):
+    serializer_class = CreateUserForSubscriptionMixin
+    mail_with_celery = False
+
+    def post(self, *args, **kwargs):
+        serializer = self.serializer_class(data=self.request.data)
+        serializer.is_valid(raise_exception=True)
+
+        email = serializer.data.get('email')
+        full_name = serializer.data.get('full_name')
+        if not self.check_email_unique(email):
+            return Response({
+                'error': 'User with provided email is already exists!'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        user = self.create_user_for_email(email, full_name)
+
+        if user is None:
+            return Response({
+                'error': 'Something went wrong... Please, try again.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            'data': get_jwt_tokens_for_user(user)
+        }, status=status.HTTP_200_OK)
 
 
 class CreatePaypalUserSubscriptionAPIView(UserSubscriptionsService,

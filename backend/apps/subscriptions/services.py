@@ -7,9 +7,14 @@ import os
 import binascii
 
 from django.conf import settings
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+
 from typing import NamedTuple, Optional
 
 from .models import PayPalProduct, UserSubscription, Plan
+
+from .utils import get_random_password
 
 from apps.users.models import User
 from apps.users.services import get_user_by_id
@@ -446,3 +451,64 @@ class UserSubscriptionsService:
             subscription = user.subscriptions.get(status='ACTIVE')
             return subscription
         return None
+
+
+class UserCreateForSubscriptionMixin:
+    mail_with_celery = True
+
+    @classmethod
+    def check_email_unique(cls, email: str) -> bool:
+        if User.objects.filter(email=email).exists():
+            return False
+        return True
+
+    @classmethod
+    def get_random_password(cls):
+        return get_random_password()
+
+    @classmethod
+    def get_html_email_for_data(cls, data: dict):
+        context = {
+            'email': data['email'],
+            'password': data['password'],
+            'full_name': data.get('full_name'),
+            'website': settings.FRONTEND_DOMAIN
+        }
+
+        html_msg = render_to_string(
+            'subscriptions/create_user_for_sub_mail.html',
+            context
+        )
+        return html_msg
+
+    def create_user_for_email(self, email: str, full_name: str) -> User | None:
+        try:
+            user = User.objects.create(
+                email=email,
+                is_active=True,
+                full_name=full_name
+            )
+            random_password = self.get_random_password()
+
+            if self.mail_with_celery:
+                pass
+            else:
+                send_mail(
+                    subject='You successfully registered at FlexFi.',
+                    message='',
+                    from_email=settings.EMAIL_HOST_USER,
+                    recipient_list=[email],
+                    fail_silently=False,
+                    html_message=self.get_html_email_for_data(data={
+                        'email': email,
+                        'password': random_password,
+                        'full_name': full_name
+                    })
+                )
+
+            user.set_password(random_password)
+            user.save()
+        except Exception as e:
+            print(e)
+            user = None
+        return user

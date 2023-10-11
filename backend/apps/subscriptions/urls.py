@@ -6,11 +6,13 @@ from .views import (home,
                     StripeCheckoutSessionAPIView,
                     CreatePaypalUserSubscriptionAPIView,
                     SubscriptionsAPIVIew,
-                    CancelSubscriptionAPIView)
+                    CancelSubscriptionAPIView,
+                    CreateUserToBuySubscription)
 
 urlpatterns = [
     path('all/', SubscriptionsAPIVIew.as_view()),
     path('', home, name='subscriptions-home'),
+    path('create_user_for_subscription/', CreateUserToBuySubscription.as_view()),
     path('stripe/config/', StripeConfigAPIView.as_view()),
     path(
         'stripe/create_checkout_session/<int:plan_pk>/',

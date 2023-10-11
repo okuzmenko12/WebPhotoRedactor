@@ -15,6 +15,14 @@ class CreateUserSubscriptionSerializer(serializers.Serializer):
                                             max_length=250)
 
 
+class CreateUserForSubscriptionMixin(serializers.Serializer):
+    full_name = serializers.CharField(max_length=150,
+                                      required=False,
+                                      label='Full name')
+    email = serializers.EmailField(required=True,
+                                   label='Email for account creation')
+
+
 class PlanSerializer(serializers.ModelSerializer):
     period_in_str = serializers.SerializerMethodField(read_only=True)
 
