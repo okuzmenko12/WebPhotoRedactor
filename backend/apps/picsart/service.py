@@ -138,6 +138,10 @@ class PCsService(RequestContextMixin,
                  JPEGArtifactsRemoverMixin):
     free_version = True
 
+    @classmethod
+    def get_valid_image_formats(cls):
+        return ['png', 'jpg', 'jpeg', 'tiff', 'tga']
+
     @staticmethod
     def _add_watermark_to_url_image(image_url):
         hdr = {
@@ -199,7 +203,7 @@ class PCsService(RequestContextMixin,
             }
         return data
 
-    def upscale(self, serializer_img):
+    def upscale(self, serializer_img) -> dict:
         pillow_img = self.get_pillow_img(serializer_img)
         image_dict = self.get_normalized_image(pillow_img)
         image = image_dict.get('image')
@@ -217,7 +221,7 @@ class PCsService(RequestContextMixin,
         data = self.get_normalized_data_from_api_service(response.json())
         return data
 
-    def remove_bg(self, serializer_img):
+    def remove_bg(self, serializer_img) -> dict:
         pillow_img = self.get_pillow_img(serializer_img, for_bg_remove=True)
         image_dict = self.get_normalized_image(pillow_img)
         image = image_dict.get('image')
@@ -247,7 +251,7 @@ class PCsService(RequestContextMixin,
             }
         return data
 
-    def remove_jpeg_artifacts(self, serializer_img):
+    def remove_jpeg_artifacts(self, serializer_img) -> dict:
         image_name: str = serializer_img.name.split('.')[0]
         pillow_img = self.get_pillow_img(serializer_img)
         image_dict = self.get_normalized_image(pillow_img,
@@ -270,7 +274,7 @@ class PCsService(RequestContextMixin,
                               'image (jpg, jpeg, png, tiff, tga).')
         if serializer_img is None:
             return image_format_error
-        valid_formats = ['png', 'jpg', 'jpeg', 'tiff', 'tga']
+        valid_formats = cls.get_valid_image_formats()
         if serializer_img.name.split('.')[-1] not in valid_formats:
             return image_format_error
         return None
@@ -288,10 +292,17 @@ class PCsService(RequestContextMixin,
             url: str
     ) -> dict | None:
         if 'http' in url or 'https' in url:
+            image_name = None
+            image_format = None
 
-            url = ''
-
-            return {}
+            for img_format in cls.get_valid_image_formats():
+                if img_format in url:
+                    image_lst = url.split(f'.{img_format}')
+                    image_name = image_lst[0].split('/')[-1]
+                    image_format = img_format
+            return {
+                'name': image_name + f'.{image_format}',
+            }
         return None
 
 

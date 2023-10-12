@@ -107,8 +107,19 @@ class BaseImageAPIView(IPAddressesUsageCountMixin,
 
             enhances_mapping = self.psc.get_enhances_mapping()
             enhance = enhances_mapping[self.enhance_type]
-            url_data = enhance(image)
-            return Response(url_data)
+            url_data: dict = enhance(image)
+
+            if url_data is None:
+                return Response({
+                    'error': 'Now service is unavailable :( Please wait some time and try again.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            url_data.update(
+                self.psc.get_image_name_and_format_from_url(
+                    url_data.get('image')
+                )
+            )
+            return Response(url_data, status=status.HTTP_200_OK)
 
         return format_error_response
 
