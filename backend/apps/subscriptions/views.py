@@ -57,6 +57,12 @@ class CreatePaypalUserSubscriptionAPIView(UserSubscriptionsService,
     serializer_class = CreateUserSubscriptionSerializer
     permission_classes = [IsAuthenticated]
 
+    def get(self, *args, **kwargs):
+        resp = {
+            'data': True
+        }
+        return Response(data=resp, status=status.HTTP_200_OK)
+
     def post(self, *args, **kwargs):
         if self.user_have_active_subscriptions(self.request.user):
             return Response({
