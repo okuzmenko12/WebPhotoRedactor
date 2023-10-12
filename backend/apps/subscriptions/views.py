@@ -2,8 +2,6 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
-from apps.users.models import User
-
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework import status
@@ -20,6 +18,7 @@ from .serializers import (CreateUserSubscriptionSerializer,
                           PlanSerializer,
                           CreateUserForSubscriptionMixin)
 
+from apps.users.models import User
 from apps.users.services import get_jwt_tokens_for_user
 from apps.picsart.service import add_count_of_usage_for_user
 

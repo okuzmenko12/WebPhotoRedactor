@@ -100,6 +100,13 @@ class BaseImageAPIView(IPAddressesUsageCountMixin,
         if serializer.is_valid(raise_exception=True):
             image = serializer.validated_data.get('image')
 
+            print(image)  # test check when we have JSONDecodeError
+
+            if type(image) != str:
+                return Response({
+                    'error': 'Something went wrong... Please try again.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
             enhances_mapping = self.psc.get_enhances_mapping()
             enhance = enhances_mapping[self.enhance_type]
             url_data = enhance(image)
