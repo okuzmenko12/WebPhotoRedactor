@@ -29,6 +29,11 @@ class BaseImageAPIView(IPAddressesUsageCountMixin,
         image = self.request.data.get('image')
         ip_address = self.request.data.get('ip_address')
 
+        if type(image) == str:
+            return Response({
+                'error': 'Something went wrong... Please try again.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         format_error = self.psc.validate_image_format(image)
         reach_limit_resp = Response({
             'error': 'You have reached the usage limit of this feature in this month!'
@@ -99,13 +104,6 @@ class BaseImageAPIView(IPAddressesUsageCountMixin,
         serializer = ImageSerializer(data=self.request.data)
         if serializer.is_valid(raise_exception=True):
             image = serializer.validated_data.get('image')
-
-            print(image)  # test check when we have JSONDecodeError
-
-            if type(image) == str:
-                return Response({
-                    'error': 'Something went wrong... Please try again.'
-                }, status=status.HTTP_400_BAD_REQUEST)
 
             enhances_mapping = self.psc.get_enhances_mapping()
             enhance = enhances_mapping[self.enhance_type]
