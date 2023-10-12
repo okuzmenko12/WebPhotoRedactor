@@ -102,7 +102,7 @@ class BaseImageAPIView(IPAddressesUsageCountMixin,
 
             print(image)  # test check when we have JSONDecodeError
 
-            if type(image) != str:
+            if type(image) == str:
                 return Response({
                     'error': 'Something went wrong... Please try again.'
                 }, status=status.HTTP_400_BAD_REQUEST)

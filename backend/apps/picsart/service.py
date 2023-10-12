@@ -15,7 +15,7 @@ from django.conf import settings
 from .models import (JPEGArtifactsImages,
                      AnonymousUserFunctionsUsageCounter,
                      FreeEnhancesLimit)
-from .utils import generate_token, ImageEnhanceTypes, CounterModelEnhanceFields
+from .utils import generate_token, ImageEnhanceTypes
 from apps.subscriptions.models import Plan
 from apps.users.models import User
 
@@ -281,6 +281,18 @@ class PCsService(RequestContextMixin,
             ImageEnhanceTypes.remove_bg: self.remove_bg,
             ImageEnhanceTypes.remove_jpeg_artifacts: self.remove_jpeg_artifacts
         }
+
+    @classmethod
+    def get_image_name_and_format_from_url(
+            cls,
+            url: str
+    ) -> dict | None:
+        if 'http' in url or 'https' in url:
+
+            url = ''
+
+            return {}
+        return None
 
 
 class IPAddressesUsageCountMixin:
