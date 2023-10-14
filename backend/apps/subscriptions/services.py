@@ -358,11 +358,7 @@ class StripeMixin(StripeAPIMixin):
                 stripe_subscription_id
             )
             return {
-                'user_id': client_reference_id,
-                'subscription_id': stripe_subscription_id,
-                'plan_price_id': sub_detail['items'].get('data')[0].get('price')['id'],
-                'start_time': datetime.fromtimestamp(sub_detail['current_period_start']),
-                'next_pay_time': datetime.fromtimestamp(sub_detail['current_period_end'])
+                'user_id': client_reference_id
             }
         return None
 

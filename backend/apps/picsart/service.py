@@ -186,7 +186,7 @@ class PCsService(RequestContextMixin,
             width, height = image.size
             watermark_img = watermark_img.resize((width, height), Image.Resampling.LANCZOS)
 
-            position1 = (50, 50)
+            position1 = (0, 0)
             image.paste(watermark_img, position1, watermark_img)
 
         return image

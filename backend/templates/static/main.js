@@ -16,7 +16,7 @@ fetch("/api/v1/subscriptions/stripe/config/")
   if (submitBtn !== null) {
     submitBtn.addEventListener("click", () => {
     // Get Checkout Session ID
-    fetch("/api/v1/subscriptions/stripe/create_checkout_session/15/")
+    fetch("/api/v1/subscriptions/stripe/create_checkout_session/19/")
       .then((result) => { return result.json(); })
       .then((data) => {
         console.log(data);

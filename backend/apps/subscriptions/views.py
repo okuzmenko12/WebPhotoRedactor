@@ -14,9 +14,11 @@ from .services import (PayPalService,
                        PaymentService,
                        UserSubscriptionsService,
                        UserCreateForSubscriptionMixin)
+
 from .serializers import (CreateUserSubscriptionSerializer,
                           PlanSerializer,
                           CreateUserForSubscriptionMixin)
+from .orders_system import PayPalOrdersMixin, StripePaymentMixin, QuerySetMixin
 
 from apps.users.models import User
 from apps.users.services import get_jwt_tokens_for_user
@@ -51,13 +53,88 @@ class CreateUserToBuySubscription(UserCreateForSubscriptionMixin,
         }, status=status.HTTP_200_OK)
 
 
+class CreatePayPalOrderAPIView(PayPalOrdersMixin,
+                               QuerySetMixin,
+                               APIView):
+
+    def post(self, *args, **kwargs):
+        plan_id = self.kwargs.get('plan_id')
+        if plan_id is None:
+            return Response({
+                'error': 'You must provide plan ID'  # noqa
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        plan: Plan = self.get_model_instance_by_id(Plan, plan_id)
+        if plan is None:
+            return Response({
+                'error': 'This plan doesn\'t exists!'  # noqa
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        data, error = self.create_order(plan.price)
+
+        if error is not None:
+            return Response({
+                'error': error
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(
+            data=data,
+            status=status.HTTP_201_CREATED
+        )
+
+
+class CreateStripeCheckoutSessionAPIView(StripePaymentMixin,
+                                         QuerySetMixin,
+                                         APIView):
+
+    def get(self, *args, **kwargs):
+        plan_id = self.kwargs.get('plan_id')
+        if plan_id is None:
+            return Response({
+                'error': 'You must provide plan ID'  # noqa
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        plan: Plan = self.get_model_instance_by_id(Plan, plan_id)
+        if plan is None:
+            return Response({
+                'error': 'This plan doesn\'t exists!'  # noqa
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        checkout_session_id = self.create_checkout_session(
+            User.objects.get(email='admin@gmail.com').id,  # self.request.user.id,
+            plan
+        )
+        if checkout_session_id is None:
+            return Response({
+                'error': 'Something went wrong with payment, please try again!'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+            'checkout_session_id': checkout_session_id
+        }, status=status.HTTP_201_CREATED)
+
+
+class StripeWebhookAPIView(StripePaymentMixin,
+                           QuerySetMixin,
+                           APIView):
+
+    def post(self, *args, **kwargs):
+        payload = self.request.body
+        sig_header = self.request.META['HTTP_STRIPE_SIGNATURE']
+
+        print(self.get_payment_data(payload, sig_header))
+        return Response(data={'data': True})
+
+
 class CreatePaypalUserSubscriptionAPIView(UserSubscriptionsService,
                                           PayPalService,
-                                          APIView):
+                                          APIView,
+                                          PayPalOrdersMixin):
     serializer_class = CreateUserSubscriptionSerializer
     permission_classes = [IsAuthenticated]
 
     def get(self, *args, **kwargs):
+        # print(self.create_order(amount=12))
+        print(self.capture_order('90Y31590YP0297141'))
         resp = {
             'data': True
         }
@@ -112,7 +189,7 @@ class StripeCheckoutSessionAPIView(StripeMixin,
             }, status=status.HTTP_400_BAD_REQUEST)
 
         checkout_session_id = self.create_checkout_session(
-            self.request.user.id,
+            User.objects.get(email='admin@gmail.com').id,  # self.request.user.id,
             plan
         )
         if checkout_session_id is None:
@@ -124,17 +201,17 @@ class StripeCheckoutSessionAPIView(StripeMixin,
         }, status=status.HTTP_201_CREATED)
 
 
-class StripeWebHookAPIView(StripeMixin, APIView):
-
-    def post(self, *args, **kwargs):
-        payload = self.request.body
-        sig_header = self.request.META['HTTP_STRIPE_SIGNATURE']
-
-        created = self.create_user_subscription(payload, sig_header)
-
-        if created:
-            return Response(status=status.HTTP_201_CREATED)
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+# class StripeWebHookAPIView(StripeMixin, APIView):
+#
+#     def post(self, *args, **kwargs):
+#         payload = self.request.body
+#         sig_header = self.request.META['HTTP_STRIPE_SIGNATURE']
+#
+#         created = self.create_user_subscription(payload, sig_header)
+#
+#         if created:
+#             return Response(status=status.HTTP_201_CREATED)
+#         return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 class SubscriptionsAPIVIew(ListAPIView):

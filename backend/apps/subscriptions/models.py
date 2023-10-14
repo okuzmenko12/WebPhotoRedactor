@@ -34,7 +34,44 @@ class Plan(models.Model):
         verbose_name_plural = 'Plans'
 
     def __str__(self):
-        return f'Plan {self.price}$ / {self.period_in_months} month(s)'
+        return f'Plan {self.price}$'
+
+
+class Order(models.Model):
+    PAYMENT_SERVICES = (
+        ('PAYPAL', 'PAYPAL'),
+        ('STRIPE', 'STRIPE')
+    )
+    STATUSES = (
+        ('ACTIVE', 'ACTIVE'),
+        ('CANCELED', 'CANCELED'),
+        ('COMPLETED', 'COMPLETED'),
+    )
+
+    user = models.ForeignKey(User,
+                             on_delete=models.CASCADE,
+                             verbose_name='User',
+                             related_name='orders')
+    plan = models.ForeignKey(Plan,
+                             on_delete=models.CASCADE,
+                             verbose_name='Plan',
+                             related_name='orders')
+    status = models.CharField(max_length=45,
+                              choices=STATUSES,
+                              verbose_name='Order status')
+    payment_service = models.CharField(max_length=45,
+                                       choices=PAYMENT_SERVICES,
+                                       verbose_name='Payment service')
+    paypal_order_id = models.CharField(max_length=150,
+                                       verbose_name='PayPal order id')
+
+    class Meta:
+        db_table = 'orders'
+        verbose_name = 'order'
+        verbose_name_plural = 'Orders'
+
+    def __str__(self):
+        return f'Order: {self.id}. User: {self.user.username}. Plan: {self.plan.name}'
 
 
 class UserSubscription(models.Model):
