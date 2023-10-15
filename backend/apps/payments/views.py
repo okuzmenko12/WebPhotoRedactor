@@ -8,24 +8,20 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Plan, UserSubscription
-from .services import (PayPalService,
-                       StripeMixin,
-                       PaymentService,
-                       UserSubscriptionsService,
-                       UserCreateForSubscriptionMixin)
+from .models import Plan
 
-from .serializers import (CreateUserSubscriptionSerializer,
-                          PlanSerializer,
+from .serializers import (PlanSerializer,
                           CreateUserForSubscriptionMixin)
-from .orders_system import PayPalOrdersMixin, StripePaymentMixin, QuerySetMixin
+from .services import (PayPalOrdersMixin,
+                       StripePaymentMixin,
+                       QuerySetMixin,
+                       UserCreateForPaymentMixin)
 
 from apps.users.models import User
 from apps.users.services import get_jwt_tokens_for_user
-from apps.picsart.service import add_count_of_usage_for_user
 
 
-class CreateUserToMakePaymentAPIView(UserCreateForSubscriptionMixin,
+class CreateUserToMakePaymentAPIView(UserCreateForPaymentMixin,
                                      APIView):
     serializer_class = CreateUserForSubscriptionMixin
     mail_with_celery = False
@@ -155,7 +151,6 @@ class PlansAPIVIew(ListAPIView):
 
 @login_required
 def home(request):
-    pr = PayPalService()
     user = User.objects.get(email='admin@gmail.com')
     # print(pr.create_user_subscription(user, 'I-PWKHCF6ACC4K'))
     return render(request, 'payments/index.html')

@@ -9,7 +9,6 @@ class Plan(models.Model):
     price = models.IntegerField(verbose_name='Price in $')
     description = models.TextField(max_length=15000,
                                    verbose_name='Description')
-    period_in_months = models.IntegerField(verbose_name='Period in months (required)')
     up_scales_count = models.IntegerField(default=100,
                                           verbose_name='Up scales count')
     bg_deletions_count = models.IntegerField(
@@ -24,10 +23,6 @@ class Plan(models.Model):
                                        verbose_name='Stripe price ID',
                                        blank=True,
                                        null=True)
-    paypal_plan_id = models.CharField(max_length=350,
-                                      verbose_name='PayPal plan Id',
-                                      blank=True,
-                                      null=True)
 
     class Meta:
         db_table = 'plans'
@@ -81,78 +76,33 @@ class Order(models.Model):
         return f'Order: {self.id}. User: {self.user.username}. Plan: {self.plan.name}'
 
 
-class UserSubscription(models.Model):
-    PAYMENT_SERVICES = (
-        (1, 'PAYPAL'),
-        (2, 'STRIPE')
-    )
-    STATUSES = (
-        ('ACTIVE', 'ACTIVE'),
-        ('SUSPENDED', 'SUSPENDED'),
-        ('CANCELED', 'CANCELED'),
-        ('EXPIRED', 'EXPIRED'),
-        ('APPROVED', 'APPROVED'),
-        ('APPROVAL_PENDING', 'APPROVAL_PENDING')
-    )
-
-    plan = models.ForeignKey(Plan,
-                             on_delete=models.CASCADE,
-                             verbose_name='Plan')
-    user = models.ForeignKey(User,
-                             on_delete=models.CASCADE,
-                             verbose_name='User',
-                             related_name='payments')
-    start_time = models.DateTimeField(verbose_name='Subscription starting date',
-                                      blank=True,
-                                      null=True)
-    next_pay_time = models.DateTimeField(verbose_name='Subscription end date',
-                                         blank=True,
-                                         null=True)
-    stripe_subscription_id = models.CharField(max_length=350,
-                                              verbose_name='Stripe subscription ID',
-                                              blank=True,
-                                              null=True)
-    paypal_subscription_id = models.CharField(
-        max_length=450,
-        verbose_name='PayPal subscription id',
-        blank=True,
-        null=True
-    )
-    paypal_subscription_cancel_link = models.URLField(
-        verbose_name='PayPal subscription cancel link',
-        blank=True,
-        null=True
-    )
-    status = models.CharField(max_length=150,
-                              verbose_name='Subscription status',
-                              choices=STATUSES)
-    payment_service = models.IntegerField(verbose_name='Payment service',
-                                          choices=PAYMENT_SERVICES)
-
-    class Meta:
-        db_table = 'users_subscriptions'
-        verbose_name = 'subscription'
-        verbose_name_plural = 'Users Subscriptions'
-
-    def __str__(self):
-        return f'User: {self.user.username}. Subscription: {self.plan}'
-
-
-class PayPalProduct(models.Model):
-    product_id = models.CharField(max_length=350,
-                                  verbose_name='PayPal product ID',
+class ForeignOrder(models.Model):
+    ext_id = models.CharField(max_length=250,
+                              verbose_name='Internal order ID')
+    amount = models.IntegerField(verbose_name='Amount')
+    currency = models.CharField(max_length=50,
+                                verbose_name='Currency')
+    email = models.EmailField(max_length=350,
+                              verbose_name='Email',
+                              blank=True,
+                              null=True)
+    description = models.TextField(verbose_name='Description',
+                                   blank=True,
+                                   null=True)
+    success_url = models.URLField(verbose_name='Return success url',
                                   blank=True,
                                   null=True)
-    name = models.CharField(max_length=350,
-                            verbose_name='PayPal product name')
-    description = models.TextField(verbose_name='Description')
-    image_url = models.URLField(verbose_name='Image url')
-    home_url = models.URLField(verbose_name='Home url')
+    cancel_url = models.URLField(verbose_name='Return cancel url',
+                                 blank=True,
+                                 null=True)
+    notify_url = models.URLField(verbose_name='Notify url',
+                                 blank=True,
+                                 null=True)
 
     class Meta:
-        db_table = 'paypal_product'
-        verbose_name = 'product'
-        verbose_name_plural = 'PayPal Products'
+        db_table = 'foreign_orders'
+        verbose_name = 'foreign order'
+        verbose_name_plural = 'Foreign Orders'
 
     def __str__(self):
-        return f'Product: {self.name}'
+        return f'Order: {self.ext_id}. Email: {self.email}'

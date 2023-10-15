@@ -1,31 +1,106 @@
-from datetime import datetime
-
-import stripe
-import requests
 import json
-import os
+import stripe
+
+import requests
 import binascii
+import os
+
+from typing import NamedTuple, Optional
+
+from .models import Plan, Order
 
 from django.conf import settings
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 
-from typing import NamedTuple, Optional
-
-from .models import PayPalProduct, UserSubscription, Plan
-
-from .utils import get_random_password
-
-from apps.users.models import User
 from apps.users.services import get_user_by_id
+from .utils import get_random_password
+from apps.users.models import User
 
 
-class PayPalPaymentData(NamedTuple):
-    instance: Optional[PayPalProduct] = None
+class PaymentData(NamedTuple):
+    data: Optional[dict] = None
     error: Optional[str] = None
 
 
-class PayPalAuthMixin:
+class QuerySetMixin:
+
+    @staticmethod
+    def get_model_instance_by_id(
+            model,
+            obj_id
+    ):
+        try:
+            instance = model.objects.get(**{'id': obj_id})
+        except (Exception,):
+            return None
+        return instance
+
+    @staticmethod
+    def create_instance_by_data(
+            model,
+            data: dict
+    ) -> bool:
+        try:
+            model.objects.create(**data)
+        except (Exception,):
+            return False
+        return True
+
+    @staticmethod
+    def get_instance_by_data(
+            model,
+            data: dict
+    ):
+        try:
+            instance = model.objects.get(**data)
+        except (Exception,):
+            return None
+        return instance
+
+
+class OrderMixin(QuerySetMixin):
+
+    def create_order_in_db(self, data):
+        order = self.create_instance_by_data(Order, data)
+        return order
+
+    def get_order_by_data(
+            self,
+            data
+    ):
+        return self.get_instance_by_data(Order, data)
+
+    @staticmethod
+    def give_credits_to_order_user(
+            order: Order
+    ):
+        user = order.user
+        plan = order.plan
+        counter_of_usage = user.counter_of_usage
+
+        plan_credit_fields = [
+            'up_scales_count',
+            'bg_deletions_count',
+            'jpg_artifacts_deletions_count'
+        ]
+        for field in plan_credit_fields:
+            plan_field_value = getattr(plan, field)
+            user_field_value = getattr(counter_of_usage, field)
+            new_value = user_field_value + plan_field_value
+            setattr(counter_of_usage, field, new_value)
+        counter_of_usage.save()
+
+    def complete_order(
+            self,
+            order: Order
+    ):
+        order.status = 'COMPLETED'
+        order.save()
+        self.give_credits_to_order_user(order)  # give credits to customer
+
+
+class PayPalContextMixin(OrderMixin):
 
     @property
     def urls_first_part(self):
@@ -49,240 +124,161 @@ class PayPalAuthMixin:
     def auth_token(self):
         return f'Bearer {self.get_access_token()}'
 
-
-class PayPalService(PayPalAuthMixin):
-
-    @property
-    def products_url(self):
-        return f'{self.urls_first_part}/v1/catalogs/products'
-
     @staticmethod
-    def __generate_request_id():
+    def generate_token_id():
         return binascii.hexlify(os.urandom(16)).decode()
 
     @property
     def headers_dict(self):
-        request_id = self.__generate_request_id()
         headers_dict = {
             'Authorization': self.auth_token,
             'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'PayPal-Request-Id': f'{request_id}',
-            'Prefer': 'return=representation'
+            'PayPal-Request-Id': self.generate_token_id()
         }
         return headers_dict
 
-    def create_product(self, product: PayPalProduct):
-        data_for_post = {
-            'name': product.name,
-            'description': product.description,
-            'type': 'SERVICE',
-            'category': 'SOFTWARE',
-            'image_url': product.image_url,
-            'home_url': product.home_url
-        }
-        response = requests.post(
-            self.products_url,
-            headers=self.headers_dict,
-            data=json.dumps(data_for_post)
-        )
-        product_id = response.json().get('id')
-        product.product_id = product_id
-        product.save()
-
     @property
-    def current_product_data(self):
-        try:
-            product = PayPalProduct.objects.all()[:1].get()
-        except PayPalProduct.DoesNotExist:
-            return PayPalPaymentData(error='PayPal payment product does not exist!')
-        return PayPalPaymentData(instance=product)
+    def order_creation_url(self):
+        return 'https://api-m.sandbox.paypal.com/v2/checkout/orders'
 
-    def create_plan(self, data: dict) -> str | None:
-        product_data = self.current_product_data
+    @staticmethod
+    def get_capture_order_url(order_id):
+        url = f'https://api-m.sandbox.paypal.com/v2/checkout/orders/{order_id}/capture'
+        return url
 
-        if product_data.instance is None:
-            return None
-        product: PayPalProduct = product_data.instance
 
-        data_for_post = {
-            "product_id": product.product_id,
-            "name": data['name'],
-            "description": data['description'],
-            "status": "ACTIVE",
-            "billing_cycles": [
+class PayPalOrdersMixin(PayPalContextMixin):
+
+    def get_json_order_creation_data(
+            self,
+            **kwargs
+    ):
+        amount = kwargs.get('amount')
+        success_url = kwargs.get('success_url')
+        cancel_url = kwargs.get('cancel_url')
+
+        data = {
+            "intent": "CAPTURE",
+            "purchase_units": [
                 {
-                    "frequency": {
-                        "interval_unit": "MONTH",
-                        "interval_count": data['period_in_months']
-                    },
-                    "tenure_type": "TRIAL",
-                    "sequence": 1,
-                    "total_cycles": 2,
-                    "pricing_scheme": {
-                        "fixed_price": {
-                            "value": data['price'],
-                            "currency_code": "USD"
-                        }
-                    }
-                },
-                {
-                    "frequency": {
-                        "interval_unit": "MONTH",
-                        "interval_count": data['period_in_months']
-                    },
-                    "tenure_type": "TRIAL",
-                    "sequence": 2,
-                    "total_cycles": 3,
-                    "pricing_scheme": {
-                        "fixed_price": {
-                            "value": data['price'],
-                            "currency_code": "USD"
-                        }
-                    }
-                },
-                {
-                    "frequency": {
-                        "interval_unit": "MONTH",
-                        "interval_count": data['period_in_months']
-                    },
-                    "tenure_type": "REGULAR",
-                    "sequence": 3,
-                    "total_cycles": 12,
-                    "pricing_scheme": {
-                        "fixed_price": {
-                            "value": data['price'],
-                            "currency_code": "USD"
-                        }
+                    "reference_id": self.generate_token_id(),
+                    "amount": {
+                        "currency_code": "USD",
+                        "value": str(amount)
                     }
                 }
             ],
-            "payment_preferences": {
-                "auto_bill_outstanding": True,
-                "setup_fee": {
-                    "value": "0",
-                    "currency_code": "USD"
-                },
-                "setup_fee_failure_action": "CONTINUE",
-                "payment_failure_threshold": 3
-            },
-            "taxes": {
-                "percentage": "10",
-                "inclusive": False
+            "payment_source": {
+                "paypal": {
+                    "experience_context": {
+                        "brand_name": "FlexFI Upscale",
+                        "locale": "en-US",
+                        "landing_page": "LOGIN",
+                        "shipping_preference": "NO_SHIPPING",
+                        "user_action": "CONTINUE",
+                        "return_url": success_url if success_url is not None else settings.PAYMENT_SUCCESS_URL,
+                        "cancel_url": cancel_url if cancel_url is not None else settings.PAYMENT_CANCEL_URL
+                    }
+                }
             }
         }
-        response = requests.post(
-            f'{self.urls_first_part}/v1/billing/plans',
-            headers=self.headers_dict,
-            data=json.dumps(data_for_post)
-        )
-        return response.json().get('id')
+        return json.dumps(data)
 
     @staticmethod
-    def __check_values_keys(value, allowed_keys):
-        value_dict = {}
-        for k, v in value.items():
-            if k in allowed_keys:
-                value_dict[k] = v
-        return value_dict
+    def order_create_response(response: requests.Response):
+        if response.status_code != 200:
+            return PaymentData(error='Something went wrong... Please, try again later.')
 
-    def __subscription_detail_response(self, response: dict) -> dict:
-        allowed_keys = ('id', 'plan_id', 'start_time', 'links',
-                        'billing_info', 'next_billing_time',
-                        'failed_payments_count', 'status')
-        response_data = {}
-        for key, value in response.items():
-            if key in allowed_keys:
-                if isinstance(value, dict):
-                    value = self.__check_values_keys(value, allowed_keys)
-                response_data[key] = value
-        return response_data
+        resp_json_data: dict = response.json()
+        order_id = resp_json_data.get('id')
 
-    def get_subscription_by_id(self, subscription_id) -> dict:
-        url = f'{self.urls_first_part}/v1/billing/payments/{subscription_id}'
-        response = requests.get(url, headers=self.headers_dict).json()
-        data = self.__subscription_detail_response(response)
-        response_data = {
-            'subscription_id': data.get('id'),
-            'plan_id': data.get('plan_id'),
-            'start_time': data.get('start_time'),
-            'cancel_link': data.get('links')[0]['href'],
-            'next_pay_time': data.get('billing_info').get('next_billing_time'),
-            'failed_payments_count': data.get('billing_info').get('failed_payments_count'),
-            'status': data.get('status')
-        }
-        return response_data
+        if order_id is None:
+            return PaymentData(error='The order wasn\'t created. Please, try again.')  # noqa
 
-    @staticmethod
-    def get_user_subscription_from_db(subscription_pk) -> UserSubscription | None:
-        if not UserSubscription.objects.filter(id=subscription_pk).exists():
-            return None
-        return UserSubscription.objects.get(id=subscription_pk)
-
-    @staticmethod
-    def get_plan_by_pp_id(plan_id) -> Plan | None:
-        if not Plan.objects.filter(paypal_plan_id=plan_id).exists():
-            return None
-        return Plan.objects.get(paypal_plan_id=plan_id)
-
-    def create_user_subscription(self, user: User, subscription_id):
-        pp_subscription_data = self.get_subscription_by_id(subscription_id)
-
-        plan_id = pp_subscription_data.get('plan_id')
-        plan = self.get_plan_by_pp_id(plan_id)
-
-        if pp_subscription_data['status'] == 'ACTIVE':
-            subscription, _ = UserSubscription.objects.get_or_create(
-                plan=plan,
-                user=user,
-                start_time=pp_subscription_data['start_time'],
-                next_pay_time=pp_subscription_data['next_pay_time'],
-                payment_service=1,  # PAYPAL,
-                status=pp_subscription_data['status'],
-                paypal_subscription_cancel_link=pp_subscription_data['cancel_link'],
-                paypal_subscription_id=subscription_id
+        links = resp_json_data.get('links')
+        if links is not None:
+            payment_link = links[1]['href']
+        else:
+            return PaymentData(
+                error='Something went wrong when creating the payment link. Please, try again.'
             )
-            return subscription
+        data = {
+            'order_id': order_id,
+            'payment_link': payment_link
+        }
+        return PaymentData(data=data)
+
+    @staticmethod
+    def capture_order_response(response: requests.Response):
+        data: dict = response.json()
+        status = data.get('status')
+        if status != 'COMPLETED':
+            return PaymentData(
+                error='This payment wasn\'t successful! Please, try again.'  # noqa
+            )
+
+        return PaymentData(data={
+            'order_id': data.get('id'),
+            'status': status,
+            'create_time': data.get('create_time')
+        })
+
+    def get_data_from_response(
+            self,
+            response: requests.Response,
+            order_create=False,
+            capture_order=False
+    ):
+        if order_create:
+            return self.order_create_response(response)
+        elif capture_order:
+            return self.capture_order_response(response)
         return None
 
-    def cancel_subscription(self, subscription_pk) -> bool:
-        subscription = self.get_user_subscription_from_db(subscription_pk)
+    def create_order(
+            self,
+            plan: Plan,
+            amount: int,
+            success_url: str = None,
+            cancel_url: str = None
+    ) -> PaymentData | None:
+        header = self.headers_dict
+        json_data = self.get_json_order_creation_data(
+            amount=amount,
+            success_url=success_url,
+            cancel_url=cancel_url
+        )
+        response = requests.post(
+            self.order_creation_url,
+            headers=header,
+            data=json_data
+        )
 
-        if subscription is not None:
-            headers = {
-                'Authorization': self.auth_token,
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
-            data = {'reason': 'Not satisfied with the service'}
-            response = requests.post(
-                subscription.paypal_subscription_cancel_link,
-                headers=headers,
-                data=json.dumps(data)
-            )
-            if not response.status_code == 204:
-                return False
-            subscription.status = 'CANCELED'
-            subscription.save()
-            return True
-        return False
+        return self.get_data_from_response(response, order_create=True)
+
+    def capture_order(self, order_id):
+        response = requests.post(
+            self.get_capture_order_url(order_id),
+            headers=self.headers_dict
+        )
+        return self.get_data_from_response(response, capture_order=True)
 
 
-class StripeAPIMixin:
+class StripePaymentMixin(OrderMixin):
 
     @staticmethod
     def configure_stripe():
         stripe.api_key = settings.STRIPE_SECRET_KEY
+
+    @property
+    def webhook_url(self):
+        return settings.STRIPE_ENDPOINT_SECRET
 
     def create_price(self, data, stripe_product_id):
         self.configure_stripe()
         price = stripe.Price.create(
             unit_amount=data['price'],
             currency="usd",
-            recurring={
-                "interval": "month",
-                "interval_count": data['interval']
-            },
             product=stripe_product_id,
         )
         return price
@@ -308,25 +304,20 @@ class StripeAPIMixin:
         except (Exception,):
             return None
 
-
-class StripeMixin(StripeAPIMixin):
-
-    @property
-    def webhook_url(self):
-        return settings.STRIPE_ENDPOINT_SECRET
-
     def create_checkout_session(
             self,
             client_id,
-            plan: Plan
+            plan: Plan,
+            success_url=None,
+            cancel_url=None
     ):
         self.configure_stripe()
         checkout_session = stripe.checkout.Session.create(
             client_reference_id=client_id,
-            success_url=settings.STRIPE_SUCCESS_URL,
-            cancel_url=settings.STRIPE_CANCEL_URL,
+            success_url=success_url if success_url is not None else settings.PAYMENT_SUCCESS_URL,
+            cancel_url=cancel_url if cancel_url is not None else settings.PAYMENT_CANCEL_URL,
             payment_method_types=['card'],
-            mode='subscription',
+            mode='payment',
             line_items=[
                 {
                     'price': plan.stripe_price_id,
@@ -334,11 +325,18 @@ class StripeMixin(StripeAPIMixin):
                 }
             ]
         )
-
         session_id = checkout_session.get('id')
+
+        self.create_order_in_db({
+            'plan': plan,
+            'user': get_user_by_id(client_id),
+            'status': 'ACTIVE',
+            'payment_service': 'STRIPE',
+            'stripe_session_id': session_id
+        })
         return session_id
 
-    def get_stripe_subscription_data(self, payload, sig_header):
+    def complete_payment(self, payload, sig_header):
         self.configure_stripe()
         endpoint_secret = self.webhook_url
 
@@ -352,104 +350,18 @@ class StripeMixin(StripeAPIMixin):
         if event['type'] == 'checkout.session.completed':
             session = event['data']['object']
             client_reference_id = session.get('client_reference_id')
-            stripe_subscription_id = session.get('subscription')
 
-            sub_detail = stripe.Subscription.retrieve(
-                stripe_subscription_id
-            )
-            return {
-                'user_id': client_reference_id
+            data = {
+                'user_id': client_reference_id,
+                'stripe_session_id': session.get('id')
             }
-        return None
+            order: Order = self.get_order_by_data(data)
+            self.complete_order(order)
 
-    def create_user_subscription(self, payload, sig_header) -> bool:
-        self.configure_stripe()
-        sub_data = self.get_stripe_subscription_data(payload, sig_header)
-
-        if sub_data is None:
-            return False
-
-        user = get_user_by_id(sub_data.get('user_id'))
-
-        if user is not None:
-            try:
-                plan = Plan.objects.get(stripe_price_id=sub_data['plan_price_id'])
-            except (Exception,):
-                return False
-
-            UserSubscription.objects.create(
-                plan=plan,
-                user=user,
-                start_time=sub_data['start_time'],
-                next_pay_time=sub_data['next_pay_time'],
-                stripe_subscription_id=sub_data['subscription_id'],
-                status='ACTIVE',
-                payment_service=2
-            )
-            return True
-        return False
-
-    def cancel_subscription(self, sub_pk) -> bool:
-        try:
-            user_sub = UserSubscription.objects.get(id=sub_pk)
-        except (Exception,):
-            return False
-        self.configure_stripe()
-
-        if user_sub.stripe_subscription_id is None:
-            return False
-
-        response = stripe.Subscription.delete(
-            user_sub.stripe_subscription_id
-        )
-        if response.get('status') == 'canceled':
-            user_sub.status = 'CANCELED'
-            user_sub.save()
-        else:
-            return False
-        return True
-
-
-class PaymentService:
-    paypal = PayPalService()
-    stripe = StripeMixin()
-
-
-class UserSubscriptionsService:
-
-    @staticmethod
-    def get_plan_by_pk(plan_pk):
-        if Plan.objects.filter(id=plan_pk).exists():
-            return Plan.objects.get(id=plan_pk)
-        return None
-
-    @staticmethod
-    def user_have_active_subscriptions(user: User) -> bool:
-        if user.subscriptions.filter(status='ACTIVE').exists():
-            return True
-        return False
-
-    @staticmethod
-    def get_active_subscription(user_pk):
-        """
-        If user have more than one active
-        subscription, method will return None.
-        In the other case, it will return
-        user subscription instance.
-        """
-        user = get_user_by_id(user_pk)
-        if user is None:
-            return None
-
-        user_active_subs = user.subscriptions.filter(status='ACTIVE')
-
-        if user_active_subs.exists() and user_active_subs.count() == 1:
-            subscription = user.subscriptions.get(status='ACTIVE')
-            return subscription
         return None
 
 
-class UserCreateForSubscriptionMixin:
+class UserCreateForPaymentMixin:
     mail_with_celery = True
 
     @classmethod
