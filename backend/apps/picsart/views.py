@@ -12,7 +12,7 @@ from .service import (PCsService,
 from .utils import ImageEnhanceTypes, CounterModelEnhanceFields
 from .serializers import ImageSerializer
 
-from apps.subscriptions.services import UserSubscriptionsService
+from apps.payments.services import UserSubscriptionsService
 from apps.users.models import User
 
 

@@ -199,7 +199,7 @@ class PayPalService(PayPalAuthMixin):
         return response_data
 
     def get_subscription_by_id(self, subscription_id) -> dict:
-        url = f'{self.urls_first_part}/v1/billing/subscriptions/{subscription_id}'
+        url = f'{self.urls_first_part}/v1/billing/payments/{subscription_id}'
         response = requests.get(url, headers=self.headers_dict).json()
         data = self.__subscription_detail_response(response)
         response_data = {
@@ -472,7 +472,7 @@ class UserCreateForSubscriptionMixin:
         }
 
         html_msg = render_to_string(
-            'subscriptions/create_user_for_sub_mail.html',
+            'payments/create_user_for_sub_mail.html',
             context
         )
         return html_msg

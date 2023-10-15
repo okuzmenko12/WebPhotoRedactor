@@ -9,13 +9,13 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('subscriptions', '0018_remove_plan_period'),
+        ('payments', '0018_remove_plan_period'),
     ]
 
     operations = [
         migrations.AlterField(
             model_name='usersubscription',
             name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='subscriptions', to=settings.AUTH_USER_MODEL, verbose_name='User'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='payments', to=settings.AUTH_USER_MODEL, verbose_name='User'),
         ),
     ]

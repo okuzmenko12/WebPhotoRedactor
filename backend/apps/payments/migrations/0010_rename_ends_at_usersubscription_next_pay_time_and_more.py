@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('subscriptions', '0009_usersubscription_paypal_subscription_cancel_link'),
+        ('payments', '0009_usersubscription_paypal_subscription_cancel_link'),
     ]
 
     operations = [

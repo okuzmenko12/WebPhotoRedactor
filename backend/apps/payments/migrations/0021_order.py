@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('subscriptions', '0020_alter_usersubscription_plan'),
+        ('payments', '0020_alter_usersubscription_plan'),
     ]
 
     operations = [
@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('status', models.CharField(choices=[('ACTIVE', 'ACTIVE'), ('CANCELED', 'CANCELED'), ('COMPLETED', 'COMPLETED')], max_length=45, verbose_name='Order status')),
                 ('payment_service', models.CharField(choices=[('PAYPAL', 'PAYPAL'), ('STRIPE', 'STRIPE')], max_length=45, verbose_name='Payment service')),
                 ('paypal_order_id', models.CharField(max_length=150, verbose_name='PayPal order id')),
-                ('plan', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='orders', to='subscriptions.plan', verbose_name='Plan')),
+                ('plan', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='orders', to='payments.plan', verbose_name='Plan')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='orders', to=settings.AUTH_USER_MODEL, verbose_name='User')),
             ],
             options={

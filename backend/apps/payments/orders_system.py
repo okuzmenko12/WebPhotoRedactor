@@ -233,6 +233,7 @@ class PayPalOrdersMixin(PayPalContextMixin):
 
     def create_order(
             self,
+            plan: Plan,
             amount: int,
             success_url: str = None,
             cancel_url: str = None
@@ -248,6 +249,7 @@ class PayPalOrdersMixin(PayPalContextMixin):
             headers=header,
             data=json_data
         )
+
         return self.get_data_from_response(response, order_create=True)
 
     def capture_order(self, order_id):

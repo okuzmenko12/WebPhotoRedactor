@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('subscriptions', '0015_alter_paypalproduct_product_id'),
+        ('payments', '0015_alter_paypalproduct_product_id'),
     ]
 
     operations = [

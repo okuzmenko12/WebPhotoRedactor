@@ -9,7 +9,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('subscriptions', '0001_initial'),
+        ('payments', '0001_initial'),
     ]
 
     operations = [
@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelTable(
             name='subscription',
-            table='subscriptions',
+            table='payments',
         ),
         migrations.CreateModel(
             name='UserSubscription',
@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('started_at', models.DateTimeField(auto_now_add=True, verbose_name='Subscription starting date')),
                 ('ends_at', models.DateTimeField(verbose_name='Subscription end date')),
-                ('subscription', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='subscriptions.subscription', verbose_name='Subscription')),
+                ('subscription', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='payments.subscription', verbose_name='Subscription')),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='subscription', to=settings.AUTH_USER_MODEL, verbose_name='User')),
             ],
             options={

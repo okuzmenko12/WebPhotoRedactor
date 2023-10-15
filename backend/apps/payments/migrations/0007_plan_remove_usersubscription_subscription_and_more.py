@@ -7,7 +7,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('subscriptions', '0006_usersubscription_paypal_subscription_id'),
+        ('payments', '0006_usersubscription_paypal_subscription_id'),
     ]
 
     operations = [
@@ -41,7 +41,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='usersubscription',
             name='plan',
-            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='subscriptions.plan', verbose_name='Subscription'),
+            field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='payments.plan', verbose_name='Subscription'),
             preserve_default=False,
         ),
     ]

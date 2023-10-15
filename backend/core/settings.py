@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     # applications
     'apps.users',
     'apps.picsart',
-    'apps.subscriptions'
+    'apps.payments'
 ]
 
 MIDDLEWARE = [

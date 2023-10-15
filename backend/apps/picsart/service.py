@@ -16,7 +16,7 @@ from .models import (JPEGArtifactsImages,
                      AnonymousUserFunctionsUsageCounter,
                      FreeEnhancesLimit)
 from .utils import generate_token, ImageEnhanceTypes
-from apps.subscriptions.models import Plan
+from apps.payments.models import Plan
 from apps.users.models import User
 
 

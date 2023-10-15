@@ -101,7 +101,7 @@ class UserSubscription(models.Model):
     user = models.ForeignKey(User,
                              on_delete=models.CASCADE,
                              verbose_name='User',
-                             related_name='subscriptions')
+                             related_name='payments')
     start_time = models.DateTimeField(verbose_name='Subscription starting date',
                                       blank=True,
                                       null=True)

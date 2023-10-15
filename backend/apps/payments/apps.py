@@ -3,7 +3,7 @@ from django.apps import AppConfig
 
 class SubscriptionsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'apps.subscriptions'
+    name = 'apps.payments'
 
     def ready(self):
-        import apps.subscriptions.signals
+        import apps.payments.signals

@@ -7,13 +7,13 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('subscriptions', '0019_alter_usersubscription_user'),
+        ('payments', '0019_alter_usersubscription_user'),
     ]
 
     operations = [
         migrations.AlterField(
             model_name='usersubscription',
             name='plan',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='subscriptions.plan', verbose_name='Plan'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='payments.plan', verbose_name='Plan'),
         ),
     ]
