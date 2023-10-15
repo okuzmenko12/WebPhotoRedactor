@@ -8,14 +8,15 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Plan
+from .models import Plan, ForeignOrder
 
 from .serializers import (PlanSerializer,
-                          CreateUserForSubscriptionMixin)
+                          CreateUserForSubscriptionMixin,
+                          ForeignOrderSerializer)
 from .services import (PayPalOrdersMixin,
                        StripePaymentMixin,
                        QuerySetMixin,
-                       UserCreateForPaymentMixin)
+                       UserCreateForPaymentMixin, ForeignOrderMixin)
 
 from apps.users.models import User
 from apps.users.services import get_jwt_tokens_for_user
@@ -66,7 +67,9 @@ class CreatePayPalOrderAPIView(PayPalOrdersMixin,
                 'error': 'This plan doesn\'t exists!'  # noqa
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        data, error = self.create_order(plan, plan.price)
+        user = User.objects.get(email='admin@gmail.com')  # self.request.user
+
+        data, error = self.create_order(plan.price)
 
         if error is not None:
             return Response({
@@ -75,7 +78,7 @@ class CreatePayPalOrderAPIView(PayPalOrdersMixin,
 
         self.create_order_in_db({
             'plan': plan,
-            'user': User.objects.get(email='admin@gmail.com'),  # self.request.user
+            'user': user,
             'status': 'ACTIVE',
             'payment_service': 'PAYPAL',
             'paypal_order_id': data.get('order_id')
@@ -132,6 +135,29 @@ class CreateStripeCheckoutSessionAPIView(StripePaymentMixin,
         }, status=status.HTTP_201_CREATED)
 
 
+class CreateStripeForeignCheckoutSessionAPIView(ForeignOrderMixin,
+                                                APIView):
+    serializer_class = ForeignOrderSerializer
+    foreign_order = True
+
+    def post(self, *args, **kwargs):
+        serializer = self.serializer_class(data=self.request.data)
+        serializer.is_valid(raise_exception=True)
+        order: ForeignOrder = serializer.save()
+
+        checkout_session_id = self.create_checkout_session(
+            client_id=order.email,
+            foreign_order=order
+        )
+        if checkout_session_id is None:
+            return Response({
+                'error': 'Something went wrong with payment, please try again!'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+            'checkout_session_id': checkout_session_id
+        }, status=status.HTTP_201_CREATED)
+
+
 class StripeWebhookAPIView(StripePaymentMixin,
                            QuerySetMixin,
                            APIView):
@@ -139,14 +165,60 @@ class StripeWebhookAPIView(StripePaymentMixin,
     def post(self, *args, **kwargs):
         payload = self.request.body
         sig_header = self.request.META['HTTP_STRIPE_SIGNATURE']
-
-        print(self.complete_payment(payload, sig_header))
+        self.complete_payment(payload, sig_header)
         return Response(data={'data': True})
 
 
 class PlansAPIVIew(ListAPIView):
     queryset = Plan.objects.all()
     serializer_class = PlanSerializer
+
+
+class CreatePayPalForeignOrderAPIView(PayPalOrdersMixin,
+                                      APIView):
+    serializer_class = ForeignOrderSerializer
+    foreign_order = True
+
+    def post(self, *args, **kwargs):
+        serializer = self.serializer_class(data=self.request.data)
+        serializer.is_valid(raise_exception=True)
+        order: ForeignOrder = serializer.save()
+
+        data, error = self.create_order(order.amount)
+
+        if error is not None:
+            return Response({
+                'error': error
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        order.paypal_order_id = data.get('order_id')
+        order.save()
+
+        return Response(
+            data=data,
+            status=status.HTTP_201_CREATED
+        )
+
+
+class CompleteForeignOrderByPayPalOrderID(ForeignOrderMixin,
+                                          APIView):
+    foreign_order = True
+
+    def post(self, *args, **kwargs):
+        order_id = self.kwargs.get('order_id')
+
+        if order_id is None:
+            return Response({
+                'error': 'Order ID must be provided!'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        data, error = self.foreign_paypal_capture(order_id)
+
+        if error is not None:
+            return Response({
+                'error': error
+            }, status=status.HTTP_400_BAD_REQUEST)
+        return Response(data, status.HTTP_200_OK)
 
 
 @login_required

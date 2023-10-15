@@ -98,6 +98,15 @@ class ForeignOrder(models.Model):
     notify_url = models.URLField(verbose_name='Notify url',
                                  blank=True,
                                  null=True)
+    paypal_order_id = models.CharField(max_length=150,
+                                       verbose_name='PayPal order id',
+                                       blank=True,
+                                       null=True)
+    stripe_session_id = models.CharField(max_length=350,
+                                         verbose_name='Stripe session id',
+                                         blank=True,
+                                         null=True)
+    is_ended = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'foreign_orders'

@@ -6,7 +6,10 @@ from .views import (home,
                     CreateStripeCheckoutSessionAPIView,
                     CreateUserToMakePaymentAPIView,
                     CreatePayPalOrderAPIView,
-                    PlansAPIVIew)
+                    PlansAPIVIew,
+                    CreatePayPalForeignOrderAPIView,
+                    CompleteForeignOrderByPayPalOrderID,
+                    CreateStripeForeignCheckoutSessionAPIView)
 
 urlpatterns = [
     path('all/', PlansAPIVIew.as_view()),
@@ -17,5 +20,8 @@ urlpatterns = [
     path('stripe/webhook/', StripeWebhookAPIView.as_view()),
     path('stripe/create_checkout_session/<int:plan_id>/',
          CreateStripeCheckoutSessionAPIView.as_view()),
-    path('paypal/create_order/<int:plan_id>/', CreatePayPalOrderAPIView.as_view())
+    path('stripe/foreign/create_checkout_session/', CreateStripeForeignCheckoutSessionAPIView.as_view()),
+    path('paypal/create_order/<int:plan_id>/', CreatePayPalOrderAPIView.as_view()),
+    path('paypal/foreign/create_order/', CreatePayPalForeignOrderAPIView.as_view()),
+    path('paypal/foreign/complete_order/<str:order_id>/', CompleteForeignOrderByPayPalOrderID.as_view())
 ]

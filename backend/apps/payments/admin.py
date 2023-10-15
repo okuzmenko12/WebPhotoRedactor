@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Plan, Order
+from .models import Plan, Order, ForeignOrder
 
 
 @admin.register(Plan)
@@ -12,4 +12,9 @@ class PlanAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(ForeignOrder)
+class ForeignOrderAdmin(admin.ModelAdmin):
     pass

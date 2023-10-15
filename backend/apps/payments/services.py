@@ -7,20 +7,26 @@ import os
 
 from typing import NamedTuple, Optional
 
-from .models import Plan, Order
+from .models import Plan, Order, ForeignOrder
 
 from django.conf import settings
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 
 from apps.users.services import get_user_by_id
-from .utils import get_random_password
+from .utils import get_random_password, get_price_in_cents
 from apps.users.models import User
 
 
 class PaymentData(NamedTuple):
     data: Optional[dict] = None
     error: Optional[str] = None
+
+
+class ForeignOrderData(NamedTuple):
+    success: bool
+    order_data: Optional[dict] = None
+    message: Optional[str] = None
 
 
 class QuerySetMixin:
@@ -60,16 +66,29 @@ class QuerySetMixin:
 
 
 class OrderMixin(QuerySetMixin):
+    foreign_order = False
+
+    @property
+    def model(self):
+        model = Order
+        if self.foreign_order:
+            model = ForeignOrder
+        return model
 
     def create_order_in_db(self, data):
-        order = self.create_instance_by_data(Order, data)
+        order = self.create_instance_by_data(self.model, data)
         return order
 
     def get_order_by_data(
             self,
             data
     ):
-        return self.get_instance_by_data(Order, data)
+        model = Order
+        instance = self.get_instance_by_data(model, data)
+        if instance is None:
+            model = ForeignOrder
+            return self.get_instance_by_data(model, data)
+        return instance
 
     @staticmethod
     def give_credits_to_order_user(
@@ -93,8 +112,9 @@ class OrderMixin(QuerySetMixin):
 
     def complete_order(
             self,
-            order: Order
+            order: Order,
     ):
+
         order.status = 'COMPLETED'
         order.save()
         self.give_credits_to_order_user(order)  # give credits to customer
@@ -237,7 +257,6 @@ class PayPalOrdersMixin(PayPalContextMixin):
 
     def create_order(
             self,
-            plan: Plan,
             amount: int,
             success_url: str = None,
             cancel_url: str = None
@@ -253,7 +272,6 @@ class PayPalOrdersMixin(PayPalContextMixin):
             headers=header,
             data=json_data
         )
-
         return self.get_data_from_response(response, order_create=True)
 
     def capture_order(self, order_id):
@@ -307,33 +325,51 @@ class StripePaymentMixin(OrderMixin):
     def create_checkout_session(
             self,
             client_id,
-            plan: Plan,
-            success_url=None,
-            cancel_url=None
+            plan: Plan = None,
+            foreign_order: ForeignOrder = None,
     ):
         self.configure_stripe()
+
+        success_url = settings.PAYMENT_SUCCESS_URL
+        cancel_url = settings.PAYMENT_CANCEL_URL
+
+        if foreign_order is not None:
+            stripe_price_id = self.create_product({
+                'name': f'Order #{foreign_order.ext_id}',
+                'description': foreign_order.description if foreign_order.description is not None else '',
+                'price': get_price_in_cents(foreign_order.amount)
+            })
+            success_url = foreign_order.success_url
+            cancel_url = foreign_order.cancel_url
+
+        else:
+            stripe_price_id = plan.stripe_price_id
         checkout_session = stripe.checkout.Session.create(
             client_reference_id=client_id,
-            success_url=success_url if success_url is not None else settings.PAYMENT_SUCCESS_URL,
-            cancel_url=cancel_url if cancel_url is not None else settings.PAYMENT_CANCEL_URL,
+            success_url=success_url,
+            cancel_url=cancel_url,
             payment_method_types=['card'],
             mode='payment',
             line_items=[
                 {
-                    'price': plan.stripe_price_id,
+                    'price': stripe_price_id,
                     'quantity': 1,
                 }
             ]
         )
         session_id = checkout_session.get('id')
 
-        self.create_order_in_db({
-            'plan': plan,
-            'user': get_user_by_id(client_id),
-            'status': 'ACTIVE',
-            'payment_service': 'STRIPE',
-            'stripe_session_id': session_id
-        })
+        if foreign_order is None:
+            self.create_order_in_db({
+                'plan': plan,
+                'user': get_user_by_id(client_id),
+                'status': 'ACTIVE',
+                'payment_service': 'STRIPE',
+                'stripe_session_id': session_id
+            })
+        else:
+            foreign_order.stripe_session_id = session_id
+            foreign_order.save()
         return session_id
 
     def complete_payment(self, payload, sig_header):
@@ -352,11 +388,14 @@ class StripePaymentMixin(OrderMixin):
             client_reference_id = session.get('client_reference_id')
 
             data = {
-                'user_id': client_reference_id,
                 'stripe_session_id': session.get('id')
             }
-            order: Order = self.get_order_by_data(data)
-            self.complete_order(order)
+            order: Order | ForeignOrder = self.get_order_by_data(data)
+
+            if isinstance(order, Order):
+                self.complete_order(order)
+            else:
+                print(order)
 
         return None
 
@@ -420,3 +459,49 @@ class UserCreateForPaymentMixin:
             print(e)
             user = None
         return user
+
+
+class ForeignOrderMixin(PayPalOrdersMixin):
+
+    def foreign_paypal_capture(
+            self,
+            order_id
+    ):
+        order: ForeignOrder = self.get_order_by_data({'paypal_order_id': order_id})
+        if order is None:
+            return PaymentData(error='No such order with provided order ID')
+        if order.is_ended:
+            return PaymentData(error='This order is already ended!')
+
+        data, error = self.capture_order(order_id)
+
+        notify_data = {
+            'success': True
+        }
+        if error is not None:
+            notify_data['success'] = False
+            notify_data['message'] = error
+            self.notify(order, notify_data)
+            return PaymentData(error='Payment error.')
+        self.notify(order, notify_data)
+        self.make_order_ended(order)
+        return PaymentData(data={
+            'success': 'Successful payment.'
+        })
+
+    @staticmethod
+    def notify(
+            order: ForeignOrder,
+            data: dict
+    ):
+        data.update({
+            'ext_id': order.ext_id,
+            'amount': order.amount,
+            'currency': order.currency
+        })
+        # requests.post(order.notify_url, data=json.dumps(data))
+
+    @staticmethod
+    def make_order_ended(order: ForeignOrder):
+        order.is_ended = True
+        order.save()
