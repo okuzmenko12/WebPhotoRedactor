@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Plan, UserSubscription, PayPalProduct
+from .models import Plan, UserSubscription, PayPalProduct, Order
 
 
 @admin.register(Plan)
@@ -22,4 +22,9 @@ class UserSubscriptionAdmin(admin.ModelAdmin):
 
 @admin.register(PayPalProduct)
 class PayPalProductAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
     pass

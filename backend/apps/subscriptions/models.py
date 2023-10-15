@@ -14,7 +14,8 @@ class Plan(models.Model):
                                           verbose_name='Up scales count')
     bg_deletions_count = models.IntegerField(
         default=100,
-        verbose_name='Background deletions count')
+        verbose_name='Background deletions count'
+    )
     jpg_artifacts_deletions_count = models.IntegerField(
         default=100,
         verbose_name='JPEG artifacts deletions count'
@@ -63,7 +64,13 @@ class Order(models.Model):
                                        choices=PAYMENT_SERVICES,
                                        verbose_name='Payment service')
     paypal_order_id = models.CharField(max_length=150,
-                                       verbose_name='PayPal order id')
+                                       verbose_name='PayPal order id',
+                                       blank=True,
+                                       null=True)
+    stripe_session_id = models.CharField(max_length=350,
+                                         verbose_name='Stripe session id',
+                                         blank=True,
+                                         null=True)
 
     class Meta:
         db_table = 'orders'

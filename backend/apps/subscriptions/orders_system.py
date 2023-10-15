@@ -7,9 +7,11 @@ import os
 
 from typing import NamedTuple, Optional
 
-from .models import Plan
+from .models import Plan, Order
 
 from django.conf import settings
+
+from apps.users.services import get_user_by_id
 
 
 class PaymentData(NamedTuple):
@@ -17,7 +19,84 @@ class PaymentData(NamedTuple):
     error: Optional[str] = None
 
 
-class PayPalContextMixin:
+class QuerySetMixin:
+
+    @staticmethod
+    def get_model_instance_by_id(
+            model,
+            obj_id
+    ):
+        try:
+            instance = model.objects.get(**{'id': obj_id})
+        except (Exception,):
+            return None
+        return instance
+
+    @staticmethod
+    def create_instance_by_data(
+            model,
+            data: dict
+    ) -> bool:
+        try:
+            model.objects.create(**data)
+        except (Exception,):
+            return False
+        return True
+
+    @staticmethod
+    def get_instance_by_data(
+            model,
+            data: dict
+    ):
+        try:
+            instance = model.objects.get(**data)
+        except (Exception,):
+            return None
+        return instance
+
+
+class OrderMixin(QuerySetMixin):
+
+    def create_order_in_db(self, data):
+        order = self.create_instance_by_data(Order, data)
+        return order
+
+    def get_order_by_data(
+            self,
+            data
+    ):
+        return self.get_instance_by_data(Order, data)
+
+    @staticmethod
+    def give_credits_to_order_user(
+            order: Order
+    ):
+        user = order.user
+        plan = order.plan
+        counter_of_usage = user.counter_of_usage
+
+        plan_credit_fields = [
+            'up_scales_count',
+            'bg_deletions_count',
+            'jpg_artifacts_deletions_count'
+        ]
+        for field in plan_credit_fields:
+            plan_field_value = getattr(plan, field)
+            user_field_value = getattr(counter_of_usage, field)
+            new_value = user_field_value + plan_field_value
+            setattr(counter_of_usage, field, new_value)
+        counter_of_usage.save()
+
+    def complete_order(
+            self,
+            order: Order
+    ):
+        order.status = 'COMPLETED'
+        order.save()
+        self.give_credits_to_order_user(order)  # give credits to customer
+
+
+class PayPalContextMixin(OrderMixin):
 
     @property
     def urls_first_part(self):
@@ -179,7 +258,7 @@ class PayPalOrdersMixin(PayPalContextMixin):
         return self.get_data_from_response(response, capture_order=True)
 
 
-class StripePaymentMixin:
+class StripePaymentMixin(OrderMixin):
 
     @staticmethod
     def configure_stripe():
@@ -222,13 +301,15 @@ class StripePaymentMixin:
     def create_checkout_session(
             self,
             client_id,
-            plan: Plan
+            plan: Plan,
+            success_url=None,
+            cancel_url=None
     ):
         self.configure_stripe()
         checkout_session = stripe.checkout.Session.create(
             client_reference_id=client_id,
-            success_url=settings.PAYMENT_SUCCESS_URL,
-            cancel_url=settings.PAYMENT_CANCEL_URL,
+            success_url=success_url if success_url is not None else settings.PAYMENT_SUCCESS_URL,
+            cancel_url=cancel_url if cancel_url is not None else settings.PAYMENT_CANCEL_URL,
             payment_method_types=['card'],
             mode='payment',
             line_items=[
@@ -239,9 +320,17 @@ class StripePaymentMixin:
             ]
         )
         session_id = checkout_session.get('id')
+
+        self.create_order_in_db({
+            'plan': plan,
+            'user': get_user_by_id(client_id),
+            'status': 'ACTIVE',
+            'payment_service': 'STRIPE',
+            'stripe_session_id': session_id
+        })
         return session_id
 
-    def get_payment_data(self, payload, sig_header):
+    def complete_payment(self, payload, sig_header):
         self.configure_stripe()
         endpoint_secret = self.webhook_url
 
@@ -256,23 +345,11 @@ class StripePaymentMixin:
             session = event['data']['object']
             client_reference_id = session.get('client_reference_id')
 
-            print(session)
-
-            return {
-                'user_id': client_reference_id
+            data = {
+                'user_id': client_reference_id,
+                'stripe_session_id': session.get('id')
             }
+            order: Order = self.get_order_by_data(data)
+            self.complete_order(order)
+
         return None
-
-
-class QuerySetMixin:
-
-    @staticmethod
-    def get_model_instance_by_id(
-            model,
-            obj_id
-    ):
-        try:
-            instance = model.objects.get(**{'id': obj_id})
-        except (Exception,):
-            return None
-        return instance

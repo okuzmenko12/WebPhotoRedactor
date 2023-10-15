@@ -121,7 +121,7 @@ class StripeWebhookAPIView(StripePaymentMixin,
         payload = self.request.body
         sig_header = self.request.META['HTTP_STRIPE_SIGNATURE']
 
-        print(self.get_payment_data(payload, sig_header))
+        print(self.complete_payment(payload, sig_header))
         return Response(data={'data': True})
 
 
