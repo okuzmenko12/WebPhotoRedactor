@@ -27,14 +27,14 @@ class BaseImageAPIView(IPAddressesUsageCountMixin,
         image = self.request.data.get('image')
         ip_address = self.request.data.get('ip_address')
 
-        if type(image) == str:
+        if isinstance(image, str):
             return Response({
                 'error': 'Something went wrong... Please try again.'
             }, status=status.HTTP_400_BAD_REQUEST)
 
         format_error = self.psc.validate_image_format(image)
         reach_limit_resp = Response({
-            'error': 'You have reached the usage limit of this feature in this month!'
+            'error': 'You have used all your credits for this feature!'
         }, status=status.HTTP_400_BAD_REQUEST)
 
         user: User = self.request.user
@@ -56,33 +56,21 @@ class BaseImageAPIView(IPAddressesUsageCountMixin,
                 self.counter_enhance_field
             )
 
-
-            # else:
-            #     if user_count_of_enhances == 0:
-            #
-            #         error_resp = Response({
-            #             'error': 'You don\'t have active subscription'
-            #                      ' and you don\'t have remaining attempts!'
-            #                      ' To use this feature, subscribe to one of'
-            #                      ' the plan.'
-            #         })
-            #
-            #         if ip_address is not None:
-            #             attempts = self.ip_attempts_for_field(
-            #                 ip_address, self.counter_enhance_field
-            #             )
-            #             if attempts >= self.get_features_max_value_of_free_usage():
-            #                 return error_resp
-            #             self.ip_increase_field_usage_count(ip_address, self.counter_enhance_field)
-            #         else:
-            #             return error_resp
-            #     else:
-            #         self.psc.free_version = False
-            #         decrease_count_of_enhances_for_field(
-            #             user,
-            #             self.counter_enhance_field,
-            #             1
-            #         )
+            if user_count_of_enhances == 0:
+                if ip_address is not None:
+                    attempts = self.ip_attempts_for_field(
+                        ip_address, self.counter_enhance_field
+                    )
+                    if attempts >= self.get_features_max_value_of_free_usage():
+                        return reach_limit_resp
+                    self.ip_increase_field_usage_count(ip_address, self.counter_enhance_field)
+                else:
+                    return reach_limit_resp
+            decrease_count_of_enhances_for_field(
+                user,
+                self.counter_enhance_field,
+                1
+            )
 
         format_error_response = Response({
             'error': format_error
