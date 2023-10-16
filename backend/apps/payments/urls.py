@@ -14,9 +14,9 @@ from .views import (home,
                     PlanDetailAPIView)
 
 urlpatterns = [
-    path('', PlansAPIVIew.as_view()),
-    path('<int:pk>/', PlanDetailAPIView.as_view()),
-    path('test', home, name='payments-home'),
+    path('plans/', PlansAPIVIew.as_view()),
+    path('plans/<int:pk>/', PlanDetailAPIView.as_view()),
+    path('test/', home, name='payments-home'),
     path('create_user_for_subscription/',
          CreateUserToMakePaymentAPIView.as_view()),
     path('stripe/config/', StripeConfigAPIView.as_view()),
