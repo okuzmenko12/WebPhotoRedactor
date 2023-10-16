@@ -53,6 +53,7 @@ class CreateUserToMakePaymentAPIView(UserCreateForPaymentMixin,
 class CreatePayPalOrderAPIView(PayPalOrdersMixin,
                                QuerySetMixin,
                                APIView):
+    permission_classes = [IsAuthenticated]
 
     def post(self, *args, **kwargs):
         plan_id = self.kwargs.get('plan_id')
@@ -67,7 +68,7 @@ class CreatePayPalOrderAPIView(PayPalOrdersMixin,
                 'error': 'This plan doesn\'t exists!'  # noqa
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        user = User.objects.get(email='admin@gmail.com')  # self.request.user
+        user = self.request.user
 
         data, error = self.create_order(plan.price)
 
@@ -129,6 +130,7 @@ class StripeConfigAPIView(APIView):
 class CreateStripeCheckoutSessionAPIView(StripePaymentMixin,
                                          QuerySetMixin,
                                          APIView):
+    permission_classes = [IsAuthenticated]
 
     def post(self, *args, **kwargs):
         plan_id = self.kwargs.get('plan_id')
@@ -144,7 +146,7 @@ class CreateStripeCheckoutSessionAPIView(StripePaymentMixin,
             }, status=status.HTTP_400_BAD_REQUEST)
 
         checkout_session_id = self.create_checkout_session(
-            User.objects.get(email='admin@gmail.com').id,  # self.request.user.id,
+            self.request.user.id,
             plan
         )
         if checkout_session_id is None:
