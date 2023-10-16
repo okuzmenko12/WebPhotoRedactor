@@ -10,11 +10,13 @@ from .views import (home,
                     CreatePayPalForeignOrderAPIView,
                     CompleteForeignOrderByPayPalOrderID,
                     CreateStripeForeignCheckoutSessionAPIView,
-                    CompleteOrderByPayPalOrderID)
+                    CompleteOrderByPayPalOrderID,
+                    PlanDetailAPIView)
 
 urlpatterns = [
-    path('all/', PlansAPIVIew.as_view()),
-    path('', home, name='payments-home'),
+    path('', PlansAPIVIew.as_view()),
+    path('<int:pk>/', PlanDetailAPIView.as_view()),
+    path('test', home, name='payments-home'),
     path('create_user_for_subscription/',
          CreateUserToMakePaymentAPIView.as_view()),
     path('stripe/config/', StripeConfigAPIView.as_view()),

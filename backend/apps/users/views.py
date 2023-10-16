@@ -34,7 +34,7 @@ class UserRegistrationAPIView(AuthTokenMixin,
         return Response({
             'status': 200,
             'message': tokenized_mail_message,
-            'data': response.data
+            'user': response.data
         }, status=status.HTTP_200_OK)
 
 
@@ -54,9 +54,10 @@ class ConfirmEmailAPIView(AuthTokenMixin,
             token_data.token.delete()
             if not UserFunctionsUsageCounter.objects.filter(user=user).exists():
                 UserFunctionsUsageCounter.objects.get_or_create(user=user)
-            return Response({
-                'data': get_jwt_tokens_for_user(user)
-            }, status=status.HTTP_200_OK)
+            return Response(
+                data=get_jwt_tokens_for_user(user),
+                status=status.HTTP_200_OK
+            )
         else:
             return Response({'error': token_data.error}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -74,7 +75,9 @@ class ChangeEmailAPIView(AuthTokenMixin,
         serializer.is_valid(raise_exception=True)
         email = self.request.data['email']
         tokenized_mail_message = self.send_tokenized_mail(email)
-        return Response({'success': tokenized_mail_message}, status=status.HTTP_200_OK)
+        return Response({
+            'success': tokenized_mail_message
+        }, status=status.HTTP_200_OK)
 
 
 class ChangeEmailConfirmAPIView(AuthTokenMixin,
@@ -91,10 +94,13 @@ class ChangeEmailConfirmAPIView(AuthTokenMixin,
             user.email = new_email
             user.save()
             token_data.token.delete()
-            return Response({'success': 'You successfully changed your email'},
-                            status=status.HTTP_200_OK)
+            return Response({
+                'success': 'You successfully changed your email'
+            }, status=status.HTTP_200_OK)
         else:
-            return Response({'error': token_data.error}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'error': token_data.error
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class SendPasswordResetAPIView(AuthTokenMixin,
@@ -127,11 +133,13 @@ class PasswordResetAPIView(AuthTokenMixin,
                                                  context={'email': kwargs['email']})
             serializer.is_valid(raise_exception=True)
             token_data.token.delete()
-            return Response({'success': 'Password reset success.'},
-                            status=status.HTTP_200_OK)
+            return Response({
+                'success': 'Password reset success.'
+            }, status=status.HTTP_200_OK)
         else:
-            return Response({'error': token_data.error},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response({
+                'error': token_data.error
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ChangePasswordAPIView(APIView):
