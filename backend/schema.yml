@@ -520,7 +520,7 @@ paths:
     get:
       operationId: subscriptions_all_list
       tags:
-      - subscriptions
+      - payments
       security:
       - jwtAuth: []
       - {}
@@ -543,7 +543,7 @@ paths:
           type: integer
         required: true
       tags:
-      - subscriptions
+      - payments
       security:
       - jwtAuth: []
       - {}
@@ -554,7 +554,7 @@ paths:
     post:
       operationId: subscriptions_paypal_create_user_subscription_create
       tags:
-      - subscriptions
+      - payments
       requestBody:
         content:
           application/json:
@@ -580,7 +580,7 @@ paths:
     get:
       operationId: subscriptions_stripe_config_retrieve
       tags:
-      - subscriptions
+      - payments
       security:
       - jwtAuth: []
       - {}
@@ -597,7 +597,7 @@ paths:
           type: integer
         required: true
       tags:
-      - subscriptions
+      - payments
       security:
       - jwtAuth: []
       responses:
@@ -607,7 +607,7 @@ paths:
     post:
       operationId: subscriptions_stripe_webhook_create
       tags:
-      - subscriptions
+      - payments
       security:
       - jwtAuth: []
       - {}

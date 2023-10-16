@@ -1,0 +1,22 @@
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
+from .models import Plan
+from .utils import get_price_in_cents
+
+from .services import StripePaymentMixin
+
+
+@receiver(post_save, sender=Plan)
+def plan_paypal_id_add(sender, instance: Plan, created, **kwargs):
+    if not instance.stripe_price_id:
+        stripe_mixin = StripePaymentMixin()
+
+        price_in_cents = get_price_in_cents(instance.price)
+
+        price_id = stripe_mixin.create_product({
+            'price': price_in_cents,
+            'name': instance.name,
+            'description': instance.description
+        })
+        Plan.objects.filter(id=instance.pk).update(stripe_price_id=price_id)

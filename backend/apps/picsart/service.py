@@ -16,7 +16,7 @@ from .models import (JPEGArtifactsImages,
                      AnonymousUserFunctionsUsageCounter,
                      FreeEnhancesLimit)
 from .utils import generate_token, ImageEnhanceTypes
-from apps.subscriptions.models import Plan
+from apps.payments.models import Plan
 from apps.users.models import User
 
 
@@ -186,7 +186,7 @@ class PCsService(RequestContextMixin,
             width, height = image.size
             watermark_img = watermark_img.resize((width, height), Image.Resampling.LANCZOS)
 
-            position1 = (50, 50)
+            position1 = (0, 0)
             image.paste(watermark_img, position1, watermark_img)
 
         return image

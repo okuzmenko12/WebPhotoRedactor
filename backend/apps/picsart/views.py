@@ -12,12 +12,10 @@ from .service import (PCsService,
 from .utils import ImageEnhanceTypes, CounterModelEnhanceFields
 from .serializers import ImageSerializer
 
-from apps.subscriptions.services import UserSubscriptionsService
 from apps.users.models import User
 
 
 class BaseImageAPIView(IPAddressesUsageCountMixin,
-                       UserSubscriptionsService,
                        APIView):
     serializer_class = ImageSerializer
     parser_classes = (MultiPartParser, FormParser)
@@ -58,42 +56,33 @@ class BaseImageAPIView(IPAddressesUsageCountMixin,
                 self.counter_enhance_field
             )
 
-            if self.user_have_active_subscriptions(user):
-                self.psc.free_version = False
 
-                if user_count_of_enhances == 0:
-                    return reach_limit_resp
-                decrease_count_of_enhances_for_field(
-                    user,
-                    self.counter_enhance_field,
-                    1
-                )
-            else:
-                if user_count_of_enhances == 0:
-
-                    error_resp = Response({
-                        'error': 'You don\'t have active subscription'
-                                 ' and you don\'t have remaining attempts!'
-                                 ' To use this feature, subscribe to one of'
-                                 ' the plan.'
-                    })
-
-                    if ip_address is not None:
-                        attempts = self.ip_attempts_for_field(
-                            ip_address, self.counter_enhance_field
-                        )
-                        if attempts >= self.get_features_max_value_of_free_usage():
-                            return error_resp
-                        self.ip_increase_field_usage_count(ip_address, self.counter_enhance_field)
-                    else:
-                        return error_resp
-                else:
-                    self.psc.free_version = False
-                    decrease_count_of_enhances_for_field(
-                        user,
-                        self.counter_enhance_field,
-                        1
-                    )
+            # else:
+            #     if user_count_of_enhances == 0:
+            #
+            #         error_resp = Response({
+            #             'error': 'You don\'t have active subscription'
+            #                      ' and you don\'t have remaining attempts!'
+            #                      ' To use this feature, subscribe to one of'
+            #                      ' the plan.'
+            #         })
+            #
+            #         if ip_address is not None:
+            #             attempts = self.ip_attempts_for_field(
+            #                 ip_address, self.counter_enhance_field
+            #             )
+            #             if attempts >= self.get_features_max_value_of_free_usage():
+            #                 return error_resp
+            #             self.ip_increase_field_usage_count(ip_address, self.counter_enhance_field)
+            #         else:
+            #             return error_resp
+            #     else:
+            #         self.psc.free_version = False
+            #         decrease_count_of_enhances_for_field(
+            #             user,
+            #             self.counter_enhance_field,
+            #             1
+            #         )
 
         format_error_response = Response({
             'error': format_error
