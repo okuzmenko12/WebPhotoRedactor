@@ -104,6 +104,12 @@ class CompleteOrderByPayPalOrderID(PayPalOrdersMixin,
             }, status=status.HTTP_400_BAD_REQUEST)
 
         order: Order = self.get_order_by_data({'paypal_order_id': order_id})
+
+        if order is None:
+            return Response({
+                'error': 'No such order with provided order ID.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         if order.status != 'ACTIVE':
             return Response({
                 'error': 'This order is not active!'
