@@ -8,7 +8,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Plan, ForeignOrder
+from .models import Plan, ForeignOrder, Order
 
 from .serializers import (PlanSerializer,
                           CreateUserForSubscriptionMixin,
@@ -95,7 +95,28 @@ class CompleteOrderByPayPalOrderID(PayPalOrdersMixin,
                                    APIView):
 
     def post(self, *args, **kwargs):
-        pass
+        order_id = self.kwargs.get('order_id')
+
+        if order_id is None:
+            return Response({
+                'error': 'Order ID must be provided!'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        order: Order = self.get_order_by_data({'paypal_order_id': order_id})
+        if order.status != 'ACTIVE':
+            return Response({
+                'error': 'This order is not active!'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        data, error = self.capture_order(order_id)
+
+        if error is not None:
+            return Response({
+                'error': error
+            }, status=status.HTTP_400_BAD_REQUEST)
+        self.complete_order(order)
+
+        return Response(data, status.HTTP_200_OK)
 
 
 class StripeConfigAPIView(APIView):
@@ -109,7 +130,7 @@ class CreateStripeCheckoutSessionAPIView(StripePaymentMixin,
                                          QuerySetMixin,
                                          APIView):
 
-    def get(self, *args, **kwargs):
+    def post(self, *args, **kwargs):
         plan_id = self.kwargs.get('plan_id')
         if plan_id is None:
             return Response({
@@ -136,6 +157,7 @@ class CreateStripeCheckoutSessionAPIView(StripePaymentMixin,
 
 
 class CreateStripeForeignCheckoutSessionAPIView(ForeignOrderMixin,
+                                                StripePaymentMixin,
                                                 APIView):
     serializer_class = ForeignOrderSerializer
     foreign_order = True

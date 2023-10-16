@@ -112,12 +112,15 @@ class OrderMixin(QuerySetMixin):
 
     def complete_order(
             self,
-            order: Order,
+            order: Order | ForeignOrder,
     ):
-
-        order.status = 'COMPLETED'
-        order.save()
-        self.give_credits_to_order_user(order)  # give credits to customer
+        if isinstance(order, Order):
+            order.status = 'COMPLETED'
+            order.save()
+            self.give_credits_to_order_user(order)  # give credits to customer
+        else:
+            order.is_ended = True
+            order.save()
 
 
 class PayPalContextMixin(OrderMixin):
@@ -282,7 +285,24 @@ class PayPalOrdersMixin(PayPalContextMixin):
         return self.get_data_from_response(response, capture_order=True)
 
 
-class StripePaymentMixin(OrderMixin):
+class ForeignOrderNotify:
+
+    @staticmethod
+    def notify(
+            order: ForeignOrder,
+            data: dict
+    ):
+        data.update({
+            'ext_id': order.ext_id,
+            'amount': order.amount,
+            'currency': order.currency
+        })
+        print(data)
+        # requests.post(order.notify_url, data=json.dumps(data))
+
+
+class StripePaymentMixin(OrderMixin,
+                         ForeignOrderNotify):
 
     @staticmethod
     def configure_stripe():
@@ -392,10 +412,11 @@ class StripePaymentMixin(OrderMixin):
             }
             order: Order | ForeignOrder = self.get_order_by_data(data)
 
-            if isinstance(order, Order):
-                self.complete_order(order)
-            else:
-                print(order)
+            if isinstance(order, ForeignOrder):
+                self.notify(order, {
+                    'success': True
+                })
+            self.complete_order(order)
 
         return None
 
@@ -461,7 +482,8 @@ class UserCreateForPaymentMixin:
         return user
 
 
-class ForeignOrderMixin(PayPalOrdersMixin):
+class ForeignOrderMixin(PayPalOrdersMixin,
+                        ForeignOrderNotify):
 
     def foreign_paypal_capture(
             self,
@@ -488,18 +510,6 @@ class ForeignOrderMixin(PayPalOrdersMixin):
         return PaymentData(data={
             'success': 'Successful payment.'
         })
-
-    @staticmethod
-    def notify(
-            order: ForeignOrder,
-            data: dict
-    ):
-        data.update({
-            'ext_id': order.ext_id,
-            'amount': order.amount,
-            'currency': order.currency
-        })
-        # requests.post(order.notify_url, data=json.dumps(data))
 
     @staticmethod
     def make_order_ended(order: ForeignOrder):

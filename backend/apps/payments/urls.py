@@ -9,7 +9,8 @@ from .views import (home,
                     PlansAPIVIew,
                     CreatePayPalForeignOrderAPIView,
                     CompleteForeignOrderByPayPalOrderID,
-                    CreateStripeForeignCheckoutSessionAPIView)
+                    CreateStripeForeignCheckoutSessionAPIView,
+                    CompleteOrderByPayPalOrderID)
 
 urlpatterns = [
     path('all/', PlansAPIVIew.as_view()),
@@ -22,6 +23,7 @@ urlpatterns = [
          CreateStripeCheckoutSessionAPIView.as_view()),
     path('stripe/foreign/create_checkout_session/', CreateStripeForeignCheckoutSessionAPIView.as_view()),
     path('paypal/create_order/<int:plan_id>/', CreatePayPalOrderAPIView.as_view()),
+    path('paypal/complete_order/<str:order_id>/', CompleteOrderByPayPalOrderID.as_view()),
     path('paypal/foreign/create_order/', CreatePayPalForeignOrderAPIView.as_view()),
     path('paypal/foreign/complete_order/<str:order_id>/', CompleteForeignOrderByPayPalOrderID.as_view())
 ]
