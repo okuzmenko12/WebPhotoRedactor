@@ -508,7 +508,8 @@ class ForeignOrderMixin(PayPalOrdersMixin,
         self.notify(order, notify_data)
         self.make_order_ended(order)
         return PaymentData(data={
-            'success': 'Successful payment.'
+            'success': 'Successful payment.',
+            'success_url': order.success_url
         })
 
     @staticmethod
