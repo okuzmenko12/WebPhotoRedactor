@@ -10,6 +10,8 @@ import PaymentPage from "@/pages/PaymentPage";
 import ConfirmPage from "@/pages/ConfirmPage";
 import ChangePassword from "@/pages/ChangePassword";
 import ChangeEmail from "@/pages/ChangeEmail";
+import ImagePage from "@/pages/ImagePage";
+import paypalSuccess from "@/pages/SuccessPaypalPage";
 
 
 const routes = [
@@ -54,7 +56,7 @@ const routes = [
         component: ConfirmPage
     },
     {
-        path: '/reset_password_confimation',
+        path: '/reset_password_confirmation',
         name: 'Resseting password confirmation',
         component: ChangePassword
     },
@@ -62,6 +64,31 @@ const routes = [
         path: '/change_email_confirmation',
         name: 'Change email confirmation',
         component: ChangeEmail
+    },
+    {
+        path: '/image_upload',
+        name: 'Image upload',
+        component: ImagePage
+    },
+    {
+        path: '/payment/paypal/success',
+        name: 'Paypal success',
+        component: paypalSuccess
+    },
+    {
+        path: '/payment/paypal/cancel',
+        name: 'Paypal cancel',
+        component: paypalSuccess
+    },
+    {
+        path: '/payment/stripe/success',
+        name: 'Stripe success',
+        component: paypalSuccess
+    },
+    {
+        path: '/payment/stripe/cancel',
+        name: 'Stripe cancel',
+        component: paypalSuccess
     },
 ]
 

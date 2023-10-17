@@ -5,7 +5,7 @@
         </template>
         <template v-else>
             <h1 class="header_text">Change email confirmation</h1>
-            <button @click="changeEmailRequest" class="verify_email_button white">Changle email</button>
+            <button @click="changeEmailRequest" class="change_email_button white">Changle email</button>
             <p id="message_conf" class="white align_center_text">{{ message }}</p>
         </template>
     </div>
@@ -28,11 +28,9 @@
         },
         methods: {
             changeEmailRequest() {
-                axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/auth/change_email_confirm/${this.tokenQuery}/${this.emailQuery}/`, { headers: getHeaders() })
+                axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/auth/change_email_confirm/${this.tokenQuery}/${this.emailQuery}/`, {}, { headers: getHeaders() })
                 .then(res => {
                     console.log(res);
-                    setLocalToken(res.data.access)
-                    setLocalRefreshToken(res.data.refresh)
                     this.message = res.data.success + " You will be redirected in 2 seconds."
                     const messageBlock = document.getElementById('message_conf')
                     messageBlock.style.color = "#00FF00"
@@ -76,8 +74,8 @@
     z-index: 1;
 }
 
-.verify_email_button {
-    background-color: #00FF00;
+.change_email_button {
+    background: var(--secondary_color);
     border: none;
     border-radius: 4px;
     padding: 5px 10px;
@@ -85,7 +83,7 @@
     transition: .3s;
 }
 
-.verify_email_button:hover {
-    background-color: #00b330;
+.change_email_button:hover {
+    background: var(--secondary_hover_color);
 }
 </style>

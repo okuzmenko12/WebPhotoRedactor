@@ -1,10 +1,8 @@
 <template>
-    <article :id=createId() class="article_article">
-        <div v-if="article_id" :id="article_id" class="article" @mouseover="showDescription(true)" @mouseleave="showDescription(false)">
-            <p v-if="article_name_id" :id="article_name_id" class="white fs--33 fw--700 art_name">{{ name }}</p>
-            <p v-if="article_desc_id" :id="article_desc_id" class="descr_art small_text fs--20">{{ article }}</p>
-        </div>
-    </article>
+    <div v-if="article_id" :id="article_id" class="article" @mouseover="showDescription(true)" @mouseleave="showDescription(false)">
+        <p v-if="article_name_id" :id="article_name_id" class="white fs--33 fw--700 art_name">{{ name }}</p>
+        <p v-if="article_desc_id" :id="article_desc_id" class="descr_art small_text fs--20">{{ article }}</p>
+    </div>
 </template>
 
 <script>
@@ -66,16 +64,9 @@
 </script>
 
 <style>
-.article_article {
+.article {
     width: 450px;
     height: 300px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.article {
-    width: 100%;
-    height: 100%;
     padding: 20px;
     margin-top: 100px;
     display: flex;

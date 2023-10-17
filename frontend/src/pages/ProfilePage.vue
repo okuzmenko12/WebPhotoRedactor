@@ -1,12 +1,14 @@
 <template>
+    <div @click="navbarToggle" id="mobile__btn"></div>
+    <div @click="navbarToggle" id="mobile__btn_close">✖</div>
     <div class="profile-container">
-        <div @click="redirectToMain" id="close_modal">
+        <div @click="redirectToMain" id="close_modal" class="profile_close_page" style="z-index: 4;">
             <svg height="15px" style="transform: rotate(180deg);" viewBox="0 0 5 9">
                 <path d="M0.419,9.000 L0.003,8.606 L4.164,4.500 L0.003,0.394 L0.419,0.000 L4.997,4.500 L0.419,9.000 Z" ></path>
             </svg>
             To Main
         </div>
-        <div class="profile_bar">
+        <div id="profile_bar" class="profile_bar">
             <div class="white user_info">
                 <p class="no-margin">Hello,</p>
                 <p class="no-margin" style="overflow-wrap: anywhere;">{{ username }}!</p>
@@ -18,8 +20,8 @@
                 <router-link id="prbtn-2" class="profile_button" :class="{ 'active': isActive('#credits') }" to="#credits">
                     Credits
                 </router-link>
-                <router-link id="prbtn-3" class="profile_button" :class="{ 'active': isActive('#tarrif') }" to="#tarrif">
-                    Tarrif
+                <router-link id="prbtn-3" class="profile_button" :class="{ 'active': isActive('#plan') }" to="#plan">
+                    Transaction
                 </router-link>
             </div>
         </div>
@@ -54,7 +56,7 @@
             <template v-else-if="$route.hash === '#credits'">
                 <div></div>
             </template>
-            <template v-else-if="$route.hash === '#tarrif'">
+            <template v-else-if="$route.hash === '#plan'">
                 <div></div>
             </template>
         </div>
@@ -106,6 +108,16 @@
                     const passObj = document.getElementById('pass_message')
                     passObj.style.color = "#00FF00"
                 })
+            },
+            navbarToggle() {
+                    const navbar = document.getElementById('profile_bar')
+                    const button = document.getElementById('mobile__btn')
+                    const redirectToMainBtn = document.getElementById('close_modal')
+                    const closeButton = document.getElementById('mobile__btn_close')
+                    navbar.classList.toggle('visible')
+                    redirectToMainBtn.classList.toggle('visible')
+                    closeButton.classList.toggle('visible')
+                    button.classList.toggle('hide')
             },
             redirectToMain() {
                 router.push({ path: "/" })
@@ -252,6 +264,7 @@
     background-color: transparent;
     border-radius: 4px;
     cursor: pointer;
+    gap: 10px;
     transition: .3s;
 }
 
@@ -281,12 +294,17 @@
     padding: 100px;
     box-sizing: border-box;
     gap: 50px;
+    overflow-y: auto;
 }
 
-.basic_user_info input {
-	width: 200px;
+.basic_user_info .input-container {
     max-width: 200px;
     height: 35px;
+}
+
+.basic_user_info .input-container input {
+    width: 100%;
+    height: 100%;
     background: transparent;
     padding-left: 20px;
     box-sizing: border-box;
@@ -324,5 +342,125 @@
 
 .change-pass-btn:hover {
     background-color: #181c24;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .profile_bar {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        display: none;
+        align-items: center;
+        flex-direction: column;
+        gap: 50px;
+        background-color: #1b1e29;
+        overflow-y: auto;
+        overflow-x: hidden;
+        z-index: 3;
+    }
+
+    #mobile__btn {
+        display: flex;
+    }
+
+    .profile_close_page {
+        display: none
+    }
+}
+
+@media (min-width: 651px) and (max-width: 767px) {
+    .profile_bar {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        display: none;
+        align-items: center;
+        flex-direction: column;
+        gap: 50px;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background-color: #1b1e29;
+        overflow-y: auto;
+        overflow-x: hidden;
+        z-index: 3;
+    }
+
+    .profile_close_page {
+        display: none
+    }
+
+    #mobile__btn {
+        display: flex;
+    }
+
+    .profile_close_page {
+        display: none
+    }
+}
+
+@media (min-width: 481px) and (max-width: 650px) {
+    .profile_bar {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        display: none;
+        align-items: center;
+        flex-direction: column;
+        gap: 50px;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background-color: #1b1e29;
+        overflow-y: auto;
+        overflow-x: hidden;
+        z-index: 3;
+    }
+
+    #mobile__btn {
+        display: flex;
+    }
+
+    .profile_close_page {
+        display: none
+    }
+}
+
+@media (max-width: 480px) {
+    .profile_bar {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        display: none;
+        align-items: center;
+        flex-direction: column;
+        gap: 50px;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        background-color: #1b1e29;
+        overflow-y: auto;
+        overflow-x: hidden;
+        z-index: 3;
+    }
+
+    .basic_user_info {
+        padding: 100px 0 100px 0;
+    }
+
+    #mobile__btn {
+        display: flex;
+    }
+
+    .profile_close_page {
+        display: none
+    }
 }
 </style>
