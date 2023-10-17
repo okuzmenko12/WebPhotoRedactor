@@ -95,7 +95,6 @@ class ImageFilesMixin:
             factors = [float(num) for num in range(2, 9, 2)]
 
             for factor in factors:
-                print(f'Width: {factor * width}. Height: {factor * height}')
                 if factor * width <= 4800 and factor * height <= 4800:
                     return UpscaleFactorData(factor=f'x{int(factor)}')
             return UpscaleFactorData(error=too_large_resp)
@@ -286,7 +285,6 @@ class PCsService(RequestContextMixin,
     def upscale(
             self,
             serializer_img,
-            *args,
             **kwargs
     ) -> dict:
         pillow_img = self.get_pillow_img(serializer_img)
@@ -309,7 +307,11 @@ class PCsService(RequestContextMixin,
             return error
 
         if additional_data is not None and additional_data.get('upscale_factor') is not None:
-            factor = f'x{additional_data.get("upscale_factor")}'
+            factor = additional_data.get("upscale_factor")
+            if upscale_type == UpScalesTypes.upscale:
+                factor = f'x{factor}'
+            else:
+                factor = float(factor)
 
         payload = {
             'upscale_factor': factor
@@ -333,31 +335,39 @@ class PCsService(RequestContextMixin,
         data = self.get_normalized_data_from_api_service(response.json())
         return data
 
-    def upscale_ultra(
-            self,
-            serializer_img,
-            *args,
-            **kwargs
-    ):
-        pass
-
     def remove_bg(
             self,
             serializer_img,
-            *args,
             **kwargs
     ) -> dict:
         pillow_img = self.get_pillow_img(serializer_img, for_bg_remove=True)
         image_dict = self.get_normalized_image(pillow_img)
         image = image_dict.get('image')
 
-        payload = {'format': 'PNG',
-                   'output_type': 'cutout'}
+        additional_data: dict = kwargs.get('additional_data')
+
+        files = {'image': image}
+
+        if additional_data.get('bg_image') is not None:
+            bg_pillow_img = self.get_pillow_img(
+                additional_data.get('bg_image'), for_bg_remove=True
+            )
+            bg_image_dict = self.get_normalized_image(bg_pillow_img)
+            files['bg_image'] = bg_image_dict.get('image')
+            del additional_data['bg_image']
+
+        for k, v in list(additional_data.items()):
+            if v == '':
+                del additional_data[k]
+
+        payload = {'format': 'PNG'}
+        payload.update(additional_data)
+
         response = requests.post(
             self.remove_bg_url,
             data=payload,
             headers=self.headers,
-            files={'image': image}
+            files=files
         )
 
         response_data = response.json()

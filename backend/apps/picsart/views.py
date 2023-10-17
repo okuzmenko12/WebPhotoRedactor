@@ -11,7 +11,10 @@ from .service import (PCsService,
                       IPAddressesUsageCountMixin,
                       UpScalesTypes)
 from .utils import ImageEnhanceTypes, CounterModelEnhanceFields
-from .serializers import ImageSerializer, UpscaleSerializer
+from .serializers import (ImageSerializer,
+                          UpscaleSerializer,
+                          BgRemoveSerializer,
+                          RemoveJPEGArtifactsSerializer)
 
 from apps.users.models import User
 
@@ -135,10 +138,27 @@ class UpscaleUltraEnhanceAPIView(UpscaleAPIVIew):
 
 
 class RemoveBGAPIView(BaseImageAPIView):
+    serializer_class = BgRemoveSerializer
     enhance_type = ImageEnhanceTypes.remove_bg
     counter_enhance_field = CounterModelEnhanceFields.bg_deletions_count
 
+    @property
+    def additional_data(self):
+        add_fields = ['bg_image', 'bg_image_url', 'bg_color', 'bg_blur', 'output_type']
+        additional_dict = {}
+
+        for field in add_fields:
+            additional_dict[field] = None
+            if field in self.request.data and self.request.data.get(field) != '':
+                additional_dict[field] = self.request.data.get(field)
+        return additional_dict
+
 
 class RemoveJPEGArtifactsAPIView(BaseImageAPIView):
+    serializer_class = RemoveJPEGArtifactsSerializer
     enhance_type = ImageEnhanceTypes.remove_jpeg_artifacts
     counter_enhance_field = CounterModelEnhanceFields.jpg_artifacts_deletions_count
+
+    # @property
+    # def additional_data(self):
+
