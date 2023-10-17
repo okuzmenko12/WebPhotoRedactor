@@ -142,13 +142,24 @@ class ImageFilesMixin:
 class JPEGArtifactsRemoverMixin:
 
     @staticmethod
-    def remove_artifacts(byte_image, image_name):
+    def remove_artifacts(byte_image, image_name, strength=None):
+        strength_options = {
+            'normal': 5,
+            'high': 10,
+            'maximal': 15
+        }
+
+        strength_val = 5
+
+        if strength is not None:
+            strength_val = strength_options[strength]
+
         image_array = np.frombuffer(byte_image.read(), dtype=np.uint8)
         img = cv2.imdecode(image_array, cv2.IMREAD_COLOR)
         dsd_image = cv2.fastNlMeansDenoisingColored(
             img,
             None,
-            10,
+            strength_val,
             10,
             7,
             21
@@ -389,7 +400,6 @@ class PCsService(RequestContextMixin,
     def remove_jpeg_artifacts(
             self,
             serializer_img,
-            *args,
             **kwargs
     ) -> dict:
         image_name: str = serializer_img.name.split('.')[0]
@@ -398,7 +408,13 @@ class PCsService(RequestContextMixin,
                                                artifacts_removing=True)
         byte_image = image_dict.get('image')
 
-        path = self.remove_artifacts(byte_image, image_name)
+        additional_data = kwargs.get('additional_data')
+
+        strength = None
+        if additional_data.get('strength') != '':
+            strength = additional_data.get('strength')
+
+        path = self.remove_artifacts(byte_image, image_name, strength)
 
         byte_image.close()
         os.remove(f'media/{image_dict["image_token"]}/{image_dict["image_name"]}.{image_dict["img_format"]}')

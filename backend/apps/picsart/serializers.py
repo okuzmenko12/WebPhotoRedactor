@@ -33,7 +33,7 @@ class BgRemoveSerializer(ImageSerializer):
                                           default='cutout')
 
 
-class RemoveJPEGArtifactsSerializer(serializers.Serializer):
+class RemoveJPEGArtifactsSerializer(ImageSerializer):
     STRENGTH_CHOICES = (
         ('normal', 'normal'),
         ('high', 'high'),

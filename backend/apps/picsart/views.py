@@ -159,6 +159,9 @@ class RemoveJPEGArtifactsAPIView(BaseImageAPIView):
     enhance_type = ImageEnhanceTypes.remove_jpeg_artifacts
     counter_enhance_field = CounterModelEnhanceFields.jpg_artifacts_deletions_count
 
-    # @property
-    # def additional_data(self):
+    @property
+    def additional_data(self):
+        return {
+            'strength': self.request.data.get('strength')
+        }
 
