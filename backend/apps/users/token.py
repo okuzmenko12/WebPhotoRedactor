@@ -1,8 +1,3 @@
-"""
-This idea of token is taken from my another project.
-Link: https://github.com/okuzmenko31/drf-ecommerce/blob/main/ecommerce/apps/users/token.py
-"""
-
 from typing import NamedTuple, Optional
 
 from django.conf import settings

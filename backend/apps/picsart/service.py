@@ -1,5 +1,9 @@
 import os
+
 from io import BytesIO
+
+from enum import Enum
+from typing import NamedTuple, Optional, Any, Union
 
 from urllib.parse import urlparse
 from urllib.request import urlopen, Request
@@ -20,10 +24,29 @@ from apps.payments.models import Plan
 from apps.users.models import User
 
 
+class UpScalesTypes(str, Enum):
+    upscale = 'upscale'
+    ultra_upscale = 'ultra_upscale'
+    ultra_enhance = 'ultra_enhance'
+
+
+class UpscaleFactorData(NamedTuple):
+    factor: Union[str, float] = None
+    error: Union[dict] = None
+
+
 class RequestContextMixin:
 
     @property
     def upscale_url(self):
+        return 'https://api.picsart.io/tools/1.0/upscale'
+
+    @property
+    def upscale_ultra_url(self):
+        return 'https://api.picsart.io/tools/1.0/upscale/ultra'
+
+    @property
+    def upscale_ultra_enhance_url(self):
         return 'https://api.picsart.io/tools/1.0/upscale/enhance'
 
     @property
@@ -59,14 +82,30 @@ class ImageFilesMixin:
         }
 
     @staticmethod
-    def get_upscale_factor(pillow_img):
-        factors = [float(2), float(4), float(6), float(8)]
+    def get_upscale_factor(
+            pillow_img,
+            upscale_type: UpScalesTypes
+    ):
         width, height = pillow_img.size
+        too_large_resp = {
+            'error': 'This image is too large for this type of upscaling'
+        }
 
-        for factor in factors:
-            if factor * width < 16000 and factor * height < 16000:
-                return factor
-        return None
+        if upscale_type == UpScalesTypes.upscale:
+            factors = [float(num) for num in range(2, 9, 2)]
+
+            for factor in factors:
+                print(f'Width: {factor * width}. Height: {factor * height}')
+                if factor * width <= 4800 and factor * height <= 4800:
+                    return UpscaleFactorData(factor=f'x{int(factor)}')
+            return UpscaleFactorData(error=too_large_resp)
+        else:
+            factors = [num for num in range(2, 17)]
+
+            for factor in factors:
+                if factor * width < 16000 and factor * height < 16000:
+                    return UpscaleFactorData(factor=float(factor))
+            return UpscaleFactorData(error=too_large_resp)
 
     @staticmethod
     def get_image_params(pillow_img) -> dict:
@@ -203,25 +242,111 @@ class PCsService(RequestContextMixin,
             }
         return data
 
-    def upscale(self, serializer_img) -> dict:
+    def get_upscale_url_by_type(
+            self,
+            upscale_type: UpScalesTypes
+    ) -> str | None:
+        urls_dict = {
+            UpScalesTypes.upscale: self.upscale_url,
+            UpScalesTypes.ultra_upscale: self.upscale_ultra_url,
+            UpScalesTypes.ultra_enhance: self.upscale_ultra_enhance_url
+        }
+
+        for ups_type, url in urls_dict.items():
+            if ups_type == upscale_type:
+                return url
+        return None
+
+    def get_upscale_factor_by_type(
+            self,
+            pillow_img,
+            upscale_type: UpScalesTypes
+    ):
+        ups_types = [
+            UpScalesTypes.upscale,
+            UpScalesTypes.ultra_upscale,
+            UpScalesTypes.ultra_enhance
+        ]
+
+        for ups_type in ups_types:
+            if ups_type == upscale_type:
+                return self.get_upscale_factor(pillow_img, ups_type)
+        return None
+
+    def get_upscale_data(
+            self,
+            pillow_img,
+            upscale_type: UpScalesTypes
+    ):
+        return {
+            'url': self.get_upscale_url_by_type(upscale_type),
+            'upscale_factor': self.get_upscale_factor_by_type(pillow_img, upscale_type)
+        }
+
+    def upscale(
+            self,
+            serializer_img,
+            *args,
+            **kwargs
+    ) -> dict:
         pillow_img = self.get_pillow_img(serializer_img)
         image_dict = self.get_normalized_image(pillow_img)
         image = image_dict.get('image')
 
-        payload = {'upscale_factor': self.get_upscale_factor(pillow_img)}
+        additional_data = kwargs.get('additional_data')
+        upscale_type = additional_data.get('upscale_type')
+
+        upscale_url = self.get_upscale_url_by_type(upscale_type)
+
+        if upscale_type is None:
+            return {
+                'error': 'The upscale type wasn\'t provided!'  # noqa
+            }
+
+        factor, error = self.get_upscale_factor(pillow_img, upscale_type)
+
+        if error is not None:
+            return error
+
+        if additional_data is not None and additional_data.get('upscale_factor') is not None:
+            factor = f'x{additional_data.get("upscale_factor")}'
+
+        payload = {
+            'upscale_factor': factor
+        }
         response = requests.post(
-            self.upscale_url,
+            upscale_url,
             data=payload,
             headers=self.headers,
             files={'image': image}
         )
+
         image.close()
         os.remove(f'media/{image_dict["image_token"]}/{image_dict["image_name"]}.{image_dict["img_format"]}')
         os.rmdir(f'media/{image_dict["image_token"]}')
+
+        if response.json().get('detail') is not None:
+            return {
+                'error': response.json().get('detail')
+            }
+
         data = self.get_normalized_data_from_api_service(response.json())
         return data
 
-    def remove_bg(self, serializer_img) -> dict:
+    def upscale_ultra(
+            self,
+            serializer_img,
+            *args,
+            **kwargs
+    ):
+        pass
+
+    def remove_bg(
+            self,
+            serializer_img,
+            *args,
+            **kwargs
+    ) -> dict:
         pillow_img = self.get_pillow_img(serializer_img, for_bg_remove=True)
         image_dict = self.get_normalized_image(pillow_img)
         image = image_dict.get('image')
@@ -251,7 +376,12 @@ class PCsService(RequestContextMixin,
             }
         return data
 
-    def remove_jpeg_artifacts(self, serializer_img) -> dict:
+    def remove_jpeg_artifacts(
+            self,
+            serializer_img,
+            *args,
+            **kwargs
+    ) -> dict:
         image_name: str = serializer_img.name.split('.')[0]
         pillow_img = self.get_pillow_img(serializer_img)
         image_dict = self.get_normalized_image(pillow_img,

@@ -8,9 +8,10 @@ from rest_framework import status
 from .service import (PCsService,
                       get_count_of_enhances_for_field,
                       decrease_count_of_enhances_for_field,
-                      IPAddressesUsageCountMixin)
+                      IPAddressesUsageCountMixin,
+                      UpScalesTypes)
 from .utils import ImageEnhanceTypes, CounterModelEnhanceFields
-from .serializers import ImageSerializer
+from .serializers import ImageSerializer, UpscaleSerializer
 
 from apps.users.models import User
 
@@ -22,6 +23,10 @@ class BaseImageAPIView(IPAddressesUsageCountMixin,
     psc = PCsService()
     enhance_type: Optional[str] = None
     counter_enhance_field: Optional[str] = None
+
+    @property
+    def additional_data(self):
+        return {}
 
     def post(self, *args, **kwargs):
         image = self.request.data.get('image')
@@ -78,18 +83,21 @@ class BaseImageAPIView(IPAddressesUsageCountMixin,
         if format_error is not None:
             return format_error_response
 
-        serializer = ImageSerializer(data=self.request.data)
+        serializer = self.serializer_class(data=self.request.data)
         if serializer.is_valid(raise_exception=True):
             image = serializer.validated_data.get('image')
 
             enhances_mapping = self.psc.get_enhances_mapping()
             enhance = enhances_mapping[self.enhance_type]
-            url_data: dict = enhance(image)
+            url_data: dict = enhance(image, additional_data=self.additional_data)
 
             if url_data is None:
                 return Response({
                     'error': 'Now service is unavailable :( Please wait some time and try again.'
                 }, status=status.HTTP_400_BAD_REQUEST)
+
+            if url_data.get('image') is None:
+                return Response(url_data, status=status.HTTP_400_BAD_REQUEST)
 
             url_data.update(
                 self.psc.get_image_name_and_format_from_url(
@@ -102,8 +110,28 @@ class BaseImageAPIView(IPAddressesUsageCountMixin,
 
 
 class UpscaleAPIVIew(BaseImageAPIView):
+    serializer_class = UpscaleSerializer
+    upscale_type = UpScalesTypes.upscale
     enhance_type = ImageEnhanceTypes.upscale
     counter_enhance_field = CounterModelEnhanceFields.up_scales_count
+
+    @property
+    def additional_data(self):
+        factor = None
+        if self.request.data.get('upscale_factor') != '':
+            factor = int(self.request.data.get('upscale_factor'))
+        return {
+            'upscale_factor': factor,
+            'upscale_type': self.upscale_type
+        }
+
+
+class UpscaleUltraAPIView(UpscaleAPIVIew):
+    upscale_type = UpScalesTypes.ultra_upscale
+
+
+class UpscaleUltraEnhanceAPIView(UpscaleAPIVIew):
+    upscale_type = UpScalesTypes.ultra_enhance
 
 
 class RemoveBGAPIView(BaseImageAPIView):

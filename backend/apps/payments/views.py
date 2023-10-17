@@ -45,9 +45,10 @@ class CreateUserToMakePaymentAPIView(UserCreateForPaymentMixin,
                 'error': 'Something went wrong... Please, try again.'
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({
-            'data': get_jwt_tokens_for_user(user)
-        }, status=status.HTTP_200_OK)
+        return Response(
+            data=get_jwt_tokens_for_user(user),
+            status=status.HTTP_200_OK
+        )
 
 
 class CreatePayPalOrderAPIView(PayPalOrdersMixin,
