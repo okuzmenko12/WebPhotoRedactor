@@ -1,6 +1,8 @@
 <template>
   <navbar-comp />
   <div class="pricing-container">
+    <p class="brand_text">Our plans</p>
+    <p class="fs--50 fw--700 header_text align_center_text no-top">Pricing</p>
     <div class="pricing-block">
         <div class="tarrifs-row">
           <card v-for="plan in plans"
@@ -11,7 +13,6 @@
               :JPEGcount="plan.jpg_artifacts_deletions_count"
               :name="plan.name"
               :price="plan.price + '$'"
-              :time="plan.period_in_str"
               :PayPal="plan.paypal_plan_id"
           />
         </div>
@@ -34,7 +35,7 @@
     },
     mounted() {
       handlePopState(),
-      axios.get(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/subscriptions/all`)
+      axios.get(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/payments/plans`)
       .then(res => {
         console.log(res);
         this.plans = res.data
@@ -59,6 +60,7 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  z-index: 1;
 }
 
 .pricing-block {

@@ -1,6 +1,6 @@
 <template>
-    <div @click="toggleActive" :class="{ active: isActive }" class="ContentBx-pay white">
-        <div class="Label-pay" :class="{ active: isActive }">
+    <div @click="toggleActive" :id="bxId" :class="{ active: isActive }" class="ContentBx-pay white">
+        <div class="Label-pay" :id="localId" :class="{ active: isActive }">
             {{ name }}
             <svg v-if="method == 'paypal'" width="30px" height="30px" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="24" cy="24" r="20" fill="#0070BA"/>
@@ -38,7 +38,7 @@
         </div>
         <div class="Content-pay small_text" @click.stop :class="{ active: isActive }">
             <p v-if="description !== ''">{{description}}</p>
-            <div v-if="method == 'paypal'" id="paypal-button-container"></div>
+            <div v-if="method == 'paypal'" @click="func" class="stripe__btn"><svg style="color: #000" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-wallet" viewBox="0 0 16 16"> <path d="M0 3a2 2 0 0 1 2-2h13.5a.5.5 0 0 1 0 1H15v2a1 1 0 0 1 1 1v8.5a1.5 1.5 0 0 1-1.5 1.5h-12A2.5 2.5 0 0 1 0 12.5V3zm1 1.732V12.5A1.5 1.5 0 0 0 2.5 14h12a.5.5 0 0 0 .5-.5V5H2a1.99 1.99 0 0 1-1-.268zM1 3a1 1 0 0 0 1 1h12V2H2a1 1 0 0 0-1 1z" fill="#000"></path></svg></div>
             <div v-else @click="func" class="stripe__btn"><svg style="color: #000" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-wallet" viewBox="0 0 16 16"> <path d="M0 3a2 2 0 0 1 2-2h13.5a.5.5 0 0 1 0 1H15v2a1 1 0 0 1 1 1v8.5a1.5 1.5 0 0 1-1.5 1.5h-12A2.5 2.5 0 0 1 0 12.5V3zm1 1.732V12.5A1.5 1.5 0 0 0 2.5 14h12a.5.5 0 0 0 .5-.5V5H2a1.99 1.99 0 0 1-1-.268zM1 3a1 1 0 0 0 1 1h12V2H2a1 1 0 0 0-1 1z" fill="#000"></path></svg></div>
         </div>
     </div>
@@ -51,17 +51,79 @@ export default {
         url: String,
         method: String,
         description: String,
-        func: Function
+        func: Function,
+        auth: Boolean
     },
     data() {
         return {
-            isActive: false
+            isActive: false,
+            localId: `pay-${this.generateId(7)}`,
+            bxId: `bx-${this.generateId(7)}`,
         };
     },
     methods: {
         toggleActive() {
-            this.isActive = !this.isActive;
-        }
+            if (this.auth === false) {
+                const contentBx = document.getElementById(this.bxId)
+                const label = document.getElementById(this.localId)
+                const input = document.getElementById('email_input_field')
+                const msg = document.getElementById('email_message_msg')
+                const input2 = document.getElementById('name_input_field')
+                const msg2 = document.getElementById('name_message_msg')
+                if (contentBx.classList.contains("activeNow")) {
+                    this.isActive = !this.isActive;
+                } else {
+                    label.style.border = "1px solid #FF0000"
+                    if (input.value.length < 1) {
+                    input.style.border = '1px solid #FF0000';
+                    msg.style.color = '#FF0000';
+                    msg.style.opacity = "1";
+                    this.updateEmail("This field is required");
+                    } else {
+                        msg.style.opacity = "0";
+                        input.style.border = '1px #2e2f35 solid';
+                    }
+
+                    if (input2.value.length < 1) {
+                        input2.style.border = '1px solid #FF0000';
+                        msg2.style.color = '#FF0000';
+                        msg2.style.opacity = "1";
+                        this.updateName("This field is required");
+                    } else {
+                            msg2.style.opacity = "0"
+                            input2.style.border = '1px #2e2f35 solid'
+                    }
+                    setTimeout(() => {
+                        label.style.border = "1px solid #3d3d3d"
+                        if (input.value.length < 1) {
+                            msg.style.opacity = "0"
+                            input.style.border = '1px #2e2f35 solid'
+                        }
+                        if (input2.value.length < 1) {
+                            msg2.style.opacity = "0"
+                            input2.style.border = '1px #2e2f35 solid'
+                        }
+                    }, 2000)
+                }
+            } else {
+                this.isActive = !this.isActive;
+            }
+        },
+        updateEmail(value) {
+            this.$emit('update:email', value);
+        },
+        updateName(value) {
+            this.$emit('update:name', value);
+        },
+        generateId(length) {
+            const characters = 'abcdefghijklmnopqrstuvwxyz0123456789'; // Pool of characters
+            let id = '';
+            for (let i = 0; i < length; i++) {
+                const randomIndex = Math.floor(Math.random() * characters.length);
+                id += characters[randomIndex];
+            }
+            return id;
+        },
     }
 };
 </script>

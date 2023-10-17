@@ -7,7 +7,7 @@
             <h1 class="header_text">Password reset confirmation</h1>
             <input-ui max="50" v-model="pass" :passwordType="true" pr="Password"/>
             <input-ui max="50" v-model="pass1" :passwordType="true" pr="Confirm Password"/>
-            <button @click="confirmChangingPassword" class="verify_email_button white">Change password</button>
+            <button @click="confirmChangingPassword" class="reset_password_button white">Change password</button>
             <p id="message_conf" class="white align_center_text">{{ message }}</p>
         </template>
     </div>
@@ -18,7 +18,7 @@
     import axios from 'axios';
     import router from "@/router/router.js";
     import InputUi from "@/components/UI/InputUi.vue";
-    import { setLocalToken, setLocalRefreshToken, fetchToken } from "@/Auth.js";
+    import { setLocalToken, setLocalRefreshToken, fetchToken, getHeaders } from "@/Auth.js";
     export default {
         components: {
             InputUi
@@ -34,11 +34,12 @@
         },
         methods: {
             confirmChangingPassword() {
-                axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/auth/password_reset/${this.tokenQuery}/${this.emailQuery}/`, {})
+                axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/auth/password_reset/${this.tokenQuery}/${this.emailQuery}/`, {
+                    "password": this.pass,
+                    "password1": this.pass1
+                }, { headers: getHeaders() })
                 .then(res => {
                     console.log(res);
-                    setLocalToken(res.data.access)
-                    setLocalRefreshToken(res.data.refresh)
                     this.message = res.data.success + " You will be redirected in 2 seconds."
                     const messageBlock = document.getElementById('message_conf')
                     messageBlock.style.color = "#00FF00"
@@ -103,8 +104,8 @@
     transition: .3s;
 }
 
-.verify_email_button {
-    background-color: #00FF00;
+.reset_password_button {
+    background: var(--secondary_color);
     border: none;
     border-radius: 4px;
     padding: 5px 10px;
@@ -112,7 +113,7 @@
     transition: .3s;
 }
 
-.verify_email_button:hover {
-    background-color: #00b330;
+.reset_password_button:hover {
+    background-color: var(--secondary_hover_color);
 }
 </style>

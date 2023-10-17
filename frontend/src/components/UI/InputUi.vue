@@ -33,18 +33,16 @@ export default {
 </script>
 
 <style>
-
-
 .input-container {
   position: relative;
   width: 100%;
 }
 
-.input-container input:focus {
+.input-container input {
   width: 100%;
   height: 35px;
   background: transparent;
-  padding-left: 20px;
+  padding-left: 10px;
   box-sizing: border-box;
   border: 1px #2e2f35 solid;
   outline: none;
@@ -57,7 +55,7 @@ export default {
 }
 
 .input-container input[readonly] {
-  color: #808080;
+  color: #808080 !important;
   transition: .3s;
 }
 

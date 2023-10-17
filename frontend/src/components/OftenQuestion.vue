@@ -1,7 +1,7 @@
 <template>
     <div class="questions-block">
         <p class="brand_text">FAQ</p>
-        <p class="header_text fs--50 fw--900 no-margin align_center_text">Often questions</p>
+        <p class="header_text fs--50 fw--900 no-top align_center_text">Often questions</p>
         <question-model question="dsadads" answear="dsadsssssssssssssssssssssssssssssssssssdasdasdsad"/>
         <question-model question="dsadads" answear="dsadsssssssssssssssssssssssssssssssssssdasdasdsad"/>
         <question-model question="dsadads" answear="dsadsssssssssssssssssssssssssssssssssssdasdasdsad"/>
@@ -20,7 +20,7 @@
 
 <style>
 .questions-block {
-    width: 50%;
+    width: 70%;
     height: auto;
     display: flex;
     flex-direction: column;
@@ -48,7 +48,7 @@
 
 @media (max-width: 480px) {
     .questions-block {
-        width: 75%;
+        width: 60%;
     }
 }
 </style>
