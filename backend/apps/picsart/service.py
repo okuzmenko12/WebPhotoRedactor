@@ -371,7 +371,6 @@ class PCsService(RequestContextMixin,
         )
 
         response_data = response.json()
-        print(response_data)
 
         image.close()
         os.remove(f'media/{image_dict["image_token"]}/{image_dict["image_name"]}.{image_dict["img_format"]}')

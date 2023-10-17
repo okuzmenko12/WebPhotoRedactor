@@ -31,3 +31,15 @@ class BgRemoveSerializer(ImageSerializer):
                                        max_value=100)
     output_type = serializers.ChoiceField(choices=OUTPUT_TYPE_CHOICES,
                                           default='cutout')
+
+
+class RemoveJPEGArtifactsSerializer(serializers.Serializer):
+    STRENGTH_CHOICES = (
+        ('normal', 'normal'),
+        ('high', 'high'),
+        ('maximal', 'maximal')
+    )
+
+    strength = serializers.ChoiceField(choices=STRENGTH_CHOICES,
+                                       label='Artifacts removing choices',
+                                       default=STRENGTH_CHOICES)
