@@ -27,9 +27,11 @@
                     <img class="ready_image" @click="downloadImage" :src="fileSrc"/>
                 </div>
             </template>
-            <button v-if="anyFiles === true && loadedFile === false" @click="handleFileUploadUpscale" id="upload_button">Start!</button>
-            <button v-if="loadedFile === true && fileSrc !== ''" @click="downloadImage" id="upload_button">Download</button>
-            <button v-if="loadedFile === true && fileSrc !== ''" @click="uploadMoreFiles" id="upload_button">Upload again!</button>
+            <div class="flex-block gp--50">
+                <button v-if="anyFiles === true && loadedFile === false && isLoading === false" @click="handleFileUploadUpscale" id="upload_button">Start!</button>
+                <button v-if="loadedFile === true && fileSrc !== ''" @click="downloadImage" id="upload_button">Download</button>
+                <button v-if="loadedFile === true && fileSrc !== ''" @click="uploadMoreFiles" id="upload_button">Upload again!</button>
+            </div>
             <p class="error_text fw--900 fs--20">{{ image_upload }}</p>
         </div>
 </template>
@@ -79,7 +81,8 @@
             async handleFileUploadUpscale() {
                 this.isLoading = true
                 const input = this.$refs.imageUploadInput;
-                const input2 = this.$refs.bgImageUpload
+                const input2 = this.$refs.bgImageUpload;
+                this.image_upload = ""
                 const formData = new FormData();
                 formData.append('ip_address', this.userIp);
                 formData.append('image', input.files[0]);

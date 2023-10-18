@@ -95,12 +95,12 @@
       },
       data() {
         return {
-          Img: require('@/assets/c.png'),
-          Img2: require('@/assets/a.jpg'),
-          Bg: require('@/assets/d.jpg'),
-          Bg2: require('@/assets/e.png'),
-          JPEG: require('@/assets/f.jpg'),
-          JPEG2: require('@/assets/g.png'),
+          Img: require('@/assets/car.jpg'),
+          Img2: require('@/assets/car2.png'),
+          Bg: require('@/assets/car.jpg'),
+          Bg2: require('@/assets/car.jpg'),
+          JPEG: require('@/assets/car.jpg'),
+          JPEG2: require('@/assets/car.jpg'),
           isAuthenticated: false
         }
       },

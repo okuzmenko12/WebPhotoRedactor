@@ -425,6 +425,7 @@
     padding-top: 20px;
     padding-bottom: 20px;
     align-items: center;
+    z-index: 2;
     box-sizing: border-box;
 }
 
@@ -442,7 +443,6 @@
     appearance: none;
     background-color: transparent;
     margin: 0;
-
     font: inherit;
     color: currentColor;
     width: 1.15em;
@@ -450,7 +450,7 @@
     border: 0.15em solid currentColor;
     border-radius: 0.15em;
     transform: translateY(-0.075em);
-
+    cursor: pointer;
     display: grid;
     place-content: center;
 }
@@ -488,7 +488,10 @@
     justify-content: center;
     box-sizing: border-box;
     flex-direction: column;
-    gap: 20px
+    overflow-y: auto;
+    overflow-x: hidden;
+    gap: 20px;
+    padding: 40px;
 }
 
 .button_image_block {

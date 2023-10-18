@@ -12,6 +12,8 @@ import ChangePassword from "@/pages/ChangePassword";
 import ChangeEmail from "@/pages/ChangeEmail";
 import ImagePage from "@/pages/ImagePage";
 import paypalSuccess from "@/pages/SuccessPaypalPage";
+import IPP from "@/pages/InterimPaymentPaypal";
+import IPS from "@/pages/InterimPaymentStripe";
 
 
 const routes = [
@@ -89,6 +91,16 @@ const routes = [
         path: '/payment/stripe/cancel',
         name: 'Stripe cancel',
         component: paypalSuccess
+    },
+    {
+        path: '/payment/paypal/creating_order',
+        name: 'Creating Paypal order',
+        component: IPP
+    },
+    {
+        path: '/payment/stripe/creating_order',
+        name: 'Creating Stripe order',
+        component: IPS
     },
 ]
 

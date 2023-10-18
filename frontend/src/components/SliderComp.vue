@@ -1,5 +1,5 @@
 <template>
-    <div :id="div_id" class="slider">
+    <div :id="div_id" class="slider" :class="div_class">
         <div class="before-slider">
             <div class="slider-resize" data-type="resize"></div>
         </div>
@@ -72,7 +72,8 @@ class Slider {
 export default {
     props: {
         before_img: String,
-        after_img: String
+        after_img: String,
+        div_class: String
     },
     data() {
         return {
