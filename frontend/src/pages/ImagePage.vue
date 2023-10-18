@@ -119,10 +119,10 @@
                 <drop-n-drag :upscale_factor="upscaleFactor" :api_url="upscaleApiURL"/>
             </template>
             <template v-else-if="isActive('#removebg')">
-                <drop-n-drag :bg_color="bgColor" @files-updated="handleFilesUpdated" api_url="/api/v1/images/remove_bg/"/>
+                <drop-n-drag :bg_color="bgColor" :bgUrl="bgImgUrl" :bgFile="bgFileOrText" :output_type="outputType" :blur="bgBlur" @files-updated="handleFilesUpdated" api_url="/api/v1/images/remove_bg/"/>
             </template>
             <template v-else-if="isActive('#removejpegartifacts')">
-                <drop-n-drag api_url="/api/v1/images/remove_jpeg_artifacts/"/>
+                <drop-n-drag :strt="strenght" api_url="/api/v1/images/remove_jpeg_artifacts/"/>
             </template>
             <template v-else>
                 <drop-n-drag api_url="/api/v1/images/upscale/"/>
@@ -154,6 +154,24 @@
                     </div>
                 </div>
 
+                <div v-if="isActive('#removejpegartifacts')" class="profile_buttons image_buttons">
+                    <div class="button_image_block" style="z-index: 2;">
+                        <p>Strenght:</p>
+                        <div id="factor-dropdown">
+                            <div id="factor-arrow"><svg height="15px" viewBox="0 0 5 9"><path d="M0.419,9.000 L0.003,8.606 L4.164,4.500 L0.003,0.394 L0.419,0.000 L4.997,4.500 L0.419,9.000 Z" ></path></svg>
+                            </div>
+                            <span id="factor-selected" @click="openFactorChoose">
+                                {{strenght}}
+                            </span>
+                            <div id="factor-menu">
+                                <li v-for="(strt, index) in jpegStrt" :key="index" @click="jpegstrtClick">
+                                    {{ strt }}
+                                </li>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div v-if="isActive('#removebg')" class="profile_buttons image_buttons">
                     <div v-if="showColor === true" class="button_image_block">
                         <p>Background color:</p>
@@ -161,9 +179,37 @@
                     </div>
                     <div v-if="showBg === true" class="button_image_block">
                         <p>Background image:</p>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" @click="openInputGUI" style="cursor: pointer" stroke-width='10px' viewBox="0 0 135 135" fill="none">
-                            <path class="fill_obj" d="M11.5 99.5V10.5H124.5V93M11.5 99.5V109.5H124.5V93M11.5 99.5L42.5 61.5C52.2302 55.0949 57.4907 55.1456 67 61.5L90 91L101 81C106.771 77.0229 109.695 76.5457 114 81L124.5 93M1 1V134H134V1H1ZM96 49.5C102.874 48.5904 105.582 46.8445 106.5 39.5C105.9 31.7287 103.969 28.9576 96 28.5C87.8186 29.4879 86.0562 32.3313 85.5 39.5C86.9237 46.4436 89.351 48.5071 96 49.5Z" stroke="white"/>
-                        </svg>
+                        <template v-if="bgFileOrText">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" @click="openInputGUI" style="cursor: pointer" stroke-width='10px' viewBox="0 0 135 135" fill="none">
+                                <path class="fill_obj" d="M11.5 99.5V10.5H124.5V93M11.5 99.5V109.5H124.5V93M11.5 99.5L42.5 61.5C52.2302 55.0949 57.4907 55.1456 67 61.5L90 91L101 81C106.771 77.0229 109.695 76.5457 114 81L124.5 93M1 1V134H134V1H1ZM96 49.5C102.874 48.5904 105.582 46.8445 106.5 39.5C105.9 31.7287 103.969 28.9576 96 28.5C87.8186 29.4879 86.0562 32.3313 85.5 39.5C86.9237 46.4436 89.351 48.5071 96 49.5Z" stroke="white"/>
+                            </svg>
+                        </template>
+
+                        <template v-else>
+                            <input-ui v-model="bgImgUrl"/>
+                        </template>
+                    </div>
+                    <p v-if="bgFileOrText === true" class='link fs--12 no-top' style="cursor: pointer" @click="changeBgFile(false) ">Paste url</p>
+                    <p v-else class='link fs--12 no-top' style="cursor: pointer" @click="changeBgFile(true)">Choose image</p>
+                    <div class="button_image_block">
+                        <p>BLUR</p>
+                        %   
+                        <input-ui :numberType="true" v-model="bgBlur" type="number" min="0" max="100" />
+                    </div>
+                    <div v-if="showBg === true && showColor === true" class="button_image_block" style="z-index: 2;">
+                        <p>Ouput:</p>
+                        <div id="factor-dropdown">
+                            <div id="factor-arrow"><svg height="15px" viewBox="0 0 5 9"><path d="M0.419,9.000 L0.003,8.606 L4.164,4.500 L0.003,0.394 L0.419,0.000 L4.997,4.500 L0.419,9.000 Z" ></path></svg>
+                            </div>
+                            <span id="factor-selected" @click="openFactorChoose">
+                                {{outputType}}
+                            </span>
+                            <div id="factor-menu">
+                                <li v-for="(output, index) in outPuts" :key="index" @click="outputClick">
+                                    {{ output }}
+                                </li>
+                            </div>
+                        </div>
                     </div>
                     <button v-if="showBg === false || showColor === false" @click="resetSettings" id="upload_button">Reset settings</button>
                 </div>
@@ -177,11 +223,13 @@
     import router from "@/router/router.js";
     import '@simonwep/pickr/dist/themes/nano.min.css';
     import Pickr from '@simonwep/pickr';
+    import InputUi from "@/components/UI/InputUi.vue";
     import handlePopState from "@/utils/index.js";
 
     export default {
         components: {
-            DropNDrag
+            DropNDrag,
+            InputUi
         },
         mounted() {
             handlePopState()
@@ -207,6 +255,8 @@
                 allUpscaleUltraFactors: [ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 ],
                 allUpscaleFactors: [ 2, 4, 6, 8 ],
                 factors: [],
+                outPuts: [ 'cutout', 'mask' ],
+                jpegStrt: [ 'normal', 'high', 'maximal' ],
                 isUltraEnhanceChecked: false,
                 isUltraChecked: false,
                 isDragOver: false,
@@ -217,9 +267,14 @@
                 fileName: "",
                 bgColor: "#ffffff",
                 upscaleFactor: 2,
+                bgBlur: 0,
+                bgFileOrText: true,
+                outputType: "cutout",
                 fileSize: 0,
                 upscaleApiURL: "/api/v1/images/upscale/",
                 showColor: true,
+                strenght: "normal",
+                bgImgUrl: "",
                 showBg: true,
                 fileSrc: ""
             }
@@ -234,6 +289,11 @@
                 setTimeout(() => {
                     this.changeColorState()
                 }, 0)
+            },
+            bgImgUrl() {
+                if (this.bgImgUrl.length > 1) {
+                    this.changeColorState()
+                }
             }
         },
         methods: {
@@ -244,10 +304,12 @@
                 const input = document.querySelector('.bgImageUpload')
                 this.showBg = true
                 this.showColor = true
-                if (this.bgColor !== "#ffffff") {
+                this.bgImgUrl = ""
+                if (this.bgColor !== "#ffffff" && document.querySelector('.pcr-button')) {
                     this.bgColor = "#ffffff"
                     document.querySelector('.pcr-button').style.setProperty('--pcr-color', this.bgColor);
                 }
+
                 input.value = ''
             },
             handleFilesUpdated() {
@@ -258,6 +320,9 @@
             },
             changeColorState() {
                 this.showColor = false
+            },
+            changeBgFile(value) {
+                this.bgFileOrText = value
             },
             navbarToggle() { 
                     const navbar = document.getElementById('profile_bar')
@@ -299,9 +364,41 @@
                     menu.classList.remove('visible');
                 }
             },
+            outputClick(event) {
+                const dd = document.getElementById('factor-arrow');
+                const menu = document.getElementById('factor-menu');
+                if (event) {
+                    const selectedOutput = event.target.textContent;
+                    this.outputType = selectedOutput;
+                    const factorItems = document.querySelectorAll('#factor-menu li');
+                    factorItems.forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    event.target.classList.add('active');
+                    dd.classList.remove('active');
+                    menu.classList.remove('visible');
+                }
+            },
+            jpegstrtClick(event) {
+                const dd = document.getElementById('factor-arrow');
+                const menu = document.getElementById('factor-menu');
+                if (event) {
+                    const selectedStrt = event.target.textContent;
+                    this.strenght = selectedStrt;
+                    const factorItems = document.querySelectorAll('#factor-menu li');
+                    factorItems.forEach(item => {
+                        item.classList.remove('active');
+                    });
+                    event.target.classList.add('active');
+                    dd.classList.remove('active');
+                    menu.classList.remove('visible');
+                }
+            },
             openInputGUI() {
                 const input = document.querySelector('.bgImageUpload')
-                input.click()
+                if (this.bgFileOrText === true) {
+                    input.click()
+                }
             },
             toggleChecked(option) {
                 if (option === "ultra_enhance" && !this.isUltraEnhanceChecked) {
@@ -453,6 +550,10 @@
     cursor: pointer;
     display: grid;
     place-content: center;
+}
+
+.input-container input {
+	color: #fff
 }
 
 .button_image_block input[type="checkbox"]::before {
