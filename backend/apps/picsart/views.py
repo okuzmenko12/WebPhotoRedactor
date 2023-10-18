@@ -74,6 +74,8 @@ class BaseImageAPIView(IPAddressesUsageCountMixin,
                     self.ip_increase_field_usage_count(ip_address, self.counter_enhance_field)
                 else:
                     return reach_limit_resp
+            elif user_count_of_enhances > 0:
+                self.psc.free_version = False
             decrease_count_of_enhances_for_field(
                 user,
                 self.counter_enhance_field,

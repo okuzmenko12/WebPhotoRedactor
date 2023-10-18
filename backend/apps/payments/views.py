@@ -1,6 +1,4 @@
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render
 
 from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView, RetrieveAPIView
@@ -12,13 +10,12 @@ from .models import Plan, ForeignOrder, Order
 
 from .serializers import (PlanSerializer,
                           CreateUserForSubscriptionMixin,
-                          ForeignOrderSerializer)
+                          ForeignOrderSerializer, OrderSerializer)
 from .services import (PayPalOrdersMixin,
                        StripePaymentMixin,
                        QuerySetMixin,
-                       UserCreateForPaymentMixin, ForeignOrderMixin)
+                       UserCreateForPaymentMixin, ForeignOrderMixin, OrderMixin)
 
-from apps.users.models import User
 from apps.users.services import get_jwt_tokens_for_user
 
 
@@ -257,8 +254,12 @@ class CompleteForeignOrderByPayPalOrderID(ForeignOrderMixin,
         return Response(data, status.HTTP_200_OK)
 
 
-@login_required
-def home(request):
-    user = User.objects.get(email='admin@gmail.com')
-    # print(pr.create_user_subscription(user, 'I-PWKHCF6ACC4K'))
-    return render(request, 'payments/index.html')
+class UserOrders(OrderMixin,
+                 APIView):
+    serializer_class = OrderSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, *args, **kwargs):
+        orders = self.get_user_orders(self.request.user)
+        serializer = self.serializer_class(many=True, instance=orders)
+        return Response(serializer.data, status=status.HTTP_200_OK)

@@ -122,6 +122,10 @@ class OrderMixin(QuerySetMixin):
             order.is_ended = True
             order.save()
 
+    @staticmethod
+    def get_user_orders(user: User):
+        return Order.objects.filter(user=user)
+
 
 class PayPalContextMixin(OrderMixin):
 

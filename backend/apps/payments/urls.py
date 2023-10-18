@@ -1,7 +1,6 @@
 from django.urls import path
 
-from .views import (home,
-                    StripeWebhookAPIView,
+from .views import (StripeWebhookAPIView,
                     StripeConfigAPIView,
                     CreateStripeCheckoutSessionAPIView,
                     CreateUserToMakePaymentAPIView,
@@ -11,12 +10,13 @@ from .views import (home,
                     CompleteForeignOrderByPayPalOrderID,
                     CreateStripeForeignCheckoutSessionAPIView,
                     CompleteOrderByPayPalOrderID,
-                    PlanDetailAPIView)
+                    PlanDetailAPIView,
+                    UserOrders)
 
 urlpatterns = [
     path('plans/', PlansAPIVIew.as_view()),
     path('plans/<int:pk>/', PlanDetailAPIView.as_view()),
-    path('test/', home, name='payments-home'),
+    path('user_orders/', UserOrders.as_view()),
     path('create_user_for_subscription/',
          CreateUserToMakePaymentAPIView.as_view()),
     path('stripe/config/', StripeConfigAPIView.as_view()),

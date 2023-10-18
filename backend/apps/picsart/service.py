@@ -431,7 +431,7 @@ class PCsService(RequestContextMixin,
         if serializer_img is None:
             return image_format_error
         valid_formats = cls.get_valid_image_formats()
-        if serializer_img.name.split('.')[-1] not in valid_formats:
+        if serializer_img.name.split('.')[-1].lower() not in valid_formats:
             return image_format_error
         return None
 

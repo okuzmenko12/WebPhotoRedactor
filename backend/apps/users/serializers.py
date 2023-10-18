@@ -136,3 +136,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'username', 'email', 'full_name')
         read_only_fields = ['email']
+
+
+class UserCreditsSerializer(serializers.Serializer):
+    ip_address = serializers.IPAddressField()

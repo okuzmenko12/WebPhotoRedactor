@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Plan, ForeignOrder
+from .models import Plan, ForeignOrder, Order
 
 
 class CreateUserForSubscriptionMixin(serializers.Serializer):
@@ -24,3 +24,11 @@ class ForeignOrderSerializer(serializers.ModelSerializer):
         model = ForeignOrder
         fields = '__all__'
         read_only_fields = ['paypal_order_id', 'stripe_session_id', 'is_ended']
+
+
+class OrderSerializer(serializers.ModelSerializer):
+    plan = PlanSerializer()
+
+    class Meta:
+        model = Order
+        fields = ['id', 'user', 'plan', 'status', 'payment_service', 'created_at']

@@ -10,9 +10,9 @@ from .serializers import (RegistrationSerializer,
                           SendPasswordResetMailSerializer,
                           PasswordResetSerializer,
                           UserSerializer,
-                          ChangePasswordSerializer)
+                          ChangePasswordSerializer, UserCreditsSerializer)
 from .permissions import IsNotAuthenticated, IsUserOrReadOnly
-from .services import get_jwt_tokens_for_user
+from .services import get_jwt_tokens_for_user, get_user_credits
 
 from apps.picsart.models import UserFunctionsUsageCounter
 
@@ -177,3 +177,22 @@ class UserAPIView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_object(self):
         return User.objects.get(id=self.request.user.id)
+
+
+class UserCredits(APIView):
+    serializer_class = UserCreditsSerializer
+
+    def post(self, *args, **kwargs):
+        user_authenticated = self.request.user.is_authenticated
+        serializer = self.serializer_class(data=self.request.data)
+        serializer.is_valid(raise_exception=True)
+
+        ip_address = serializer.data.get('ip_address')
+
+        if user_authenticated:
+            user_id = self.request.user.id
+        else:
+            user_id = None
+
+        user_credits = get_user_credits(ip_address, user_authenticated, user_id)
+        return Response(data=user_credits, status=status.HTTP_200_OK)
