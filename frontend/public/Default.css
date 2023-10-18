@@ -72,6 +72,18 @@ body {
     width: 30%;
 }
 
+.width--100 {
+    width: 100%;
+}
+
+.align_right_text {
+    text-align: right;
+}
+
+.align_left_text {
+    text-align: left;
+}
+
 .header_text {
     -webkit-text-fill-color: transparent;
     background: -webkit-linear-gradient(-56deg, rgb(248, 248, 249), rgb(144, 145, 154));

@@ -25,8 +25,13 @@
                 </template>
                 <template v-else>
                     <p class="header_text fs--33 fw--700">Payment methods</p>
+                    <template v-if="paypalRedirectLink === ''">
+                        <page-loader />
+                    </template>
+                    <template v-else>
                         <PaymentModel :auth="authEd" name="PayPal" :func="paypalRedirect" description="ahhaahhahaahaha" method='paypal'/>
                         <PaymentModel :auth="authEd" name="Credit card" description="hohohohohoohoho" :func="stripeRedirect" url="https://google.com/dsadasdasdasdSdasda" method='stripe'/>
+                    </template>
                 </template>
             </div>
             <div @click="returnToPricing" id="close_modal">
@@ -80,7 +85,7 @@
 
 <script>
 import axios from 'axios';
-import { getHeaders, fetchToken, setLocalToken, setLocalRefreshToken } from '@/Auth';
+import { fetchToken, setLocalToken, setLocalRefreshToken } from '@/Auth';
 import router from '@/router/router';
 import handlePopState from "@/utils/index.js";
 import PaymentModel from "@/components/UI/PaymentModel";
@@ -96,7 +101,6 @@ export default {
     },
     async mounted() {
         const subId = this.$route.query.sub_id;
-        this.loadStripeSDK();
         handlePopState();
         axios.get(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/payments/plans/${subId}/`)
         .then(res => {
@@ -109,10 +113,16 @@ export default {
             this.handlePageLoad(false)
         })
         this.loadPaypal()
+        this.loadStripe();
         if (await fetchToken()) {
             this.authEd = true
         } else {
             this.authEd = false
+        }
+    },
+    watch: {
+        authEd() {
+            this.loadPaypal()
         }
     },
     data() {
@@ -124,6 +134,7 @@ export default {
             stripe: "",
             stripeId: "",
             paypalRedirectLink: "",
+            stripeRedirectLink: "",
             isLoaded: false,
             authEd: false,
             values: [
@@ -132,34 +143,22 @@ export default {
             messages: [
                 { name: "", email: "" }
             ],
-            paypalCreateOrderLink: `/api/v1/payments/paypal/create_order/${this.$route.query.sub_id}/`,
-            stripeCreateOrderLinl: "/api/v1/payments/stripe/create_checkout_session/"
         }
     },
     methods: {
         stripeRedirect() {
-            console.log();
-            axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN + this.stripeCreateOrderLinl + this.sub_id}/`, {}, { headers: getHeaders() })
-            .then(res => {
-                return this.stripe.redirectToCheckout({sessionId: res.data.checkout_session_id})
-            })
-            .catch(err => {
-                console.log(err);
-                this.message = 'Transaction failure. ' + (err.response.data.error ? err.response.data.error : err.response.data.detail)
-                const success_window = document.getElementById('success');
-                const payment_block = document.getElementById('payment-block');
-                success_window.style.backgroundColor = 'rgb(255, 000, 121)'
-                success_window.classList.add('visible');
-                payment_block.classList.add('hide');
-                setTimeout(() => {
-                    success_window.classList.remove('visible');
-                    payment_block.classList.remove('hide');
-                    router.push({ path: '/pricing' })
-                }, 3000);
-            })
+            if (this.$route.query.sub_id !== undefined) {
+                router.push({ path: this.stripeRedirectLink, query: { "sub_id": this.$route.query.sub_id } })
+            } else {
+                this.isLoaded = false
+            }
         },
         paypalRedirect() {
-            window.location.href = this.paypalRedirectLink
+            if (this.$route.query.sub_id !== undefined) {
+                router.push({ path: this.paypalRedirectLink, query: { "sub_id": this.$route.query.sub_id } })
+            } else {
+                this.isLoaded = false
+            }
         },
         handleEmailSendRequest() {
             const input = document.getElementById('email_input_field')
@@ -227,33 +226,15 @@ export default {
         handlePageLoad(value) {
             this.isLoaded = value
         },
-        loadStripeSDK() {
-            return new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = "https://js.stripe.com/v3/";
-                script.async = true;
-                script.onload = () => {
-                    axios.get(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/payments/stripe/config/`)
-                    .then(res => {
-                        console.log(res)
-                        this.stripe = Stripe(res.data.public_key);
-                    })
-                    resolve();
-                };
-                script.onerror = reject;
-                document.body.appendChild(script);
-            });
-        },
         loadPaypal() {
-            axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN + this.paypalCreateOrderLink}`, {}, { headers: getHeaders() })
-            .then(res => {
-                console.log(res)
-                this.paypalRedirectLink = res.data.payment_link
-                this.handlePageLoad(true);
-            })
-            .catch(() => {
-                this.handlePageLoad(true);
-            })
+            this.paypalRedirectLink = '/payment/paypal/creating_order'
+            console.log(this.paypalRedirectLink);
+            this.handlePageLoad(true);
+        },
+        loadStripe() {
+            this.stripeRedirectLink = '/payment/stripe/creating_order'
+            console.log(this.stripeRedirectLink);
+            this.handlePageLoad(true);
         },
         returnToPricing() {
             router.push({ path: '/pricing' })
@@ -420,7 +401,7 @@ export default {
 }
 
 #close_modal {
-    position: absolute;
+    position: fixed;
     top: 20px;
     left: 20px;
     background: transparent;
