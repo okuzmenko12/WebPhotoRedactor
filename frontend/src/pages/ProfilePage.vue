@@ -101,14 +101,6 @@
             handlePopState()
         },
         methods: {
-            sendChangePasswordRequest() {
-                axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/auth/password_reset/`, { 'email': this.email }, { headers: getHeaders() })
-                .then(res => {
-                    this.pass_message = res.data.success
-                    const passObj = document.getElementById('pass_message')
-                    passObj.style.color = "#00FF00"
-                })
-            },
             navbarToggle() {
                     const navbar = document.getElementById('profile_bar')
                     const button = document.getElementById('mobile__btn')

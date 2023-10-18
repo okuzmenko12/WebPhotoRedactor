@@ -1,7 +1,7 @@
 <template>
         <div class="upload_image_container">
             <input v-show="false" ref="imageUploadInput" id="image_upload_btn" type='file' @input="checkIfThereAnyFile" :accept="allowedFormats" />
-            <input v-show="false" ref="bgImageUpload" id="image_upload_btn" class="bgImageUpload" type='file' @input="handleFileChange" :accept="allowedFormats" />
+            <input v-show="false" ref="bgImageUpload" id="image_upload_btn" class="bgImageUpload" :type='bgFile ? "file" : "text"' @input="handleFileChange" :accept="allowedFormats" />
             <div v-if='isLoading === false && loadedFile === false' @drop.prevent="handleDrop" @dragenter.prevent="toggleIsDragOver(true)" @dragleave.prevent="toggleIsDragOver(false)" @dragover.prevent @click="handleClickZone" id="image_upload_block" class="white">
                 <template v-if="isDragOver === false && anyFiles === false">
                     <p class="no-margin align_center_text">Drag and drop file</p>
@@ -48,7 +48,12 @@
         props: {
             api_url: String,
             upscale_factor: String,
-            bg_color: String
+            bg_color: String,
+            blur: Number,
+            output_type: String,
+            bgFile: Boolean,
+            bgUrl: String,
+            strt: String
         },
         mounted() {
             axios.get('https://ipapi.co/ip/')
@@ -86,13 +91,42 @@
                 const formData = new FormData();
                 formData.append('ip_address', this.userIp);
                 formData.append('image', input.files[0]);
-                if (input2.files.length > 0) {
+                if (this.bgFile === true) {
+                    if (input2.files.length > 0) {
                     formData.append('bg_image', input2.files[0]);
-                } else if (this.bg_color !== undefined && this.bg_color !== '#ffffff') {
-                    formData.append('bg_color', this.bg_color)
+                    } else if (this.bg_color !== undefined && this.bg_color !== '#ffffff') {
+                        formData.append('bg_color', this.bg_color);
+                    }
+                } else {
+                    if (this.bgUrl !== "") {
+                    formData.append('bg_image_url', this.bgUrl);
+                    } else if (this.bg_color !== undefined && this.bg_color !== '#ffffff') {
+                        formData.append('bg_color', this.bg_color);
+                    }
+                }
+
+                if (this.blur !== undefined) {
+                    let blur = parseInt(this.blur)
+                    if (blur <= 0) {
+                        blur = 0
+                    } else if (blur >= 100) {
+                        blur = 100
+                    }
+                    console.log(blur);
+                    formData.append('bg_blur', blur)
+                }
+
+                if (this.output_type !== undefined) {
+                    let output = this.output_type
+                    formData.append('output_type', output)
                 }
                 if (this.upscale_factor !== undefined) {
                     formData.append('upscale_factor', this.upscale_factor);
+                }
+
+                if (this.strt !== undefined) {
+                    let strt = this.strt
+                    formData.append('strength', strt);
                 }
 
                 if (await fetchToken() === true) {

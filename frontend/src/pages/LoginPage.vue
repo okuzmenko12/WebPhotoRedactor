@@ -9,6 +9,7 @@
             <input-ui max="50" v-model="email" pr="Email"/>
             <input-ui max="50" v-model="password" :passwordType="true" pr="Password"/>
             <button class="auth__authpage__btn" @click="sendLogInRequest">Log in</button>
+            <router-link to="/reset_password" class="width--100 fs--12 align_center_text link">Forgot password?</router-link>
             <h5 id="message__auth">{{ message }}</h5>
         </form>
     </div>

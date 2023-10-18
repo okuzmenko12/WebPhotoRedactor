@@ -1,7 +1,8 @@
 <template>
   <div class="input-container">
-    <input v-if="passwordType" :id="inputId" :maxlength="max" :type="showPassword ? 'text' : 'password'" :placeholder="pr" :value="modelValue" @input="updateValue" />
-    <input v-else type="text" :id="inputId" :readonly="enableReadonly" :maxlength="max" :value="modelValue" @input="updateValue" :placeholder="pr" />
+    <input v-if="passwordType && !numberType" :id="inputId" :maxlength="max" :type="showPassword ? 'text' : 'password'" :placeholder="pr" :value="modelValue" @input="updateValue" />
+    <input v-else-if="!passwordType && !numberType" type="text" :id="inputId" :readonly="enableReadonly" :maxlength="max" :value="modelValue" @input="updateValue" :placeholder="pr" />
+    <input v-else :id="inputId" :min="min" :max="max" type="number" :placeholder="pr" :value="modelValue" @input="updateValue" />
     <span v-if="passwordType" class="eye-icon" @click="toggleVisibility">{{ showPassword ? '👁️' : '👁️‍🗨️' }}</span>
   </div>
 </template>
@@ -11,8 +12,10 @@ export default {
   props: {
     modelValue: String,
     passwordType: Boolean,
+    numberType: Boolean,
     pr: String,
     max: String,
+    min: String,
     enableReadonly: Boolean,
     inputId: String
   },
@@ -23,11 +26,12 @@ export default {
   },
   methods: {
     updateValue(event) {
-      this.$emit('update:modelValue', event.target.value);
+      const inputValue = event.target.value;
+      this.$emit('update:modelValue', inputValue);
     },
     toggleVisibility() {
       this.showPassword = !this.showPassword;
-    }
+    },
   }
 };
 </script>

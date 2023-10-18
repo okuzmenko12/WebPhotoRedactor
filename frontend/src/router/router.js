@@ -9,6 +9,7 @@ import ProfilePage from "@/pages/ProfilePage";
 import PaymentPage from "@/pages/PaymentPage";
 import ConfirmPage from "@/pages/ConfirmPage";
 import ChangePassword from "@/pages/ChangePassword";
+import ChangePasswordEmail from "@/pages/ChangePasswordEmail";
 import ChangeEmail from "@/pages/ChangeEmail";
 import ImagePage from "@/pages/ImagePage";
 import paypalSuccess from "@/pages/SuccessPaypalPage";
@@ -56,6 +57,11 @@ const routes = [
         path: '/email_confirmation',
         name: 'Email confirmation',
         component: ConfirmPage
+    },
+    {
+        path: '/reset_password',
+        name: 'Resseting password',
+        component: ChangePasswordEmail
     },
     {
         path: '/reset_password_confirmation',
