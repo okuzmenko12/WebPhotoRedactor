@@ -15,7 +15,9 @@ from .views import (UserRegistrationAPIView,
                     PasswordResetAPIView,
                     UserAPIView,
                     ChangePasswordAPIView,
-                    UserCredits, GetClientIpAPIView)
+                    UserCredits,
+                    GetClientIpAPIView,
+                    NotAuthenticatedUserTokenAPIView)
 
 urlpatterns = [
     path('registration/', UserRegistrationAPIView.as_view(), name='registration'),
@@ -33,5 +35,6 @@ urlpatterns = [
     path('token/blacklist/', TokenBlacklistView.as_view(), name='token_blacklist'),
     path('user/', UserAPIView.as_view(), name='user'),
     path('user/credits/', UserCredits.as_view(), name='user_credits'),
-    path('client_ip/', GetClientIpAPIView.as_view())
+    path('client_ip/', GetClientIpAPIView.as_view()),
+    path('client_token_create/', NotAuthenticatedUserTokenAPIView.as_view())
 ]

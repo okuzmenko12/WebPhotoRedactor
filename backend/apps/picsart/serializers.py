@@ -2,9 +2,9 @@ from rest_framework import serializers
 
 
 class ImageSerializer(serializers.Serializer):
-    ip_address = serializers.IPAddressField(required=True,
-                                            label='IP Address',
-                                            max_length=25)
+    ip_address_or_token = serializers.CharField(required=True,
+                                                label='IP Address or Token',
+                                                max_length=250)
     image = serializers.ImageField()
 
 

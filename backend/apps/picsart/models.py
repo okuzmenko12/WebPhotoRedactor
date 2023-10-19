@@ -58,16 +58,16 @@ class UserFunctionsUsageCounter(AbstractFunctionsUsageCounter):
 
 
 class AnonymousUserFunctionsUsageCounter(AbstractFunctionsUsageCounter):
-    ip_address = models.GenericIPAddressField(max_length=25,
-                                              verbose_name='IP Address',
-                                              unique=True)
+    ip_address_or_token = models.CharField(max_length=250,
+                                           verbose_name='IP Address',
+                                           unique=True)
 
     class Meta:
         db_table = 'ip_functions_usage_counter'
         verbose_name_plural = 'Usage counters (Anonymous users)'
 
     def __str__(self):
-        return f'Counter for: {self.ip_address}'
+        return f'Counter for: {self.ip_address_or_token}'
 
 
 class FreeEnhancesLimit(models.Model):

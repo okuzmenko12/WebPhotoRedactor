@@ -478,11 +478,11 @@ class IPAddressesUsageCountMixin:
         return limit_instance.limit
 
     @staticmethod
-    def get_or_create_ip(ip_address):
-        if ip_address is not None:
+    def get_or_create_ip(ip_address_or_token):
+        if ip_address_or_token is not None:
             model_objects = AnonymousUserFunctionsUsageCounter.objects
             data = {
-                'ip_address': ip_address
+                'ip_address_or_token': ip_address_or_token
             }
             if not model_objects.filter(
                     **data
@@ -497,23 +497,23 @@ class IPAddressesUsageCountMixin:
 
     def ip_attempts_for_field(
             self,
-            ip_address,
+            ip_address_or_token,
             enhance_field
     ):
-        ip = self.get_or_create_ip(ip_address)
-        field_value_count = getattr(ip, enhance_field)
+        ip_or_token = self.get_or_create_ip(ip_address_or_token)
+        field_value_count = getattr(ip_or_token, enhance_field)
         return field_value_count
 
     def ip_increase_field_usage_count(
             self,
-            ip_address,
+            ip_address_or_token,
             enhance_field
     ):
-        ip = self.get_or_create_ip(ip_address)
-        old_value = getattr(ip, enhance_field)
+        ip_or_token = self.get_or_create_ip(ip_address_or_token)
+        old_value = getattr(ip_or_token, enhance_field)
         new_value = old_value + 1
-        setattr(ip, enhance_field, new_value)
-        ip.save()
+        setattr(ip_or_token, enhance_field, new_value)
+        ip_or_token.save()
 
 
 def get_count_of_enhances_for_field(user, counter_field):
@@ -553,7 +553,7 @@ class FreeOrPaidVersionData(NamedTuple):
 
 def get_data_for_free_or_paid_version(
         user: User,
-        ip_address,
+        ip_address_or_token,
         counter_field
 ):
     data_dict = {}
@@ -563,9 +563,9 @@ def get_data_for_free_or_paid_version(
     if not user.is_authenticated:
         data_dict['free_version'] = True
 
-        if ip_address is not None:
+        if ip_address_or_token is not None:
             attempts = usage_count_mixin.ip_attempts_for_field(
-                ip_address, counter_field
+                ip_address_or_token, counter_field
             )
             if attempts >= usage_count_mixin.get_features_max_value_of_free_usage():
                 return FreeOrPaidVersionData(error=reach_limit_error)
@@ -581,9 +581,9 @@ def get_data_for_free_or_paid_version(
 
         if user_count_of_enhances == 0:
             data_dict['free_version'] = True
-            if ip_address is not None:
+            if ip_address_or_token is not None:
                 attempts = usage_count_mixin.ip_attempts_for_field(
-                    ip_address, counter_field
+                    ip_address_or_token, counter_field
                 )
                 if attempts >= usage_count_mixin.get_features_max_value_of_free_usage():
                     return FreeOrPaidVersionData(error=reach_limit_error)

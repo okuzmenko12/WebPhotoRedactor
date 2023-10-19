@@ -1,3 +1,6 @@
+import binascii
+import os
+
 from .models import User
 
 from apps.picsart.models import (AnonymousUserFunctionsUsageCounter,
@@ -24,17 +27,17 @@ def get_jwt_tokens_for_user(user: User) -> dict:
     }
 
 
-def get_or_create_usage_counter_for_ip(user_ip):
+def get_or_create_usage_counter_for_ip_or_token(user_ip_or_token):
     usage_counter, _ = AnonymousUserFunctionsUsageCounter.objects.get_or_create(
-        ip_address=user_ip
+        ip_address_or_token=user_ip_or_token
     )
     return usage_counter
 
 
-def get_credits_for_ip(user_ip):
+def get_credits_for_ip_or_token(user_ip_or_token):
     credits_left_dict = {}
     counter_fields = ['up_scales_count', 'bg_deletions_count', 'jpg_artifacts_deletions_count']
-    usage_counter = get_or_create_usage_counter_for_ip(user_ip)
+    usage_counter = get_or_create_usage_counter_for_ip_or_token(user_ip_or_token)
 
     free_limit = 5
     if FreeEnhancesLimit.objects.count() > 0:
@@ -48,7 +51,7 @@ def get_credits_for_ip(user_ip):
 
 
 def get_user_credits(
-        user_ip,
+        user_ip_or_token,
         is_authenticated,
         user_id=None
 ):
@@ -63,7 +66,7 @@ def get_user_credits(
     ]
 
     if not is_authenticated:
-        ip_credits = get_credits_for_ip(user_ip)
+        ip_credits = get_credits_for_ip_or_token(user_ip_or_token)
         for field, value in ip_credits.items():
             credits_left_dict['free_credits'][field] = value
             credits_left_dict['paid_credits'][field] = 0
@@ -73,7 +76,7 @@ def get_user_credits(
             field_value = getattr(usage_counter, field)
             credits_left_dict['paid_credits'][field] = field_value
 
-        ip_credits = get_credits_for_ip(user_ip)
+        ip_credits = get_credits_for_ip_or_token(user_ip_or_token)
         for field, value in ip_credits.items():
             credits_left_dict['free_credits'][field] = value
 
@@ -91,3 +94,13 @@ def get_client_ip(request):
         'addr': request.META.get('REMOTE_ADDR'),
         'x_forwarded_for': x_forwarded_for
     }
+
+
+class NotAuthenticatedUsersTokensMixin:
+
+    @classmethod
+    def generate_token(cls):
+        return binascii.hexlify(os.urandom(32)).decode()
+
+    def create_token(self):
+        return self.generate_token()

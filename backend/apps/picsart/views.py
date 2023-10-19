@@ -33,7 +33,7 @@ class BaseImageAPIView(IPAddressesUsageCountMixin,
 
     def post(self, *args, **kwargs):
         image = self.request.data.get('image')
-        ip_address = self.request.data.get('ip_address')
+        ip_address_or_token = self.request.data.get('ip_address_or_token')
 
         if isinstance(image, str):
             return Response({
@@ -41,9 +41,6 @@ class BaseImageAPIView(IPAddressesUsageCountMixin,
             }, status=status.HTTP_400_BAD_REQUEST)
 
         format_error = self.psc.validate_image_format(image)
-        reach_limit_resp = Response({
-            'error': 'You have used all your credits for this feature!'
-        }, status=status.HTTP_400_BAD_REQUEST)
 
         user: User = self.request.user
 
@@ -57,7 +54,11 @@ class BaseImageAPIView(IPAddressesUsageCountMixin,
         if serializer.is_valid(raise_exception=True):
             image = serializer.validated_data.get('image')
 
-            data_dict, error = get_data_for_free_or_paid_version(user, ip_address, self.counter_enhance_field)
+            data_dict, error = get_data_for_free_or_paid_version(
+                user,
+                ip_address_or_token,
+                self.counter_enhance_field
+            )
             if error is not None:
                 return Response({'error': error}, status.HTTP_400_BAD_REQUEST)
             self.psc.free_version = data_dict['free_version']
@@ -81,45 +82,12 @@ class BaseImageAPIView(IPAddressesUsageCountMixin,
             )
 
             if data_dict['function'] == 'free_increase':
-                self.ip_increase_field_usage_count(ip_address, self.counter_enhance_field)
+                self.ip_increase_field_usage_count(
+                    ip_address_or_token,
+                    self.counter_enhance_field
+                )
             elif data_dict['function'] == 'paid_decrease':
                 decrease_count_of_enhances_for_field(user, self.counter_enhance_field, 1)
-
-            #
-            # if not user.is_authenticated:
-            #     self.psc.free_version = True
-            #
-            #     if ip_address is not None:
-            #         attempts = self.ip_attempts_for_field(
-            #             ip_address, self.counter_enhance_field
-            #         )
-            #         if attempts >= self.get_features_max_value_of_free_usage():
-            #             return reach_limit_resp
-            #         self.ip_increase_field_usage_count(ip_address, self.counter_enhance_field)
-            #
-            # else:
-            #     user_count_of_enhances = get_count_of_enhances_for_field(
-            #         user,
-            #         self.counter_enhance_field
-            #     )
-            #
-            #     if user_count_of_enhances == 0:
-            #         if ip_address is not None:
-            #             attempts = self.ip_attempts_for_field(
-            #                 ip_address, self.counter_enhance_field
-            #             )
-            #             if attempts >= self.get_features_max_value_of_free_usage():
-            #                 return reach_limit_resp
-            #             self.ip_increase_field_usage_count(ip_address, self.counter_enhance_field)
-            #         else:
-            #             return reach_limit_resp
-            #     elif user_count_of_enhances > 0:
-            #         self.psc.free_version = False
-            #     decrease_count_of_enhances_for_field(
-            #         user,
-            #         self.counter_enhance_field,
-            #         1
-            #     )
 
             return Response(url_data, status=status.HTTP_200_OK)
 

@@ -14,7 +14,7 @@ from .serializers import (RegistrationSerializer,
                           UserSerializer,
                           ChangePasswordSerializer, UserCreditsSerializer)
 from .permissions import IsNotAuthenticated, IsUserOrReadOnly
-from .services import get_jwt_tokens_for_user, get_user_credits, get_client_ip
+from .services import get_jwt_tokens_for_user, get_user_credits, get_client_ip, NotAuthenticatedUsersTokensMixin
 
 from apps.picsart.models import UserFunctionsUsageCounter
 
@@ -192,14 +192,14 @@ class UserCredits(APIView):
         serializer = self.serializer_class(data=self.request.data)
         serializer.is_valid(raise_exception=True)
 
-        ip_address = serializer.data.get('ip_address')
+        ip_address_or_token = serializer.data.get('ip_address_or_token')
 
         if user_authenticated:
             user_id = self.request.user.id
         else:
             user_id = None
 
-        user_credits = get_user_credits(ip_address, user_authenticated, user_id)
+        user_credits = get_user_credits(ip_address_or_token, user_authenticated, user_id)
         return Response(data=user_credits, status=status.HTTP_200_OK)
 
 
@@ -208,3 +208,13 @@ class GetClientIpAPIView(APIView):
     def get(self, *args, **kwargs):
         ip = get_client_ip(self.request)
         return Response(data=ip, status=status.HTTP_200_OK)
+
+
+class NotAuthenticatedUserTokenAPIView(NotAuthenticatedUsersTokensMixin,
+                                       APIView):
+
+    def post(self, *args, **kwargs):
+        token = self.create_token()
+        return Response({
+            'token': token
+        }, status.HTTP_201_CREATED)
