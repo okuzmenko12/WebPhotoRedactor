@@ -166,4 +166,3 @@ class RemoveJPEGArtifactsAPIView(BaseImageAPIView):
         return {
             'strength': self.request.data.get('strength')
         }
-

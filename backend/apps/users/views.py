@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from rest_framework import generics, status
 from rest_framework.views import APIView
 
+from django.conf import settings
+
 from .models import User
 from .token import TokenTypes, AuthTokenMixin, get_token_data
 from .serializers import (RegistrationSerializer,
@@ -12,7 +14,7 @@ from .serializers import (RegistrationSerializer,
                           UserSerializer,
                           ChangePasswordSerializer, UserCreditsSerializer)
 from .permissions import IsNotAuthenticated, IsUserOrReadOnly
-from .services import get_jwt_tokens_for_user, get_user_credits
+from .services import get_jwt_tokens_for_user, get_user_credits, get_client_ip
 
 from apps.picsart.models import UserFunctionsUsageCounter
 
@@ -25,6 +27,7 @@ class UserRegistrationAPIView(AuthTokenMixin,
     token_type = TokenTypes.SIGNUP
     html_message_template = 'users/confirm_email_message.html'
     mail_with_celery = False
+    front_url = settings.EMAIL_CONFIRMATION_URL
 
     def create(self, request, *args, **kwargs):
         response = super().create(request, *args, **kwargs)
@@ -69,6 +72,7 @@ class ChangeEmailAPIView(AuthTokenMixin,
     token_type = TokenTypes.CHANGE_EMAIL
     html_message_template = 'users/confirm_email_changing.html'
     mail_with_celery = False
+    front_url = settings.CHANGE_EMAIL_CONFIRMATION_URL
 
     def post(self, *args, **kwargs):
         serializer = ChangeEmailSerializer(data=self.request.data)
@@ -109,6 +113,7 @@ class SendPasswordResetAPIView(AuthTokenMixin,
     token_type = TokenTypes.PASSWORD_RESET
     html_message_template = 'users/password_reset_msg.html'
     mail_with_celery = False
+    front_url = settings.RESET_PASSWORD_CONFIRMATION_URL
 
     def post(self, *args, **kwargs):
         serializer = SendPasswordResetMailSerializer(data=self.request.data)
@@ -196,3 +201,12 @@ class UserCredits(APIView):
 
         user_credits = get_user_credits(ip_address, user_authenticated, user_id)
         return Response(data=user_credits, status=status.HTTP_200_OK)
+
+
+class GetClientIpAPIView(APIView):
+
+    def get(self, *args, **kwargs):
+        ip = get_client_ip(self.request)
+        return Response({
+            'ip': ip
+        }, status=status.HTTP_200_OK)

@@ -3,7 +3,7 @@ import os
 from io import BytesIO
 
 from enum import Enum
-from typing import NamedTuple, Optional, Any, Union
+from typing import NamedTuple, Union
 
 from urllib.parse import urlparse
 from urllib.request import urlopen, Request
@@ -382,6 +382,11 @@ class PCsService(RequestContextMixin,
         )
 
         response_data = response.json()
+
+        if response_data.get('detail') is not None:
+            return {
+                'error': response.json().get('detail')
+            }
 
         image.close()
         os.remove(f'media/{image_dict["image_token"]}/{image_dict["image_name"]}.{image_dict["img_format"]}')

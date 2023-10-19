@@ -100,6 +100,7 @@ class AuthTokenMixin(MailContextMixin):
     token_type = None
     html_message_template = None
     mail_with_celery = False
+    front_url = None
 
     def _create_token(self, email: str) -> TokenData:
         """
@@ -149,12 +150,11 @@ class AuthTokenMixin(MailContextMixin):
         if token_data.error:
             return token_data.error
 
+        full_url = self.front_url + f'?token={token_data.token.token}&email={str(email)}'
+
         cont = {
-            'email': str(email),
-            'domain': '127.0.0.1:8000',
-            'site_name': 'CodeSphere',
-            'token': token_data.token.token,
-            'protocol': 'http'
+            'site_name': settings.SITE_NAME,
+            'url': full_url
         }
         subject = mail_context['subject']
         message = mail_context['message']
