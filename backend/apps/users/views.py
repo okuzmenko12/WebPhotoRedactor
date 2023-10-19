@@ -207,6 +207,4 @@ class GetClientIpAPIView(APIView):
 
     def get(self, *args, **kwargs):
         ip = get_client_ip(self.request)
-        return Response({
-            'ip': ip
-        }, status=status.HTTP_200_OK)
+        return Response(data=ip, status=status.HTTP_200_OK)
