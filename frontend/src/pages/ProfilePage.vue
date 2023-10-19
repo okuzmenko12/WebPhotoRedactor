@@ -92,39 +92,39 @@
             </template>
             <template v-else-if="$route.hash === '#transactions'">
                 <div class="basic_user_info white">
-                    <div  class="flex-block column gp--15">
+                    <div class="flex-block transactions_container column gp--15">
                         <p class="fs--25 header_text fw--900 width--min">Transactions:</p>
                         <template v-if="transactions.length > 0">
-                            <div v-for="transaction in transactions" :key="transaction.id" class="width--100 flex-block column" style="border: 1px solid rgb(144, 145, 154); background-color: #1b1e29; border-radius: 20px;">
-                                <div class="flex-block space-between">
-                                    <div class="flex-block column align-items-center width--100">
+                            <div v-for="transaction in transactions" :key="transaction.id" class="order_block_container width--100 flex-block column" style="border: 1px solid rgb(144, 145, 154); background-color: #1b1e29; border-radius: 20px;">
+                                <div class="order_block flex-block space-between">
+                                    <div class="flex-block column align_center_text align-items-center width--100">
                                         <p>ORDER ID</p>
                                         <p class="fs--20">#{{ transaction.id }}</p>
                                     </div>
 
-                                    <div class="flex-block column align-items-center width--100">
+                                    <div class="flex-block column align_center_text align-items-center width--100">
                                         <p>CREATED AT</p>
                                         <p class="fs--20">{{ transaction.parsed_created_at }}</p>
                                     </div>
 
-                                    <div class="flex-block column align-items-center width--100">
+                                    <div class="flex-block column align_center_text align-items-center width--100">
                                         <p>METHOD</p>
                                         <p class="fs--20">{{ transaction.payment_service }}</p>
                                     </div>
 
-                                    <div class="flex-block column align-items-center width--100">
+                                    <div class="flex-block column align_center_text align-items-center width--100">
                                         <p>PLAN</p>
                                             <p class="fs--20">{{ transaction.plan.name }}</p>
                                     </div>
 
-                                    <div class="flex-block column align-items-center width--100">
+                                    <div class="flex-block column align_center_text align-items-center width--100">
                                         <p>PRICE</p>
                                         <p class="fs--20">{{ transaction.plan.price }}$</p>
                                     </div>
 
-                                    <div class="flex-block column align-items-center width--100">
+                                    <div class="flex-block column align_center_text align-items-center width--100">
                                         <p>STATUS</p>
-                                        <p class="fs--20 width--70 align_center_text" style="border-radius: 16px; padding: 0 5px"
+                                        <p class="fs--20 width--70" style="border-radius: 16px; padding: 0 5px"
                                         :style="transaction.status === 'COMPLETED' ? 'background-color: #66ff63' : transaction.status === 'CANCELED' ? 'background-color: rgb(255, 0, 121)' : transaction.status === 'ACTIVE' ? 'background-color: #fcd056' : ''">
                                             {{ transaction.status }}
                                         </p>
@@ -531,6 +531,37 @@
     background-color: #181c24;
 }
 
+@media (min-width: 1400px) and (max-width: 1599px) {
+    .order_block .flex-block .fs--20 {
+        font-size: 15px;
+    }
+
+    .order_block .flex-block p {
+        font-size: 15px;
+    }
+}
+
+@media (min-width: 1200px) and (max-width: 1399px) {
+    .order_block .flex-block .fs--20 {
+        font-size: 15px;
+    }
+
+    .order_block .flex-block p {
+        font-size: 15px;
+    }
+}
+
+
+@media (min-width: 992px) and (max-width: 1199px) {
+    .order_block .flex-block .fs--20 {
+        font-size: 10px;
+    }
+
+    .order_block .flex-block p {
+        font-size: 10px;
+    }
+}
+
 @media (min-width: 768px) and (max-width: 991px) {
     .profile_bar {
         position: fixed;
@@ -556,6 +587,10 @@
 
     .profile_close_page {
         display: none
+    }
+
+    .order_block {
+        flex-direction: column;
     }
 }
 
@@ -589,6 +624,10 @@
     .profile_close_page {
         display: none
     }
+
+    .order_block {
+        flex-direction: column;
+    }
 }
 
 @media (min-width: 481px) and (max-width: 650px) {
@@ -616,6 +655,10 @@
 
     .profile_close_page {
         display: none
+    }
+
+    .order_block {
+        flex-direction: column;
     }
 }
 
@@ -648,6 +691,27 @@
 
     .profile_close_page {
         display: none
+    }
+
+    .transactions_container {
+        align-items: center;
+        text-align: left
+    }
+
+    .order_block_container {
+        width: 90% !important;
+    }
+
+    .order_block {
+        flex-direction: column;
+    }
+
+    .order_block .flex-block .fs--20 {
+        font-size: 15px;
+    }
+
+    .order_block .flex-block p {
+        font-size: 15px;
     }
 }
 </style>
