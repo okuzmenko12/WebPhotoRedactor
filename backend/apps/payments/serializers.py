@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from rest_framework import serializers
 
 from .models import Plan, ForeignOrder, Order
@@ -28,7 +30,15 @@ class ForeignOrderSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     plan = PlanSerializer()
+    parsed_created_at = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
-        fields = ['id', 'user', 'plan', 'status', 'payment_service', 'created_at']
+        fields = ['id', 'user', 'plan', 'status', 'payment_service', 'parsed_created_at', 'created_at']
+
+    @staticmethod
+    def get_parsed_created_at(instance: Order):
+        created_at = str(instance.created_at)
+        parsed_date = datetime.fromisoformat(created_at.replace('T', ' ').split('+')[0])
+        formatted_date = parsed_date.strftime('%Y-%m-%d %H:%M:%S')
+        return formatted_date
