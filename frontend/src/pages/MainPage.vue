@@ -4,7 +4,7 @@
     <div class="main-page">
       <div class="whatis-block white">
         <p class="brand_text">About us</p>
-        <p class="fs--50 fw--700 header_text align_center_text no-top">What is FlexFi Upscale?</p>
+        <p class="fs--50 fw--700 header_text align_center_text no-top few-padding">What is FlexFi Upscale?</p>
         <div class="whatis-about">
           <h1 class="fs--25 fw--400 whatis-text-desc small_text">It's a website where you have all tools in your hand. From upscaling to removing bacgkrounds.</h1>
           <div class="whatis-block-block">
@@ -15,7 +15,7 @@
       </div>
       <div class="tools-usage-block">
         <p class="brand_text">Our tools</p>
-        <p class="fs--50 fw--700 header_text no-top align_center_text">We have many tools for your usage</p>
+        <p class="fs--50 fw--700 header_text no-top align_center_text few-padding">We have many tools for your usage</p>
         <div class="tools-cards-block">
           <tool-card name="Upscaling" description="
           Upscale your image resolution and quality just in one click
@@ -39,7 +39,7 @@
       </div>
       <div class="why-us-block">
           <p class="brand_text">Preferences</p>
-          <p class="fs--50 fw--700 header_text no-top align_center_text">Why would you choose us?</p>
+          <p class="fs--50 fw--700 header_text no-top align_center_text few-padding">Why would you choose us?</p>
           <div class="why-us-block">
             <div class="why-us-table-features">
               <div class="why-item">
@@ -67,7 +67,7 @@
           </div>
       </div>
       <often-questions />
-      <div class="payment_info_block flex-block column center white gp--50">
+      <div class="get-started-main-block payment_info_block flex-block column center white gp--50">
         <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9Ijk5IiB2aWV3Qm94PSIwIDAgMTAwIDk5IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8Y2lyY2xlIGN4PSI1MC4zNTc0IiBjeT0iNDkuNSIgcj0iNDkuMTUxNCIgc3Ryb2tlPSIjOTAyRUYyIiBzdHJva2Utd2lkdGg9IjAuNjk3MTgzIi8+CjxwYXRoIGQ9Ik02Ni42MjEgMjkuOTc5SDYwLjExNzRDNTkuMjUzNSAyOS45NzkgNTguNDI3MiAzMC4zMjQ4IDU3LjgxNjQgMzAuOTM1MUM1Ny4yMDU2IDMxLjU0NTQgNTYuODYyNSAzMi4zNzIzIDU2Ljg2MDQgMzMuMjM2N1YzOS43Mzk2QzU2Ljg2MDQgNDAuMTY2NiA1Ni43NzY3IDQwLjU5MTUgNTYuNjEzNiA0MC45ODUyQzU2LjQ1MDQgNDEuMzc4OCA1Ni4yMTE5IDQxLjczOTIgNTUuOTA4NiA0Mi4wNDEyQzU1LjYwNzQgNDIuMzQzMiA1NS4yNDc2IDQyLjU4MjggNTQuODUyMiA0Mi43NDczQzU0LjQ1NjkgNDIuOTExOSA1NC4wMzQzIDQyLjk5NTIgNTMuNjA3NiA0Mi45OTUySDQ3LjA5NzdDNDYuMjMzOCA0Mi45OTUyIDQ1LjQwNzUgNDIuNjQ5NCA0NC43OTg4IDQyLjAzOTFDNDQuMTkwMSA0MS40Mjg4IDQzLjg0NyA0MC41OTk4IDQzLjg0NyAzOS43Mzc1VjMzLjIzNjdDNDMuODQ3IDMyLjM3NDQgNDMuNTA0IDMxLjU0NTQgNDIuODk1MiAzMC45MzUxQzQyLjI4NjUgMzAuMzI0OCA0MS40NjAyIDI5Ljk3OSA0MC41OTYzIDI5Ljk3OUgzNC4wODY1QzMzLjIyNDYgMjkuOTc5IDMyLjM5ODMgMzAuMzI0OCAzMS43ODc1IDMwLjkzNTFDMzEuMTc4OCAzMS41NDU0IDMwLjgzNTcgMzIuMzc0NCAzMC44MzU3IDMzLjIzNjdWMzkuNzM5NkMzMC44MzU3IDQwLjE2NjYgMzAuOTE5NCA0MC41OTE1IDMxLjA4MjYgNDAuOTg1MkMzMS4yNDU3IDQxLjM4MDkgMzEuNDg0MiA0MS43MzkyIDMxLjc4NzUgNDIuMDQxMkMzMi4wODg3IDQyLjM0MzIgMzIuNDQ4NSA0Mi41ODI4IDMyLjg0MzkgNDIuNzQ3M0MzMy4yMzkzIDQyLjkxMTkgMzMuNjYxOCA0Mi45OTUyIDM0LjA4ODUgNDIuOTk1Mkg0MC41OTg0QzQxLjQ2MDIgNDIuOTk1MiA0Mi4yODg2IDQzLjMzNjggNDIuODk3MyA0My45NDcxQzQzLjUwODEgNDQuNTU3NCA0My44NDkxIDQ1LjM4NDMgNDMuODQ5MSA0Ni4yNDY2VjUyLjc1NTdDNDMuODQ5MSA1My42MTgxIDQzLjUwNiA1NC40NDUgNDIuODk3MyA1NS4wNTUzQzQyLjI4NjUgNTUuNjY1NiA0MS40NjAyIDU2LjAwNzIgNDAuNTk4NCA1Ni4wMDcySDM0LjA4NjVDMzMuMjI0NiA1Ni4wMDcyIDMyLjM5NjIgNTYuMzQ4OCAzMS43ODc1IDU2Ljk1OTFDMzEuMTc4OCA1Ny41NzE0IDMwLjgzNTcgNTguMzk4NCAzMC44MzU3IDU5LjI2MDdWNjUuNzY5OEMzMC44MzU3IDY2LjYzMjEgMzEuMTc4OCA2Ny40NTkxIDMxLjc4NzUgNjguMDY5NEMzMi4zOTgzIDY4LjY3OTcgMzMuMjI0NiA2OS4wMjEzIDM0LjA4NjUgNjkuMDIxM0g0MC41OTYzQzQxLjQ1ODEgNjkuMDIxMyA0Mi4yODY1IDY4LjY3OTcgNDIuODk1MiA2OC4wNjk0QzQzLjUwNiA2Ny40NTkxIDQzLjg0NyA2Ni42MzIxIDQzLjg0NyA2NS43Njk4VjU5LjI2MDdDNDMuODQ3IDU4LjM5ODQgNDQuMTkwMSA1Ny41NzE0IDQ0Ljc5ODggNTYuOTYxMUM0NS40MDk2IDU2LjM1MDkgNDYuMjM1OSA1Ni4wMDkzIDQ3LjA5NzcgNTYuMDA5M0g1My42MDc2QzU0LjQ2OTQgNTYuMDA5MyA1NS4yOTc4IDU2LjM1MDkgNTUuOTA2NSA1Ni45NjExQzU2LjUxNzMgNTcuNTcxNCA1Ni44NTgzIDU4LjM5ODQgNTYuODU4MyA1OS4yNjA3VjY1Ljc2OThDNTYuODU4MyA2Ni42MzIxIDU3LjIwMzUgNjcuNDU5MSA1Ny44MTQzIDY4LjA2OTRDNTguNDI1MSA2OC42Nzk3IDU5LjI1MzUgNjkuMDIxMyA2MC4xMTUzIDY5LjAyMTNINjYuNjE4OUM2Ny4wNDU2IDY5LjAyMTMgNjcuNDcwMyA2OC45Mzc5IDY3Ljg2NTYgNjguNzc1NUM2OC4yNjEgNjguNjEzIDY4LjYyMDggNjguMzczNSA2OC45MjIgNjguMDcxNEM2OS4yMjUzIDY3Ljc2OTQgNjkuNDYzOCA2Ny40MTEyIDY5LjYyOSA2Ny4wMTU0QzY5Ljc5MjIgNjYuNjIxNyA2OS44NzggNjYuMTk2OCA2OS44NzggNjUuNzY5OFY1OS4yNjA3QzY5Ljg3OCA1OC44MzM3IDY5Ljc5NDMgNTguNDEwOSA2OS42MjkgNTguMDE1MUM2OS40NjU5IDU3LjYyMTQgNjkuMjI1MyA1Ny4yNjExIDY4LjkyMiA1Ni45NTkxQzY4LjYxODcgNTYuNjU3IDY4LjI2MSA1Ni40MTc1IDY3Ljg2NTYgNTYuMjU1QzY3LjQ3MDMgNTYuMDkyNiA2Ny4wNDc3IDU2LjAwOTMgNjYuNjE4OSA1Ni4wMDkzSDYwLjExNTNDNTkuMjUxNCA1Ni4wMDkzIDU4LjQyNTEgNTUuNjY3NyA1Ny44MTQzIDU1LjA1NzRDNTcuMjAzNSA1NC40NDcxIDU2Ljg2MDQgNTMuNjIwMSA1Ni44NTgzIDUyLjc1NzhWNDYuMjQ4N0M1Ni44NTgzIDQ1LjM4NjQgNTcuMjAzNSA0NC41NTk0IDU3LjgxNDMgNDMuOTQ5MUM1OC40MjUxIDQzLjMzODkgNTkuMjUzNSA0Mi45OTczIDYwLjExNTMgNDIuOTk3M0g2Ni42MTg5QzY3LjA0NzcgNDIuOTk3MyA2Ny40NzAzIDQyLjkxMzkgNjcuODY1NiA0Mi43NTE1QzY4LjI2MSA0Mi41ODkgNjguNjIwOCA0Mi4zNDc0IDY4LjkyNDEgNDIuMDQ1NEM2OS4yMjc0IDQxLjc0MzMgNjkuNDY1OSA0MS4zODMgNjkuNjI5IDQwLjk4NzJDNjkuNzkyMiA0MC41OTE1IDY5Ljg3NTkgNDAuMTY4NiA2OS44NzU5IDM5LjczOTZWMzMuMjM2N0M2OS44NzU5IDMyLjM3MjMgNjkuNTMyOCAzMS41NDMzIDY4LjkyMiAzMC45MzNDNjguMzExMiAzMC4zMjI3IDY3LjQ4MjggMjkuOTc5IDY2LjYxODkgMjkuOTc5SDY2LjYyMVoiIGZpbGw9InVybCgjcGFpbnQwX2xpbmVhcl8xNTI5Xzc3MzMxKSIvPgo8ZGVmcz4KPGxpbmVhckdyYWRpZW50IGlkPSJwYWludDBfbGluZWFyXzE1MjlfNzczMzEiIHgxPSIyOS4wNzY1IiB5MT0iNDcuMzYzMSIgeDI9IjcxLjYzNTYiIHkyPSI1MS42NzM2IiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+CjxzdG9wIHN0b3AtY29sb3I9IiM5MDJFRjIiLz4KPHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRkY2MkI3Ii8+CjwvbGluZWFyR3JhZGllbnQ+CjwvZGVmcz4KPC9zdmc+Cg==">
         <p class="no-margin fw--900 fs--50 align_center_text">Get started</p>
         <p class="no-margin fw--400 fs--15 width--30 align_center_text">Sign up for a free attemps, you can upgrade to a plan that suits your needs</p>
@@ -273,6 +273,10 @@
 
 .main_signup_btn:hover {
     background: var(--secondary_hover_color);
+}
+
+.get-started-main-block {
+  width: 90% !important;
 }
 
 @media (min-width: 768px) and (max-width: 991px) {
