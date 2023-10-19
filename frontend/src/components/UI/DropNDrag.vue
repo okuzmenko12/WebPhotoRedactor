@@ -55,6 +55,11 @@
             bgUrl: String,
             strt: String
         },
+        watch: {
+            isLoading(newV) {
+                this.changeIsLoadingInParentElem(newV)
+            }
+        },
         mounted() {
             axios.get('https://ipapi.co/ip/')
             .then(res => this.userIp = res.data)
@@ -71,7 +76,8 @@
                 fileSrc: "",
                 fileNameResponse: "",
                 image_upload: "",
-                userIp: ""
+                userIp: "",
+                FDFunctions: []
             }
         },
         methods: {
@@ -83,96 +89,119 @@
                 const selectedFiles = event.target.files[0];
                 this.$emit('files-updated', selectedFiles);
             },
+            changeIsLoadingInParentElem(value) {
+                this.$emit('is_loading', value);
+            },
             async handleFileUploadUpscale() {
-                this.isLoading = true
+                this.isLoading = true;
+                let bgBlurValid = true;
                 const input = this.$refs.imageUploadInput;
                 const input2 = this.$refs.bgImageUpload;
-                this.image_upload = ""
+                this.image_upload = "";
                 const formData = new FormData();
-                formData.append('ip_address', this.userIp);
+                this.FDFunctions.push({'ip_address_or_token': this.userIp});
                 formData.append('image', input.files[0]);
+
                 if (this.bgFile === true) {
                     if (input2.files.length > 0) {
-                    formData.append('bg_image', input2.files[0]);
+                        formData.append('bg_image', input2.files[0]);
                     } else if (this.bg_color !== undefined && this.bg_color !== '#ffffff') {
-                        formData.append('bg_color', this.bg_color);
+                        this.FDFunctions.push({'bg_color': this.bg_color});
                     }
                 } else {
                     if (this.bgUrl !== "") {
-                    formData.append('bg_image_url', this.bgUrl);
+                        formData.append('bg_image_url', this.bgUrl);
                     } else if (this.bg_color !== undefined && this.bg_color !== '#ffffff') {
-                        formData.append('bg_color', this.bg_color);
+                        this.FDFunctions.push({'bg_color': this.bg_color});
                     }
                 }
 
                 if (this.blur !== undefined) {
-                    let blur = parseInt(this.blur)
-                    if (blur <= 0) {
-                        blur = 0
-                    } else if (blur >= 100) {
-                        blur = 100
+                    let blur = parseInt(this.blur);
+
+                    if (blur > 100 || isNaN(blur) || blur < 0) {
+                        this.image_upload = "Please enter a valid blur %, between 0 and 100.";
+                        bgBlurValid = false;
+                    } else {
+                        this.FDFunctions.push({'bg_blur': blur});
+                        bgBlurValid = true;
                     }
-                    console.log(blur);
-                    formData.append('bg_blur', blur)
                 }
 
                 if (this.output_type !== undefined) {
-                    let output = this.output_type
-                    formData.append('output_type', output)
+                    this.FDFunctions.push({'output_type': this.output_type});
                 }
+
                 if (this.upscale_factor !== undefined) {
-                    formData.append('upscale_factor', this.upscale_factor);
+                    this.FDFunctions.push({'upscale_factor': this.upscale_factor});
                 }
 
                 if (this.strt !== undefined) {
-                    let strt = this.strt
-                    formData.append('strength', strt);
+                    this.FDFunctions.push({'strength': this.strt});
                 }
 
-                if (await fetchToken() === true) {
-                    axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN + this.api_url}`, formData, { headers: getHeaders() })
-                    .then(res => {
-                        console.log(res);
-                        this.isLoading = false
-                        this.loadedFile = true
-                        this.fileNameResponse = res.data.name
-                        this.fileSrc = res.data.image
-                        this.image_upload = ""
-                    })
-                    .catch(err => {
-                        const input = this.$refs.imageUploadInput;
-                        console.error(err);
-                        this.isLoading = false;
-                        this.image_upload = err.response.data.error;
-                        let list = new DataTransfer();
-                        const file = new File([formData.get('image')], this.fileName)
-                        list.items.add(file)
-                        input.files = list.files
-                    });
+
+                this.FDFunctions.forEach(obj => {
+                    for (let key in obj) {
+                        formData.append(key, obj[key]);
+                    }
+                });
+
+                if (!this.FDFunctions.some(obj => Object.prototype.hasOwnProperty.call(obj, 'bg_blur')) && bgBlurValid) {
+                    this.sendRequestImg(formData)
+                } else if (this.FDFunctions.some(obj => Object.prototype.hasOwnProperty.call(obj, 'bg_blur')) && bgBlurValid) {
+                    this.sendRequestImg(formData)
+                } else if (this.FDFunctions.some(obj => Object.prototype.hasOwnProperty.call(obj, 'bg_blur')) && !bgBlurValid) {
+                    this.isLoading = false
                 } else {
-                    axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN + this.api_url}`, formData)
-                    .then(res => {
-                        console.log(res);
-                        this.isLoading = false
-                        this.loadedFile = true
-                        this.fileNameResponse = res.data.name
-                        this.fileSrc = res.data.image
-                        this.image_upload = ""
-                    })
-                    .catch(err => {
-                        const input = this.$refs.imageUploadInput;
-                        console.error(err);
-                        this.isLoading = false;
-                        this.image_upload = err.response.data.error;
-                        let list = new DataTransfer();
-                        const file = new File([formData.get('image')], this.fileName)
-                        list.items.add(file)
-                        input.files = list.files
-                    });
+                    this.isLoading = false
                 }
             },
             toggleIsDragOver(value) {
                 this.isDragOver = value
+            },
+            async sendRequestImg(formData) {
+                if (await fetchToken() === true) {
+                    axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN + this.api_url}`, formData, { headers: getHeaders() })
+                    .then(response => {
+                        console.log(response);
+                        this.isLoading = false;
+                        this.loadedFile = true;
+                        this.fileNameResponse = response.data.name;
+                        this.fileSrc = response.data.image;
+                        this.image_upload = "";
+                    })
+                    .catch(error => {
+                        const inputFile = this.$refs.imageUploadInput;
+                        console.error(error);
+                        this.isLoading = false;
+                        this.image_upload = error.response ? error.response.data.error : "An error occurred during the upload.";
+                        let fileList = new DataTransfer();
+                        const file = new File([formData.get('image')], this.fileName);
+                        fileList.items.add(file);
+                        inputFile.files = fileList.files;
+                    });
+                } else {
+                    axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN + this.api_url}`, formData)
+                    .then(response => {
+                        console.log(response);
+                        this.isLoading = false;
+                        this.loadedFile = true;
+                        this.fileNameResponse = response.data.name;
+                        this.fileSrc = response.data.image;
+                        this.image_upload = "";
+                    })
+                    .catch(error => {
+                        const inputFile = this.$refs.imageUploadInput;
+                        console.error(error);
+                        this.isLoading = false;
+                        this.image_upload = error.response ? error.response.data.error : "An error occurred during the upload.";
+                        let fileList = new DataTransfer();
+                        const file = new File([formData.get('image')], this.fileName);
+                        fileList.items.add(file);
+                        inputFile.files = fileList.files;
+                    });
+                }
             },
             handleDrop(event) {
                 const input = this.$refs.imageUploadInput;
@@ -230,23 +259,6 @@
 </script>
 
 <style>
-.image_upload_head_container {
-    position: fixed;
-    width: 100%;
-    height: auto;
-    display: flex;
-    box-sizing: border-box;
-    justify-content: left;
-    align-items: center;
-    z-index: 1;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    left: 0;
-    background-color: #171921;
-}
-
-
 .upload_image_container {
     width: 100%;
     height: 100%;
@@ -255,7 +267,10 @@
     justify-content: center;
     box-sizing: border-box;
     flex-direction: column;
-    gap: 20px
+    overflow-y: auto;
+    overflow-x: hidden;
+    gap: 20px;
+    padding: 40px;
 }
 
 .error_text {
@@ -266,7 +281,7 @@
 
 #image_upload_block {
     width: 90%;
-    height: 500px;
+    height: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -275,6 +290,11 @@
     border-radius: 20px;
     cursor: pointer;
     gap: 20px;
+    transition: .3s;
+}
+
+#image_upload_block:hover {
+    border: 5px #fff dashed;
 }
 
 #upload_button {
@@ -297,13 +317,6 @@
 #image_upload_btn {
     cursor: pointer;
     color: #fff;
-}
-
-.width-auto {
-    width: auto !important;
-    max-width: 80% !important;
-    height: auto !important;
-    max-height: 80% !important;
 }
 
 #image_upload_btn::-webkit-file-upload-button {
@@ -331,5 +344,15 @@
 
 #download_on_click:hover {
     background-color: var(--secondary_color)
+}
+
+@media (max-height: 420px) {
+    #upload_button {
+        padding: 5px;
+    }
+
+    #image_upload_block {
+        height: 70%;
+    }
 }
 </style>

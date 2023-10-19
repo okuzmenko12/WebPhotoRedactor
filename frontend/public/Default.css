@@ -72,6 +72,10 @@ body {
     width: 30%;
 }
 
+.width--70 {
+    width: 70%;
+}
+
 .width--100 {
     width: 100%;
 }
@@ -90,8 +94,30 @@ body {
     -webkit-background-clip: text;
 }
 
+.few-padding {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.margtin--10 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.space-between {
+    justify-content: space-between;
+}
+
 .width-auto {
     width: auto !important;
+}
+
+.width--min {
+    width: fit-content;
+}
+
+.align-items-center {
+    align-items: center;
 }
 
 .brand_text {

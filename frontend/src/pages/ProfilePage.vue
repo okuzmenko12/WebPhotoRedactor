@@ -20,8 +20,8 @@
                 <router-link id="prbtn-2" class="profile_button" :class="{ 'active': isActive('#credits') }" to="#credits">
                     Credits
                 </router-link>
-                <router-link id="prbtn-3" class="profile_button" :class="{ 'active': isActive('#plan') }" to="#plan">
-                    Transaction
+                <router-link id="prbtn-3" class="profile_button" :class="{ 'active': isActive('#transactions') }" to="#transactions">
+                    Transactions
                 </router-link>
             </div>
         </div>
@@ -30,7 +30,7 @@
                 <div class="basic_user_info white">
                     <div class="flex-block column gp--15">
                         <div class="flex-block baseline gp--15">
-                            <h1 class="fs--25 header_text fw--900">Personal information</h1>
+                            <h1 class="fs--25 header_text fw--900 width--min">Personal information</h1>
                             <h5 class="edit_button" @click="changeInputStatus('username-profile-info')">Edit</h5>
                         </div>
                         <input-ui max="25" enableReadonly="true" inputId="username-profile-info" @change="handleUsernameChange" v-model="username" />
@@ -39,7 +39,7 @@
                     </div>
                     <div class="flex-block column gp--15">
                         <div class="flex-block baseline gp--15">
-                            <h1 class="fs--25 header_text fw--900">Email</h1>
+                            <h1 class="fs--25 header_text fw--900 width--min">Email</h1>
                             <h5 class="edit_button" @click="changeInputStatus('email-profile-info')">Edit</h5>
                         </div>
                         <input-ui max="50" @change="handleEmailChange" enableReadonly="true" inputId="email-profile-info" v-model="email" />
@@ -47,17 +47,101 @@
                         <p id="email_message" class="fs--15">{{ email_message }}</p>
                     </div>
                     <div class="flex-block column gp--15">
-                        <h1 class="fs--25 header_text fw--900">Password reset</h1>
-                        <button class="change-pass-btn" @click="sendChangePasswordRequest">Reset password</button>
+                        <h1 class="fs--25 header_text fw--900 width--min">Change password</h1>
+                        <input-ui max="50" v-model="old_pass" :passwordType="true" inputId="old_pass_input" pr="Old Password"/>
+                        <input-ui max="50" v-model="pass" :passwordType="true" inputId="new_pass_input" pr="Password"/>
+                        <input-ui max="50" v-model="pass1" :passwordType="true" inputId="new_passconf_input" pr="Password confirmation"/>
+                        <button class="change-pass-btn" @click="sendChangePasswordRequest">Change password</button>
                         <p id="pass_message" class="fs--15">{{ pass_message }}</p>
                     </div>
                 </div>
             </template>
             <template v-else-if="$route.hash === '#credits'">
-                <div></div>
+                <div class="basic_user_info white">
+                    <div class="flex-block column gp--15">
+                        <p class="fs--25 header_text fw--900 width--min">Free credits:</p>
+                        <div class="flex-block gp--15 align-items-center">
+                            <p class="brand_text width--min">Upscale:</p>
+                            <p class="fs--20 no-margin">{{ free_upscale }}</p>
+                        </div>
+                        <div class="flex-block gp--15 align-items-center">
+                            <p class="brand_text width--min">Background removes:</p>
+                            <p class="fs--20 no-margin">{{ free_bg }}</p>
+                        </div>
+                        <div class="flex-block gp--15 align-items-center">
+                            <p class="brand_text width--min">JPEG Artifacts removes:</p>
+                            <p class="fs--20 no-margin">{{ free_jpeg }}</p>
+                        </div>
+                    </div>
+                    <div class="flex-block column gp--15">
+                        <p class="fs--25 header_text fw--900 width--min">Paid credits:</p>
+                        <div class="flex-block gp--15 align-items-center">
+                            <p class="brand_text width--min">Upscale:</p>
+                            <p class="fs--20 no-margin">{{ paid_upscale }}</p>
+                        </div>
+                        <div class="flex-block gp--15 align-items-center">
+                            <p class="brand_text width--min">Background removes:</p>
+                            <p class="fs--20 no-margin">{{ paid_bg }}</p>
+                        </div>
+                        <div class="flex-block gp--15 align-items-center">
+                            <p class="brand_text width--min">JPEG Artifacts removes:</p>
+                            <p class="fs--20 no-margin">{{ paid_jpeg }}</p>
+                        </div>
+                    </div>
+                </div>
             </template>
-            <template v-else-if="$route.hash === '#plan'">
-                <div></div>
+            <template v-else-if="$route.hash === '#transactions'">
+                <div class="basic_user_info white">
+                    <div  class="flex-block column gp--15">
+                        <p class="fs--25 header_text fw--900 width--min">Transactions:</p>
+                        <template v-if="transactions.length > 0">
+                            <div v-for="transaction in transactions" :key="transaction.id" class="width--100 flex-block column" style="border: 1px solid rgb(144, 145, 154); background-color: #1b1e29; border-radius: 20px;">
+                                <div class="flex-block space-between">
+                                    <div class="flex-block column align-items-center width--100">
+                                        <p>ORDER ID</p>
+                                        <p class="fs--20">#{{ transaction.id }}</p>
+                                    </div>
+
+                                    <div class="flex-block column align-items-center width--100">
+                                        <p>CREATED AT</p>
+                                        <p class="fs--20">{{ transaction.parsed_created_at }}</p>
+                                    </div>
+
+                                    <div class="flex-block column align-items-center width--100">
+                                        <p>METHOD</p>
+                                        <p class="fs--20">{{ transaction.payment_service }}</p>
+                                    </div>
+
+                                    <div class="flex-block column align-items-center width--100">
+                                        <p>PLAN</p>
+                                            <p class="fs--20">{{ transaction.plan.name }}</p>
+                                    </div>
+
+                                    <div class="flex-block column align-items-center width--100">
+                                        <p>PRICE</p>
+                                        <p class="fs--20">{{ transaction.plan.price }}$</p>
+                                    </div>
+
+                                    <div class="flex-block column align-items-center width--100">
+                                        <p>STATUS</p>
+                                        <p class="fs--20 width--70 align_center_text" style="border-radius: 16px; padding: 0 5px"
+                                        :style="transaction.status === 'COMPLETED' ? 'background-color: #66ff63' : transaction.status === 'CANCELED' ? 'background-color: rgb(255, 0, 121)' : transaction.status === 'ACTIVE' ? 'background-color: #fcd056' : ''">
+                                            {{ transaction.status }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        <template v-else>
+                            <div class="flex-block column gp--15">
+                                <div class="flex-block column gp--15">
+                                    <p class="brand_text width--min">No transactions yet</p>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
             </template>
         </div>
     </div>
@@ -81,6 +165,22 @@
                 Stemail: "",
                 user_message: "",
                 email_message: "",
+                old_pass: "",
+                pass: "",
+                pass1: "",
+                userIp: "",
+
+                free_upscale: "",
+                free_bg: "",
+                free_jpeg: "",
+
+                paid_upscale: "",
+                paid_bg: "",
+                paid_jpeg: "",
+
+                transactions: [],
+                transactions_loaded: false,
+
                 pass_message: "",
                 showEmailButton: false,
                 showUsernameButton: false,
@@ -98,7 +198,20 @@
             .catch(() => {
                 router.push({ path: "/" })
             })
+            axios.get('https://ipapi.co/ip/')
+            .then(res => this.userIp = res.data)
             handlePopState()
+            this.getUserCredits()
+            this.getUserPlan()
+        },
+        updated() {
+            this.getUserCredits()
+            this.getUserPlan()
+        },
+        watch: {
+            userIp() {
+                this.getUserCredits()
+            }
         },
         methods: {
             navbarToggle() {
@@ -188,6 +301,88 @@
                     return "@user"
                 } else {
                     return usrnm.join("")
+                }
+            },
+            sendChangePasswordRequest() {
+                this.pass_message = ""
+                axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/auth/change_password/`, {
+                    "old_password": this.old_pass,
+                    "new_password": this.pass,
+                    "new_password_confirm": this.pass1
+                }, { headers: getHeaders() })
+                .then(res => {
+                    console.log(res)
+                })
+                .catch(err => {
+                    console.log(err);
+                    if (err.response.data.new_password) {
+                        this.pass_message = err.response.data.new_password[0]
+                        const input = document.getElementById('new_pass_input')
+                        input.style.border = '1px solid #FF0000'
+                        setTimeout(() => {
+                            input.style.border = '1px #2e2f35 solid'
+                        }, 2000)
+                    } 
+
+                    if (err.response.data.new_password_confirm) {
+                        this.pass_message = err.response.data.new_password_confirm[0]
+                        const input = document.getElementById('new_passconf_input')
+                        input.style.border = '1px solid #FF0000'
+                        setTimeout(() => {
+                            input.style.border = '1px #2e2f35 solid'
+                        }, 2000)
+                    } 
+                    
+                    if (err.response.data.error) {
+                        this.pass_message = err.response.data.error
+                        const input = document.getElementById('old_pass_input')
+                        input.style.border = '1px solid #FF0000'
+                        setTimeout(() => {
+                            input.style.border = '1px #2e2f35 solid'
+                        }, 2000)
+                    }
+                    
+                    if (err.response.data.old_password) {
+                        this.pass_message = err.response.data.old_password[0]
+                        const input = document.getElementById('old_pass_input')
+                        input.style.border = '1px solid #FF0000'
+                        setTimeout(() => {
+                            input.style.border = '1px #2e2f35 solid'
+                        }, 2000)
+                    }
+
+                    const passObj = document.getElementById('pass_message')
+                    passObj.style.color = "#FF0000"
+                })
+            },
+            async getUserCredits() {
+                const ip = await this.userIp
+                if (this.isActive('#credits') && this.userIp !== "") {
+                    axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/auth/user/credits/`, { "ip_address_or_token": ip })
+                    .then(res => {
+                        console.log(res)
+                        this.free_upscale = res.data.free_credits.up_scales_count
+                        this.free_bg = res.data.free_credits.bg_deletions_count
+                        this.free_jpeg = res.data.free_credits.jpg_artifacts_deletions_count
+
+                        this.paid_upscale = res.data.paid_credits.up_scales_count
+                        this.paid_bg = res.data.paid_credits.bg_deletions_count
+                        this.paid_jpeg = res.data.paid_credits.jpg_artifacts_deletions_count
+                    })
+                }
+            },
+            getUserPlan() {
+                if (this.isActive('#transactions') && !this.transactions_loaded) {
+                    axios.get(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/payments/user_orders/`, { headers: getHeaders() })
+                    .then(res => {
+                        console.log(res)
+                        this.transactions = res.data
+                        this.transactions_loaded = true
+                    })
+                    .catch(err => {
+                        console.log(err)
+                        this.transactions_loaded = true
+                    })
                 }
             },
             isActive(hash) {

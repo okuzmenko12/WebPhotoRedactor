@@ -10,7 +10,7 @@
     <div class="image_upload_head_container">
         <div class="image_upload_navbar">
             <div id="dd-dropdown">
-                <div id="dd-arrow"><svg height="15px" viewBox="0 0 5 9"><path d="M0.419,9.000 L0.003,8.606 L4.164,4.500 L0.003,0.394 L0.419,0.000 L4.997,4.500 L0.419,9.000 Z" ></path></svg>
+                <div @click="dropdownClick" id="dd-arrow"><svg height="15px" viewBox="0 0 5 9"><path d="M0.419,9.000 L0.003,8.606 L4.164,4.500 L0.003,0.394 L0.419,0.000 L4.997,4.500 L0.419,9.000 Z" ></path></svg>
                 </div>
                 <span v-if="isActive('#upscale')" id="dd-selected" @click="dropdownClick">
                     <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 21 21" fill="none">
@@ -116,23 +116,23 @@
         </div>
         <div class="image_upload_cont_container">
             <template v-if="isActive('#upscale')">
-                <drop-n-drag :upscale_factor="upscaleFactor" :api_url="upscaleApiURL"/>
+                <drop-n-drag :upscale_factor="upscaleFactor" @is_loading="changeIsLoading" :api_url="upscaleApiURL"/>
             </template>
             <template v-else-if="isActive('#removebg')">
-                <drop-n-drag :bg_color="bgColor" :bgUrl="bgImgUrl" :bgFile="bgFileOrText" :output_type="outputType" :blur="bgBlur" @files-updated="handleFilesUpdated" api_url="/api/v1/images/remove_bg/"/>
+                <drop-n-drag :bg_color="bgColor" @is_loading="changeIsLoading" :bgUrl="bgImgUrl" :bgFile="bgFileOrText" :output_type="outputType" :blur="bgBlur" @files-updated="handleFilesUpdated" api_url="/api/v1/images/remove_bg/"/>
             </template>
             <template v-else-if="isActive('#removejpegartifacts')">
-                <drop-n-drag :strt="strenght" api_url="/api/v1/images/remove_jpeg_artifacts/"/>
+                <drop-n-drag :strt="strenght" @is_loading="changeIsLoading" api_url="/api/v1/images/remove_jpeg_artifacts/"/>
             </template>
             <template v-else>
-                <drop-n-drag api_url="/api/v1/images/upscale/"/>
+                <drop-n-drag :upscale_factor="upscaleFactor" @is_loading="isLoading" :api_url="upscaleApiURL"/>
             </template>
             <div id="profile_bar" class="profile_bar">
-                <div v-if="isActive('#upscale')" class="profile_buttons image_buttons">
+                <div v-if="isActive('#upscale') && !isLoading" class="profile_buttons image_buttons">
                     <div class="button_image_block" style="z-index: 2;">
                         <p>Upscale factor:</p>
                         <div id="factor-dropdown">
-                            <div id="factor-arrow"><svg height="15px" viewBox="0 0 5 9"><path d="M0.419,9.000 L0.003,8.606 L4.164,4.500 L0.003,0.394 L0.419,0.000 L4.997,4.500 L0.419,9.000 Z" ></path></svg>
+                            <div @click="openFactorChoose" id="factor-arrow"><svg height="15px" viewBox="0 0 5 9"><path d="M0.419,9.000 L0.003,8.606 L4.164,4.500 L0.003,0.394 L0.419,0.000 L4.997,4.500 L0.419,9.000 Z" ></path></svg>
                             </div>
                             <span id="factor-selected" @click="openFactorChoose">
                                 {{upscaleFactor}}
@@ -154,11 +154,11 @@
                     </div>
                 </div>
 
-                <div v-if="isActive('#removejpegartifacts')" class="profile_buttons image_buttons">
+                <div v-if="isActive('#removejpegartifacts') && !isLoading" class="profile_buttons image_buttons">
                     <div class="button_image_block" style="z-index: 2;">
                         <p>Strenght:</p>
                         <div id="factor-dropdown">
-                            <div id="factor-arrow"><svg height="15px" viewBox="0 0 5 9"><path d="M0.419,9.000 L0.003,8.606 L4.164,4.500 L0.003,0.394 L0.419,0.000 L4.997,4.500 L0.419,9.000 Z" ></path></svg>
+                            <div @click="openFactorChoose" id="factor-arrow"><svg height="15px" viewBox="0 0 5 9"><path d="M0.419,9.000 L0.003,8.606 L4.164,4.500 L0.003,0.394 L0.419,0.000 L4.997,4.500 L0.419,9.000 Z" ></path></svg>
                             </div>
                             <span id="factor-selected" @click="openFactorChoose">
                                 {{strenght}}
@@ -172,7 +172,7 @@
                     </div>
                 </div>
 
-                <div v-if="isActive('#removebg')" class="profile_buttons image_buttons">
+                <div v-if="isActive('#removebg') && !isLoading" class="profile_buttons image_buttons">
                     <div v-if="showColor === true" class="button_image_block">
                         <p>Background color:</p>
                         <div id="color-picker"></div>
@@ -189,17 +189,17 @@
                             <input-ui v-model="bgImgUrl"/>
                         </template>
                     </div>
-                    <p v-if="bgFileOrText === true" class='link fs--12 no-top' style="cursor: pointer" @click="changeBgFile(false) ">Paste url</p>
-                    <p v-else class='link fs--12 no-top' style="cursor: pointer" @click="changeBgFile(true)">Choose image</p>
+                    <p v-if="bgFileOrText === true && showBg === true" class='link fs--12 no-top' style="cursor: pointer" @click="changeBgFile(false) ">Paste url</p>
+                    <p v-else-if="bgFileOrText === false && showBg === true" class='link fs--12 no-top' style="cursor: pointer" @click="changeBgFile(true)">Choose image</p>
                     <div class="button_image_block">
                         <p>BLUR</p>
                         %   
-                        <input-ui :numberType="true" v-model="bgBlur" type="number" min="0" max="100" />
+                        <input-ui :numberType="true" v-model="bgBlur" type="number" min="0" max="100" inputId="blur_bg_input" />
                     </div>
                     <div v-if="showBg === true && showColor === true" class="button_image_block" style="z-index: 2;">
                         <p>Ouput:</p>
                         <div id="factor-dropdown">
-                            <div id="factor-arrow"><svg height="15px" viewBox="0 0 5 9"><path d="M0.419,9.000 L0.003,8.606 L4.164,4.500 L0.003,0.394 L0.419,0.000 L4.997,4.500 L0.419,9.000 Z" ></path></svg>
+                            <div @click="openFactorChoose" id="factor-arrow"><svg height="15px" viewBox="0 0 5 9"><path d="M0.419,9.000 L0.003,8.606 L4.164,4.500 L0.003,0.394 L0.419,0.000 L4.997,4.500 L0.419,9.000 Z" ></path></svg>
                             </div>
                             <span id="factor-selected" @click="openFactorChoose">
                                 {{outputType}}
@@ -219,6 +219,7 @@
 </template>
 
 <script>
+import axios from 'axios'
     import DropNDrag from "@/components/UI/DropNDrag.vue";
     import router from "@/router/router.js";
     import '@simonwep/pickr/dist/themes/nano.min.css';
@@ -239,6 +240,11 @@
                 });
             }
             this.factors = this.allUpscaleFactors
+            
+            axios.get(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/images/get-ip/`)
+            .then(res => {
+                console.log(res);
+            })
         },
         updated() {
             const dd = document.getElementById('dd-arrow');
@@ -302,6 +308,7 @@
             },
             resetSettings() {
                 const input = document.querySelector('.bgImageUpload')
+                input.value = ''
                 this.showBg = true
                 this.showColor = true
                 this.bgImgUrl = ""
@@ -309,11 +316,9 @@
                     this.bgColor = "#ffffff"
                     document.querySelector('.pcr-button').style.setProperty('--pcr-color', this.bgColor);
                 }
-
-                input.value = ''
             },
-            handleFilesUpdated() {
-                this.bgFileExist = true
+            handleFilesUpdated(value) {
+                this.bgFileExist = value
             },
             changeBgState() {
                 this.showBg = false
@@ -489,6 +494,9 @@
                         }
                     })
                 }
+            },
+            changeIsLoading(value) {
+                this.isLoading = value
             }
         }
     }
@@ -581,20 +589,6 @@
     padding: 70px 0 0 0;
 }
 
-.upload_image_container {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    flex-direction: column;
-    overflow-y: auto;
-    overflow-x: hidden;
-    gap: 20px;
-    padding: 40px;
-}
-
 .button_image_block {
     width: 100%;
     max-width: 100%;
@@ -612,74 +606,11 @@
     gap: 10px;
 }
 
-#image_upload_block {
-    width: 90%;
-    height: 500px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    border: 5px #ffffff5e dashed;
-    border-radius: 20px;
-    cursor: pointer;
-    gap: 20px;
-    transition: .3s;
-}
-
-#image_upload_block:hover {
-    border: 5px #fff dashed;
-}
-
-#upload_button {
-    border: none;
-    color: #fff;
-    border-radius: 10px;
-    background: linear-gradient(to right, var(--first_color), var(--secondary_color), var(--first_color));
-    background-position: 0 50%;
-    text-transform: uppercase;
-    background-size: 200px;
-    cursor: pointer;
-    padding: 10px;
-    transition: .3s;
-}
-
-#upload_button:hover {
-    background-position: 50% 100%;
-}
-
-#image_upload_btn {
-    cursor: pointer;
-    color: #fff;
-}
-
 .width-auto {
     width: auto !important;
     max-width: 80% !important;
     height: auto !important;
     max-height: 80% !important;
-}
-
-#image_upload_btn::-webkit-file-upload-button {
-    border: none;
-    color: #fff;
-    border-radius: 10px;
-    background: linear-gradient(to right, var(--first_color), var(--secondary_color), var(--first_color));
-    background-position: 0 50%;
-    text-transform: uppercase;
-    background-size: 200px;
-    cursor: pointer;
-    padding: 10px;
-    transition: .3s;
-}
-
-#image_upload_btn::-webkit-file-upload-button:hover {
-    background-position: 50% 100%;
-}
-
-.ready_image {
-    width: 100%;
-    height: 100%;
-    border-radius: 20px;
 }
 
 #dd-dropdown {
@@ -691,6 +622,7 @@
 
 #dd-arrow {
     position: absolute;
+    cursor: pointer;
     right: 10px;
     transform: rotate(90deg) translateX(130%);
     stroke: #fff;
@@ -738,6 +670,7 @@
 
 #factor-arrow {
     position: absolute;
+    cursor: pointer;
     right: 10px;
     transform: rotate(90deg) translateX(130%);
     stroke: #fff;

@@ -375,7 +375,7 @@
 
 @media (min-width: 651px) and (max-width: 767px) {
     .about-feature-block {
-        width: 100%;
+        width: 90%;
         flex-direction: column;
     }
 
@@ -413,7 +413,7 @@
     }
 
     .about-feature-block {
-        width: 100%;
+        width: 90%;
         flex-direction: column;
     }
 
