@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    restart: always
+    volumes:
+      - psql_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_HOST: ${DB_HOST}
+      POSTGRES_PORT: ${DB_PORT}
+      TZ: 'Europe/Kiev'
+
+  back_app:
+    build:
+      context: .
+    restart: always
+    expose:
+      - 8000
+    volumes:
+      - .:/apps/backend
+      - static_volume:/apps/backend/static
+    env_file:
+      - .env
+    depends_on:
+      - db
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_HOST: ${DB_HOST}
+      POSTGRES_PORT: ${DB_PORT}
+
+  nginx:
+    build:
+      context: ./nginx
+    ports:
+      - '80:80'
+    env_file:
+      - .env
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - static_volume:/apps/backend/static
+    depends_on:
+      - back_app
+
+
+volumes:
+  psql_data:
+  static_volume:
