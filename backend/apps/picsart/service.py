@@ -3,7 +3,7 @@ import os
 from io import BytesIO
 
 from enum import Enum
-from typing import NamedTuple, Union
+from typing import NamedTuple, Union, Optional
 
 from urllib.parse import urlparse
 from urllib.request import urlopen, Request
@@ -544,3 +544,61 @@ def add_count_of_usage_for_user(user: User, plan: Plan):
     counter_of_usage.bg_deletions_count += plan.bg_deletions_count
     counter_of_usage.jpg_artifacts_deletions_count += plan.jpg_artifacts_deletions_count
     counter_of_usage.save()
+
+
+class FreeOrPaidVersionData(NamedTuple):
+    data: Optional[dict] = None
+    error: Optional[str] = None
+
+
+def get_data_for_free_or_paid_version(
+        user: User,
+        ip_address,
+        counter_field
+):
+    data_dict = {}
+    usage_count_mixin = IPAddressesUsageCountMixin()
+    reach_limit_error = 'You have used all your credits for this feature!'
+
+    if not user.is_authenticated:
+        data_dict['free_version'] = True
+
+        if ip_address is not None:
+            attempts = usage_count_mixin.ip_attempts_for_field(
+                ip_address, counter_field
+            )
+            if attempts >= usage_count_mixin.get_features_max_value_of_free_usage():
+                return FreeOrPaidVersionData(error=reach_limit_error)
+            data_dict['function'] = 'free_increase'
+            return FreeOrPaidVersionData(data=data_dict)
+            # usage_count_mixin.ip_increase_field_usage_count(ip_address, counter_field)
+
+    else:
+        user_count_of_enhances = get_count_of_enhances_for_field(
+            user,
+            counter_field
+        )
+
+        if user_count_of_enhances == 0:
+            data_dict['free_version'] = True
+            if ip_address is not None:
+                attempts = usage_count_mixin.ip_attempts_for_field(
+                    ip_address, counter_field
+                )
+                if attempts >= usage_count_mixin.get_features_max_value_of_free_usage():
+                    return FreeOrPaidVersionData(error=reach_limit_error)
+                data_dict['function'] = 'free_increase'
+                return FreeOrPaidVersionData(data=data_dict)
+                # usage_count_mixin.ip_increase_field_usage_count(ip_address, counter_field)
+            else:
+                data_dict['free_version'] = True
+                return FreeOrPaidVersionData(error=reach_limit_error)
+        elif user_count_of_enhances > 0:
+            data_dict['free_version'] = False
+            data_dict['function'] = 'paid_decrease'
+        return FreeOrPaidVersionData(data=data_dict)
+        # decrease_count_of_enhances_for_field(
+        #     user,
+        #     counter_field,
+        #     1
+        # )
