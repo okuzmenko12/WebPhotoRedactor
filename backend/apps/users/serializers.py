@@ -139,4 +139,4 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserCreditsSerializer(serializers.Serializer):
-    ip_address_or_token = serializers.IPAddressField()
+    ip_address_or_token = serializers.CharField ()

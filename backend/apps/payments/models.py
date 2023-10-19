@@ -73,6 +73,7 @@ class Order(models.Model):
         db_table = 'orders'
         verbose_name = 'order'
         verbose_name_plural = 'Orders'
+        ordering = ['-created_at']
 
     def __str__(self):
         return f'Order: {self.id}. User: {self.user.username}. Plan: {self.plan.name}'
