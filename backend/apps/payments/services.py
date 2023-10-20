@@ -360,11 +360,11 @@ class StripePaymentMixin(OrderMixin,
     ):
         self.configure_stripe()
         if foreign_order is None:
-            success_url = settings.STRIPE_FOREIGN_SUCCESS
-            cancel_url = settings.STRIPE_FOREIGN_CANCEL
-        else:
             success_url = settings.STRIPE_PAYMENT_SUCCESS_URL
             cancel_url = settings.STRIPE_PAYMENT_CANCEL_URL
+        else:
+            success_url = settings.STRIPE_FOREIGN_SUCCESS
+            cancel_url = settings.STRIPE_FOREIGN_CANCEL
 
         cancel_id = binascii.hexlify(os.urandom(12)).decode()
         success_id = binascii.hexlify(os.urandom(12)).decode()
