@@ -225,7 +225,8 @@ class StripeWebhookAPIView(StripePaymentMixin,
         return Response(data={'data': True})
 
 
-class StripeSuccessAPIView(QuerySetMixin,
+class StripeSuccessAPIView(OrderMixin,
+                           QuerySetMixin,
                            APIView):
 
     def post(self, *args, **kwargs):
