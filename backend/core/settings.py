@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     # applications
     'apps.users',
     'apps.picsart',
-    'apps.payments'
+    'apps.payments',
+    'apps.main'
 ]
 
 USE_X_FORWARDED_HOST = True
