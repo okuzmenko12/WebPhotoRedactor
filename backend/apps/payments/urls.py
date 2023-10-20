@@ -32,7 +32,7 @@ urlpatterns = [
     path('stripe/cancel_order/<str:cancel_id>/', StripeCancelOrderAPIView.as_view()),
     path('stripe/success_order/<str:success_id>/', StripeSuccessAPIView.as_view()),
     path('stripe/foreign/create_checkout_session/', CreateStripeForeignCheckoutSessionAPIView.as_view()),
-    path('stripe/foreign/cancel_order/', StripeCancelForeignOrderAPIView.as_view()),
+    path('stripe/foreign/cancel_order/<str:cancel_id>/', StripeCancelForeignOrderAPIView.as_view()),
     path('stripe/foreign/success_order/<str:success_id>/', StripeForeignSuccessAPIView.as_view()),
     path('paypal/create_order/<int:plan_id>/', CreatePayPalOrderAPIView.as_view()),
     path('paypal/complete_order/<str:order_id>/', CompleteOrderByPayPalOrderID.as_view()),
