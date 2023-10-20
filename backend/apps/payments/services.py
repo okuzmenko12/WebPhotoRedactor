@@ -377,8 +377,6 @@ class StripePaymentMixin(OrderMixin,
                 'description': foreign_order.description if foreign_order.description is not None else 'FlexFi Upscale',
                 'price': get_price_in_cents(foreign_order.amount)
             })
-            success_url = foreign_order.success_url
-            cancel_url = foreign_order.cancel_url
 
         else:
             stripe_price_id = plan.stripe_price_id
