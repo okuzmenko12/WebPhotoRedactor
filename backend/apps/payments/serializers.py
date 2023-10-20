@@ -25,7 +25,8 @@ class ForeignOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = ForeignOrder
         fields = '__all__'
-        read_only_fields = ['paypal_order_id', 'stripe_session_id', 'is_ended']
+        read_only_fields = ['paypal_order_id', 'stripe_session_id', 'is_ended',
+                            'stripe_cancel_id', 'stripe_success_id']
 
 
 class OrderSerializer(serializers.ModelSerializer):
@@ -34,13 +35,14 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ['id', 'user', 'plan', 'status', 'payment_service', 'parsed_created_at', 'created_at']
+        fields = ['id', 'user', 'plan', 'status',
+                  'payment_service', 'parsed_created_at',
+                  'created_at', 'stripe_cancel_id', 'stripe_success_id']
 
     @staticmethod
     def get_parsed_created_at(instance: Order):
         created_at = str(instance.created_at)
-        parsed_date = datetime.fromisoformat(created_at.replace('T', ' ').split('+')[0])
+        parsed_date = datetime.fromisoformat(
+            created_at.replace('T', ' ').split('+')[0])
         formatted_date = parsed_date.strftime('%Y-%m-%d %H:%M:%S')
         return formatted_date
-
-
