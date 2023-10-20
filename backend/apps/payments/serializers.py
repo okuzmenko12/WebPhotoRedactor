@@ -42,3 +42,5 @@ class OrderSerializer(serializers.ModelSerializer):
         parsed_date = datetime.fromisoformat(created_at.replace('T', ' ').split('+')[0])
         formatted_date = parsed_date.strftime('%Y-%m-%d %H:%M:%S')
         return formatted_date
+
+

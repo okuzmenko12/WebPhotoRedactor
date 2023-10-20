@@ -11,7 +11,11 @@ from .views import (StripeWebhookAPIView,
                     CreateStripeForeignCheckoutSessionAPIView,
                     CompleteOrderByPayPalOrderID,
                     PlanDetailAPIView,
-                    UserOrders)
+                    UserOrders,
+                    CancelPayPalOrderByIDAPIView,
+                    StripeCancelOrderAPIView,
+                    CancelForeignOrderByPayPalOrderID,
+                    StripeCancelForeignOrderAPIView)
 
 urlpatterns = [
     path('plans/', PlansAPIVIew.as_view()),
@@ -23,9 +27,13 @@ urlpatterns = [
     path('stripe/webhook/', StripeWebhookAPIView.as_view()),
     path('stripe/create_checkout_session/<int:plan_id>/',
          CreateStripeCheckoutSessionAPIView.as_view()),
+    path('stripe/cancel_order/<str:cancel_id>/', StripeCancelOrderAPIView.as_view()),
     path('stripe/foreign/create_checkout_session/', CreateStripeForeignCheckoutSessionAPIView.as_view()),
+    path('stripe/foreign/cancel_order/', StripeCancelForeignOrderAPIView.as_view()),
     path('paypal/create_order/<int:plan_id>/', CreatePayPalOrderAPIView.as_view()),
     path('paypal/complete_order/<str:order_id>/', CompleteOrderByPayPalOrderID.as_view()),
+    path('paypal/cancel_order/<str:order_id>/', CancelPayPalOrderByIDAPIView.as_view()),
     path('paypal/foreign/create_order/', CreatePayPalForeignOrderAPIView.as_view()),
-    path('paypal/foreign/complete_order/<str:order_id>/', CompleteForeignOrderByPayPalOrderID.as_view())
+    path('paypal/foreign/complete_order/<str:order_id>/', CompleteForeignOrderByPayPalOrderID.as_view()),
+    path('paypal/foreign/cancel_order/<str:order_id>/', CancelForeignOrderByPayPalOrderID.as_view())
 ]

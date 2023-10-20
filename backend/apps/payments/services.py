@@ -288,6 +288,11 @@ class PayPalOrdersMixin(PayPalContextMixin):
         )
         return self.get_data_from_response(response, capture_order=True)
 
+    def cancel_order_in_db(self, order: Order):
+        order.status = 'CANCELED'
+        order.save()
+        return True
+
 
 class ForeignOrderNotify:
 
@@ -341,7 +346,8 @@ class StripePaymentMixin(OrderMixin,
                 description=data['description']
             )
             price_obj = self.create_price(data, product.id)
-            final_product = self.get_product_with_price_id(product.id, price_obj.id)
+            final_product = self.get_product_with_price_id(
+                product.id, price_obj.id)
             return final_product.default_price
         except (Exception,):
             return None
@@ -356,6 +362,9 @@ class StripePaymentMixin(OrderMixin,
 
         success_url = settings.PAYMENT_SUCCESS_URL
         cancel_url = settings.PAYMENT_CANCEL_URL
+
+        cancel_id = binascii.hexlify(os.urandom(12)).decode()
+        cancel_url = cancel_url + f'?cancel_id={cancel_id}'
 
         if foreign_order is not None:
             stripe_price_id = self.create_product({
@@ -389,10 +398,12 @@ class StripePaymentMixin(OrderMixin,
                 'user': get_user_by_id(client_id),
                 'status': 'ACTIVE',
                 'payment_service': 'STRIPE',
-                'stripe_session_id': session_id
+                'stripe_session_id': session_id,
+                'stripe_cancel_id': cancel_id
             })
         else:
             foreign_order.stripe_session_id = session_id
+            foreign_order.stripe_cancel_id = cancel_id
             foreign_order.save()
         return session_id
 
@@ -409,7 +420,6 @@ class StripePaymentMixin(OrderMixin,
 
         if event['type'] == 'checkout.session.completed':
             session = event['data']['object']
-            client_reference_id = session.get('client_reference_id')
 
             data = {
                 'stripe_session_id': session.get('id')
@@ -423,6 +433,18 @@ class StripePaymentMixin(OrderMixin,
             self.complete_order(order)
 
         return None
+
+    def cancel_order(self, order, cancel_id):
+        if isinstance(order, Order):
+            order.status = 'CANCELED'
+            order.save()
+        else:
+            order.is_ended = True
+            order.save()
+            self.notify(order, {
+                'success': False,
+                'message': 'Order was canceled.'
+            })
 
 
 class UserCreateForPaymentMixin:
@@ -493,7 +515,8 @@ class ForeignOrderMixin(PayPalOrdersMixin,
             self,
             order_id
     ):
-        order: ForeignOrder = self.get_order_by_data({'paypal_order_id': order_id})
+        order: ForeignOrder = self.get_order_by_data(
+            {'paypal_order_id': order_id})
         if order is None:
             return PaymentData(error='No such order with provided order ID')
         if order.is_ended:
@@ -520,3 +543,14 @@ class ForeignOrderMixin(PayPalOrdersMixin,
     def make_order_ended(order: ForeignOrder):
         order.is_ended = True
         order.save()
+
+    def cancel_foreign_order(self, order: ForeignOrder):
+        data = {
+            'success': False,
+            'message': 'Order was canceled.'
+        }
+        self.notify(order, data=data)
+        return PaymentData(data={
+            'success': 'Order was successfully canceled!',
+            'cancel_url': order.cancel_url
+        })

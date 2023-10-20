@@ -124,6 +124,34 @@ class CompleteOrderByPayPalOrderID(PayPalOrdersMixin,
         return Response(data, status.HTTP_200_OK)
 
 
+class CancelPayPalOrderByIDAPIView(PayPalOrdersMixin,
+                                   QuerySetMixin,
+                                   APIView):
+
+    def post(self, *args, **kwargs):
+        order_id = self.kwargs.get('order_id')
+
+        if order_id is None:
+            return Response({
+                'error': 'Order ID must be provided!'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        order: Order = self.get_order_by_data({'paypal_order_id': order_id})
+
+        if order is None:
+            return Response({
+                'error': 'No such order with provided order ID.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if order.status != 'ACTIVE':
+            return Response({
+                'error': 'This order is not active!'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        self.cancel_order_in_db(order)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 class StripeConfigAPIView(APIView):
 
     def get(self, *args, **kwargs):
@@ -197,6 +225,58 @@ class StripeWebhookAPIView(StripePaymentMixin,
         return Response(data={'data': True})
 
 
+class StripeCancelOrderAPIView(StripePaymentMixin,
+                               QuerySetMixin,
+                               APIView):
+
+    def post(self, *args, **kwargs):
+        cancel_id = self.kwargs.get('cancel_id')
+
+        if cancel_id is None:
+            return Response({
+                'error': 'Wrong cancel ID'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        order = self.get_order_by_data({'stripe_cancel_id': cancel_id})
+        if order is None:
+            return Response({
+                'error': 'No such order with provided cancel ID'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        self.cancel_order(order, cancel_id)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class StripeCancelForeignOrderAPIView(StripePaymentMixin,
+                                      QuerySetMixin,
+                                      APIView):
+
+    def post(self, *args, **kwargs):
+        cancel_id = self.kwargs.get('cancel_id')
+
+        if cancel_id is None:
+            return Response({
+                'error': 'Wrong cancel ID'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        order = self.get_order_by_data({'stripe_cancel_id': cancel_id})
+        if order is None:
+            return Response({
+                'error': 'No such order with provided cancel ID'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if order.is_ended:
+            return Response({
+                'error': 'This order is not active!'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        self.cancel_order(order, cancel_id)
+        return Response({
+            'success': 'Order was successfully',
+            'cancel_url': order.cancel_url
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
 class PlansAPIVIew(ListAPIView):
     queryset = Plan.objects.all()
     serializer_class = PlanSerializer
@@ -252,6 +332,41 @@ class CompleteForeignOrderByPayPalOrderID(ForeignOrderMixin,
                 'error': error
             }, status=status.HTTP_400_BAD_REQUEST)
         return Response(data, status.HTTP_200_OK)
+
+
+class CancelForeignOrderByPayPalOrderID(ForeignOrderMixin,
+                                        APIView):
+    foreign_order = True
+
+    def post(self, *args, **kwargs):
+        order_id = self.kwargs.get('order_id')
+
+        if order_id is None:
+            return Response({
+                'error': 'Order ID must be provided!'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        order: Order = self.get_order_by_data({'paypal_order_id': order_id})
+
+        if order is None:
+            return Response({
+                'error': 'No such order with provided order ID.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if order.is_ended:
+            return Response({
+                'error': 'This order is not active!'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        self.make_order_ended(order)
+        data, error = self.cancel_foreign_order(order)
+
+        if error is not None:
+            return Response({
+                'error': error
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(data=data, status=status.HTTP_200_OK)
 
 
 class UserOrders(OrderMixin,
