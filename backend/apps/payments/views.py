@@ -225,6 +225,38 @@ class StripeWebhookAPIView(StripePaymentMixin,
         return Response(data={'data': True})
 
 
+class StripeSuccessAPIView(QuerySetMixin,
+                           APIView):
+
+    def post(self, *args, **kwargs):
+        success_id = self.kwargs.get('success_id')
+
+        if success_id is None:
+            return Response({
+                'error': 'Wrong success ID'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        order = self.get_order_by_data({'stripe_success_id': success_id})
+        if order is None:
+            return Response({
+                'error': 'No such order with provided cancel ID'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        return Response({
+            'success': 'Successful payment',
+            'order_id': order.id
+        }, status=status.HTTP_200_OK)
+
+
+class StripeForeignSuccessAPIView(StripeSuccessAPIView):
+
+    def post(self, *args, **kwargs):
+        response = super().post(*args, **kwargs)
+
+        if response.status_code == 200:
+            order = self.get_order_by_data({'id': response.data['order_id']})
+            response.data['success_url'] = order.success_url
+        return response
+
+
 class StripeCancelOrderAPIView(StripePaymentMixin,
                                QuerySetMixin,
                                APIView):
@@ -244,7 +276,9 @@ class StripeCancelOrderAPIView(StripePaymentMixin,
             }, status=status.HTTP_400_BAD_REQUEST)
 
         self.cancel_order(order, cancel_id)
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({
+            'success': 'Order was successfully canceled'
+        }, status=status.HTTP_200_OK)
 
 
 class StripeCancelForeignOrderAPIView(StripePaymentMixin,
@@ -272,7 +306,7 @@ class StripeCancelForeignOrderAPIView(StripePaymentMixin,
 
         self.cancel_order(order, cancel_id)
         return Response({
-            'success': 'Order was successfully',
+            'success': 'Order was successfully canceled',
             'cancel_url': order.cancel_url
         }, status=status.HTTP_400_BAD_REQUEST)
 

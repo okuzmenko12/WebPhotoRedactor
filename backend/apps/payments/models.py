@@ -70,6 +70,10 @@ class Order(models.Model):
                                         verbose_name='Stripe cancel ID',
                                         blank=True,
                                         null=True)
+    stripe_success_id = models.CharField(max_length=350,
+                                         verbose_name='Stripe success ID',
+                                         blank=True,
+                                         null=True)
     created_at = models.DateTimeField(auto_now_add=True,
                                       verbose_name='Created at')
 
@@ -117,6 +121,10 @@ class ForeignOrder(models.Model):
                                         verbose_name='Stripe cancel ID',
                                         blank=True,
                                         null=True)
+    stripe_success_id = models.CharField(max_length=350,
+                                         verbose_name='Stripe success ID',
+                                         blank=True,
+                                         null=True)
     is_ended = models.BooleanField(default=False)
 
     class Meta:

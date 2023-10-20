@@ -364,6 +364,8 @@ class StripePaymentMixin(OrderMixin,
         cancel_url = settings.PAYMENT_CANCEL_URL
 
         cancel_id = binascii.hexlify(os.urandom(12)).decode()
+        success_id = binascii.hexlify(os.urandom(12)).decode()
+        success_url = success_url + f'?success_id={success_id}'
         cancel_url = cancel_url + f'?cancel_id={cancel_id}'
 
         if foreign_order is not None:
@@ -399,11 +401,13 @@ class StripePaymentMixin(OrderMixin,
                 'status': 'ACTIVE',
                 'payment_service': 'STRIPE',
                 'stripe_session_id': session_id,
-                'stripe_cancel_id': cancel_id
+                'stripe_cancel_id': cancel_id,
+                'stripe_success_id': success_id
             })
         else:
             foreign_order.stripe_session_id = session_id
             foreign_order.stripe_cancel_id = cancel_id
+            foreign_order.stripe_success_id = success_id
             foreign_order.save()
         return session_id
 
