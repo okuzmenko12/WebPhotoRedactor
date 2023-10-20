@@ -178,11 +178,11 @@ class PayPalOrdersMixin(PayPalContextMixin):
 
     def get_json_order_creation_data(
             self,
+            success_url,
+            cancel_url,
             **kwargs
     ):
         amount = kwargs.get('amount')
-        success_url = kwargs.get('success_url')
-        cancel_url = kwargs.get('cancel_url')
 
         data = {
             "intent": "CAPTURE",
@@ -203,8 +203,8 @@ class PayPalOrdersMixin(PayPalContextMixin):
                         "landing_page": "LOGIN",
                         "shipping_preference": "NO_SHIPPING",
                         "user_action": "CONTINUE",
-                        "return_url": success_url if success_url is not None else settings.PAYMENT_SUCCESS_URL,
-                        "cancel_url": cancel_url if cancel_url is not None else settings.PAYMENT_CANCEL_URL
+                        "return_url": success_url,
+                        "cancel_url": cancel_url
                     }
                 }
             }
@@ -271,8 +271,8 @@ class PayPalOrdersMixin(PayPalContextMixin):
         header = self.headers_dict
         json_data = self.get_json_order_creation_data(
             amount=amount,
-            success_url=success_url,
-            cancel_url=cancel_url
+            success_url=success_url if success_url is not None else settings.PAYPAL_SUCCESS_URL,
+            cancel_url=cancel_url if cancel_url is not None else settings.PAYPAL_CANCEL_URL
         )
         response = requests.post(
             self.order_creation_url,
@@ -359,9 +359,12 @@ class StripePaymentMixin(OrderMixin,
             foreign_order: ForeignOrder = None,
     ):
         self.configure_stripe()
-
-        success_url = settings.PAYMENT_SUCCESS_URL
-        cancel_url = settings.PAYMENT_CANCEL_URL
+        if foreign_order is None:
+            success_url = settings.STRIPE_FOREIGN_SUCCESS
+            cancel_url = settings.STRIPE_FOREIGN_CANCEL
+        else:
+            success_url = settings.STRIPE_PAYMENT_SUCCESS_URL
+            cancel_url = settings.STRIPE_PAYMENT_CANCEL_URL
 
         cancel_id = binascii.hexlify(os.urandom(12)).decode()
         success_id = binascii.hexlify(os.urandom(12)).decode()

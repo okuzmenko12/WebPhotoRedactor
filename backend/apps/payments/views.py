@@ -331,7 +331,11 @@ class CreatePayPalForeignOrderAPIView(PayPalOrdersMixin,
         serializer.is_valid(raise_exception=True)
         order: ForeignOrder = serializer.save()
 
-        data, error = self.create_order(order.amount)
+        data, error = self.create_order(
+            order.amount,
+            success_url=settings.PAYPAL_FOREIGN_SUCCESS_URL,
+            cancel_url=settings.PAYPAL_FOREIGN_CANCEL_URL
+        )
 
         if error is not None:
             return Response({
