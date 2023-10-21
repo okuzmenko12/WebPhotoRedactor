@@ -69,7 +69,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 112;
     background-color: #171921;
 }
 
@@ -85,6 +84,7 @@
     flex-direction: column;
     display: flex;
     transition: .3s;
+    z-index: 112;
     gap: 10px;
 }
 </style>
