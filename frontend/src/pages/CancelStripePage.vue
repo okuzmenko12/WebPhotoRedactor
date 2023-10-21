@@ -28,7 +28,6 @@
                 .then(res => {
                     this.success = true
                     const modal = document.getElementById('success_modal')
-                    console.log(res);
                     if (window.location.href.includes('/payment/stripe/cancel')) {
                         modal.style.backgroundColor = 'rgb(255, 000, 121)';
                     } else {
@@ -42,7 +41,6 @@
                 })
                 .catch(err => {
                     this.success = true
-                    console.log(err);
                     const modal = document.getElementById('success_modal')
                     this.message = err.response.data.error
                     modal.style.backgroundColor = 'rgb(255, 000, 121)';

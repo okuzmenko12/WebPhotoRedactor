@@ -28,7 +28,6 @@
                 .then(res => {
                     this.success = true
                     const modal = document.getElementById('success_modal')
-                    console.log(res);
                     this.message = "You have successfuly bought the plan."
                     modal.style.backgroundColor = '#66ff63'
                     setTimeout(() => {
@@ -37,7 +36,6 @@
                 })
                 .catch(err => {
                     this.success = true
-                    console.log(err);
                     const modal = document.getElementById('success_modal')
                     this.message = err.response.data.error
                     modal.style.backgroundColor = 'rgb(255, 000, 121)';

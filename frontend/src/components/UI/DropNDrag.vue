@@ -163,7 +163,6 @@
                 if (await fetchToken() === true) {
                     axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN + this.api_url}`, formData, { headers: getHeaders() })
                     .then(response => {
-                        console.log(response);
                         this.isLoading = false;
                         this.loadedFile = true;
                         this.fileNameResponse = response.data.name;
@@ -183,7 +182,6 @@
                 } else {
                     axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN + this.api_url}`, formData)
                     .then(response => {
-                        console.log(response);
                         this.isLoading = false;
                         this.loadedFile = true;
                         this.fileNameResponse = response.data.name;

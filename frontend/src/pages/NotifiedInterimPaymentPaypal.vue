@@ -70,11 +70,9 @@
                 }
                 axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN + this.paypalCreateOrderLink}`, data)
                 .then(res => {
-                    console.log(res)
                     window.location.href = res.data.payment_link
                 })
                 .catch(err => {
-                    console.log(err);
                     this.error = true
                     if (err.response.data.cancel_url) {
                         this.message = 'Transaction failure. ' + err.response.data.cancel_url[0]

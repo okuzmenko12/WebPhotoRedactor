@@ -17,11 +17,13 @@
           />
         </div>
     </div>
+    <pricing-questions />
   </div>
   <footer-comp />
 </template>
 
 <script>
+  import PricingQuestions from "@/components/PricingQuestions.vue";
   import Card from "@/components/UI/TarrifCard.vue";
   import NavbarComp from "@/components/NavbarComp.vue";
   import FooterComp from "@/components/FooterComp.vue";
@@ -31,13 +33,13 @@
     components: {
       Card,
       NavbarComp,
-      FooterComp
+      FooterComp,
+      PricingQuestions
     },
     mounted() {
       handlePopState(),
       axios.get(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/payments/plans`)
       .then(res => {
-        console.log(res);
         this.plans = res.data
       })
       document.title = `FlexFi Upscale - Pricing`

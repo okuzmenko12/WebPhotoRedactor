@@ -483,8 +483,6 @@
                         if (args[0] !== null) {
                             let color = args[0].toHEXA();
                             this.bgColor = `#${color[0]+ color[1] + color[2]}`
-                            console.log(args);
-                            console.log(this.bgColor);
                         }
                     })
                 }

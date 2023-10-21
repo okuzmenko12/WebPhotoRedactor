@@ -9,7 +9,8 @@ module.exports = {
   },
   plugins: [
     new Dotenv({
-      path: '.env.development'
+      path: '.env.development',
+      defaults: true
     })
   ],
   module: {

@@ -20,8 +20,6 @@
         mounted() {
             this.tokenQuery = this.$route.query.token;
             this.emailQuery = this.$route.query.email;
-            console.log(this.$route.query.token);
-            console.log(this.$route.query.email);
             if(fetchToken() === false) {
                 router.push({ path: "/" })
             }
@@ -30,7 +28,6 @@
             changeEmailRequest() {
                 axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/auth/change_email_confirm/${this.tokenQuery}/${this.emailQuery}/`, {}, { headers: getHeaders() })
                 .then(res => {
-                    console.log(res);
                     this.message = res.data.success + " You will be redirected in 2 seconds."
                     const messageBlock = document.getElementById('message_conf')
                     messageBlock.style.color = "#00FF00"
@@ -39,7 +36,6 @@
                     }, 2000)
                 })
                 .catch(err => {
-                    console.log(err)
                     this.message = err.response.data.error
                     const messageBlock = document.getElementById('message_conf')
                     messageBlock.style.color = "#FF0000"

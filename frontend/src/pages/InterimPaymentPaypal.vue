@@ -41,11 +41,9 @@
             createPaypalOrder() {
                 axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN + this.paypalCreateOrderLink}`, {}, { headers: getHeaders() })
                 .then(res => {
-                    console.log(res)
                     window.location.href = res.data.payment_link
                 })
                 .catch(err => {
-                    console.log(err);
                     this.error = true
                     this.message = 'Transaction failure. ' + (err.response.data.error ? err.response.data.error : err.response.data.detail)
                     const success_window = document.getElementById('success');

@@ -36,7 +36,6 @@
                     } else if (err.response.data.email) {
                         this.message = err.response.data.email[0]
                     }
-                    console.log(err);
                     const passObj = document.getElementById('message_conf')
                     passObj.style.color = "#FF0000"
                 })

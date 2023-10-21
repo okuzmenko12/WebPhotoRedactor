@@ -64,7 +64,6 @@
                     script.onload = () => {
                         axios.get(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/payments/stripe/config/`)
                         .then(res => {
-                            console.log(res)
                             this.stripe = Stripe(res.data.public_key);
                         })
                         resolve();
@@ -89,11 +88,9 @@
                 }
                 axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN + this.stripeCreateOrderLink}`, data)
                 .then(res => {
-                    console.log(res)
                     return this.stripe.redirectToCheckout({sessionId: res.data.checkout_session_id})
                 })
                 .catch(err => {
-                    console.log(err);
                     this.error = true
                     if (err.response.data.cancel_url) {
                         this.message = 'Transaction failure. ' + err.response.data.cancel_url[0]
