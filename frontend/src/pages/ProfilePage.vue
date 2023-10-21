@@ -29,7 +29,7 @@
             <template v-if="$route.hash === '#profile'">
                 <div class="basic_user_info white">
                     <div class="flex-block column gp--15">
-                        <div class="flex-block baseline gp--15">
+                        <div class="flex-block baseline gp--15 pers_info_special">
                             <h1 class="fs--25 header_text fw--900 width--min">Personal information</h1>
                             <h5 class="edit_button" @click="changeInputStatus('username-profile-info')">Edit</h5>
                         </div>
@@ -38,7 +38,7 @@
                         <p id="user_message" class="fs--15">{{ user_message }}</p>
                     </div>
                     <div class="flex-block column gp--15">
-                        <div class="flex-block baseline gp--15">
+                        <div class="flex-block baseline gp--15 pers_info_special">
                             <h1 class="fs--25 header_text fw--900 width--min">Email</h1>
                             <h5 class="edit_button" @click="changeInputStatus('email-profile-info')">Edit</h5>
                         </div>
@@ -149,7 +149,7 @@
 
 <script>
     import axios from 'axios';
-    import { getHeaders } from '@/Auth.js';
+    import { getHeaders, checkTrackingToken } from '@/Auth.js';
     import handlePopState from "@/utils/index.js";
     import router from "@/router/router.js";
     import InputUi from "@/components/UI/InputUi.vue";
@@ -187,6 +187,7 @@
             }
         },
         async mounted() {
+            this.userIp = await checkTrackingToken()
             axios.get(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/auth/user/`, { headers: await getHeaders() })
             .then(res => {
                 document.title = `FlexFi Upscale - ${res.data.username}`
@@ -198,8 +199,7 @@
             .catch(() => {
                 router.push({ path: "/" })
             })
-            axios.get('https://ipapi.co/ip/')
-            .then(res => this.userIp = res.data)
+            
             handlePopState()
             this.getUserCredits()
             this.getUserPlan()
@@ -663,6 +663,18 @@
 }
 
 @media (max-width: 480px) {
+    .pers_info_special {
+        flex-direction: column
+    }
+
+    .pers_info_special h5 {
+        margin-top: 0
+    }
+    
+    .pers_info_special h1 {
+        margin-bottom: 0
+    }
+    
     .profile_bar {
         position: fixed;
         width: 100%;
@@ -682,7 +694,7 @@
     }
 
     .basic_user_info {
-        padding: 100px 0 100px 0;
+        padding: 100px 10px 100px 10px;
     }
 
     #mobile__btn {

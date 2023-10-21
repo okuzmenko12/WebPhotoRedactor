@@ -24,7 +24,7 @@
             if (this.$route.query.token !== undefined) {
                 this.queryToken = this.$route.query.token
                 this.validURL = true
-                axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/payments/paypal/complete_order/${this.queryToken}/`)
+                axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/payments/paypal/foreign/complete_order/${this.queryToken}/`, {})
                 .then(res => {
                     this.success = true
                     const modal = document.getElementById('success_modal')

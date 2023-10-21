@@ -20,6 +20,36 @@ export const setNewToken = () =>{
     .catch())
 };
 
+//cookie token
+
+export const setTrackingToken = async (token) => {
+    return document.cookie = `TrackingToken=${token}`
+};
+
+export const getTrackingToken = () => {
+    const cookies = document.cookie.split(";").map(cookie => cookie.trim());
+
+    const trackingToken = cookies.find(cookie => cookie.startsWith('TrackingToken='));
+
+    if (trackingToken) {
+        return trackingToken.split('=')[1];
+    } else {
+        return null;
+    }
+};
+
+export const checkTrackingToken = () => {
+    if (getTrackingToken() === null) {
+        axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/auth/client_token_create/`, {})
+        .then(res => {
+            setTrackingToken(res.data.token)
+            return getTrackingToken()
+        })
+    } else {
+        return getTrackingToken()
+    }
+}
+
 //Local tokens
 
 export const setLocalToken = async (token) => {

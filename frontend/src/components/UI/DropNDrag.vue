@@ -38,7 +38,7 @@
 
 <script>
     import axios from "axios";
-    import { getHeaders, fetchToken } from "@/Auth.js";
+    import { getHeaders, fetchToken, checkTrackingToken } from "@/Auth.js";
     import PageLoader from "@/components/UI/PageLoader.vue";
 
     export default {
@@ -60,9 +60,8 @@
                 this.changeIsLoadingInParentElem(newV)
             }
         },
-        mounted() {
-            axios.get('https://ipapi.co/ip/')
-            .then(res => this.userIp = res.data)
+        async mounted() {
+            this.userIp = await checkTrackingToken()
         },
         data() {
             return {

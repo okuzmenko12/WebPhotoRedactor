@@ -219,7 +219,6 @@
 </template>
 
 <script>
-import axios from 'axios'
     import DropNDrag from "@/components/UI/DropNDrag.vue";
     import router from "@/router/router.js";
     import '@simonwep/pickr/dist/themes/nano.min.css';
@@ -240,11 +239,6 @@ import axios from 'axios'
                 });
             }
             this.factors = this.allUpscaleFactors
-            
-            axios.get(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/images/get-ip/`)
-            .then(res => {
-                console.log(res);
-            })
         },
         updated() {
             const dd = document.getElementById('dd-arrow');

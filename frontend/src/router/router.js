@@ -13,8 +13,19 @@ import ChangePasswordEmail from "@/pages/ChangePasswordEmail";
 import ChangeEmail from "@/pages/ChangeEmail";
 import ImagePage from "@/pages/ImagePage";
 import paypalSuccess from "@/pages/SuccessPaypalPage";
+import stripeSuccess from "@/pages/SuccessStripePage";
+import paypalCancel from "@/pages/CancelPaypalPage";
+import stripeCancel from "@/pages/CancelStripePage";
 import IPP from "@/pages/InterimPaymentPaypal";
 import IPS from "@/pages/InterimPaymentStripe";
+
+import NotifiedPaymentPage from "@/pages/NotifiedPaymentPage";
+import NIPP from "@/pages/NotifiedInterimPaymentPaypal";
+import NIPS from "@/pages/NotifiedInterimPaymentStripe";
+import notifiedPaypalSuccess from "@/pages/NotifiedSuccessPaypalPage";
+import notifiedStripeSuccess from "@/pages/NotifiedSuccessStripePage";
+import notifiedPaypalCancel from "@/pages/NotifiedCancelPaypalPage";
+import notifiedStripeCancel from "@/pages/NotifiedCancelStripePage";
 
 
 const routes = [
@@ -86,17 +97,17 @@ const routes = [
     {
         path: '/payment/paypal/cancel',
         name: 'Paypal cancel',
-        component: paypalSuccess
+        component: paypalCancel
     },
     {
         path: '/payment/stripe/success',
         name: 'Stripe success',
-        component: paypalSuccess
+        component: stripeSuccess
     },
     {
         path: '/payment/stripe/cancel',
         name: 'Stripe cancel',
-        component: paypalSuccess
+        component: stripeCancel
     },
     {
         path: '/payment/paypal/creating_order',
@@ -107,6 +118,41 @@ const routes = [
         path: '/payment/stripe/creating_order',
         name: 'Creating Stripe order',
         component: IPS
+    },
+    {
+        path: '/payment/notified',
+        name: 'Notified payment',
+        component: NotifiedPaymentPage
+    },
+    {
+        path: '/payment/paypal/creating_notified_order',
+        name: 'Creating Notified Paypal order',
+        component: NIPP
+    },
+    {
+        path: '/payment/stripe/creating_notified_order',
+        name: 'Creating Notified Stripe order',
+        component: NIPS
+    },
+    {
+        path: '/payment/paypal/notified_success',
+        name: 'Notified Paypal success',
+        component: notifiedPaypalSuccess
+    },
+    {
+        path: '/payment/paypal/notified_cancel',
+        name: 'Notified Paypal cancel',
+        component: notifiedPaypalCancel
+    },
+    {
+        path: '/payment/stripe/notified_success',
+        name: 'Notified Stripe success',
+        component: notifiedStripeSuccess
+    },
+    {
+        path: '/payment/stripe/notified_cancel',
+        name: 'Notified Stripe cancel',
+        component: notifiedStripeCancel
     },
 ]
 

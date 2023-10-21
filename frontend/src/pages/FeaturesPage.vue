@@ -17,67 +17,73 @@
                 <p class="header_text fs--50 fw--900 no-top">More about FlexFI Upscale Features</p>
             </div>
             <div class="more-features-block-block">
-                <div class="about-feature-block">
-                    <div class="about-feature-info white">
-                        <p class="fs--33 fw--900 width--100 align_left_text">Upscaling</p>
-                        <div @click="setNewImg($event, 1)" class="article_choose__btn UPSC">
-                            <p class="fs--25 fw--900 white no-margin">Upscale</p>
-                            <p class="small_text no-margin">  </p>
+                <div class="about-feature-block column">
+                    <p class="fs--33 fw--900 width--100 align_center_text">Upscaling</p>
+                    <div class="about-contain-all">
+                        <div class="about-feature-info white">
+                            <div @click="setNewImg($event, 1)" class="article_choose__btn UPSC">
+                                <p class="fs--25 fw--900 white no-margin">Upscale</p>
+                                <p class="small_text no-margin">  </p>
+                            </div>
+                            <div @click="setNewImg($event, 2)" class="article_choose__btn UPSC">
+                                <p class="fs--25 fw--900 white no-margin">Ultra upscale</p>
+                                <p class="small_text no-margin">ultra enhance</p>
+                            </div>
+                            <div @click="setNewImg($event, 3)" :class="upscaleBlock > 3 || upscaleBlock < 1 ? 'active' : '' " class="article_choose__btn UPSC">
+                                <p class="fs--25 fw--900 white no-margin">Ultra enhance</p>
+                                <p class="small_text no-margin">AAHAHHA</p>
+                            </div>
                         </div>
-                        <div @click="setNewImg($event, 2)" class="article_choose__btn UPSC">
-                            <p class="fs--25 fw--900 white no-margin">Ultra upscale</p>
-                            <p class="small_text no-margin">ultra enhance</p>
+                        <div class="about-feature-image-block">
+                            <slider-comp v-if="upscaleBlock === 1" :before_img="UpImg1" :after_img="UpImg1_2" :div_class="sliderClass" />
+                            <slider-comp v-else-if="upscaleBlock === 2" :before_img="UpImg2" :after_img="UpImg2_2" :div_class="sliderClass" />
+                            <slider-comp v-else :before_img="UpImg3" :after_img="UpImg3_2" :div_class="sliderClass" />
                         </div>
-                        <div @click="setNewImg($event, 3)" :class="upscaleBlock > 3 || upscaleBlock < 1 ? 'active' : '' " class="article_choose__btn UPSC">
-                            <p class="fs--25 fw--900 white no-margin">Ultra enhance</p>
-                            <p class="small_text no-margin">AAHAHHA</p>
-                        </div>
-                    </div>
-                    <div class="about-feature-image-block">
-                        <slider-comp v-if="upscaleBlock === 1" :before_img="UpImg1" :after_img="UpImg1_2" :div_class="sliderClass" />
-                        <slider-comp v-else-if="upscaleBlock === 2" :before_img="UpImg2" :after_img="UpImg2_2" :div_class="sliderClass" />
-                        <slider-comp v-else :before_img="UpImg3" :after_img="UpImg3_2" :div_class="sliderClass" />
-                    </div>
-                </div>
-
-                <div class="about-feature-block">
-                    <div class="about-feature-image-block">
-                        <slider-comp v-if="bgBlock === 1" :before_img="BgImg1" :after_img="BgImg1_2" :div_class="sliderClass" />
-                        <slider-comp v-else-if="bgBlock === 2" :before_img="BgImg2" :after_img="BgImg2_2" :div_class="sliderClass" />
-                        <slider-comp v-else :before_img="BgImg3" :after_img="BgImg3_2" :div_class="sliderClass" />
-                    </div>
-                    <div class="about-feature-info white">
-                        <p class="fs--33 fw--900 width--100 align_left_text">Background remove</p>
-                        <div class=""></div>
-                        <div @click="setNewImgBg($event, 1)" class="article_choose__btn BGR">
-                            <p class="fs--25 fw--900 white no-margin">AAHAHHA</p>
-                            <p class="small_text no-margin">AAHAHHA</p></div>
-                        <div @click="setNewImgBg($event, 2)" class="article_choose__btn BGR">
-                            <p class="fs--25 fw--900 white no-margin">AAHAHHA</p>
-                            <p class="small_text no-margin">AAHAHHA</p></div>
-                        <div @click="setNewImgBg($event, 3)" :class="bgBlock > 3 || bgBlock < 1 ? 'active' : '' " class="article_choose__btn BGR">
-                            <p class="fs--25 fw--900 white no-margin">AAHAHHA</p>
-                            <p class="small_text no-margin">AAHAHHA</p></div>
                     </div>
                 </div>
 
-                <div class="about-feature-block">
-                    <div class="about-feature-info white">
-                        <p class="fs--33 fw--900 width--100 align_left_text">Remove JPEG Artifacts</p>
-                        <div @click="setNewImgJpeg($event, 1)" class="article_choose__btn RJPEGA">
-                            <p class="fs--25 fw--900 white no-margin">AAHAHHA</p>
-                            <p class="small_text no-margin">AAHAHHA</p></div>
-                        <div @click="setNewImgJpeg($event, 2)" class="article_choose__btn RJPEGA">
-                            <p class="fs--25 fw--900 white no-margin">AAHAHHA</p>
-                            <p class="small_text no-margin">AAHAHHA</p></div>
-                        <div @click="setNewImgJpeg($event, 3)" :class="jpegBlock > 3 || jpegBlock < 1 ? 'active' : '' " class="article_choose__btn  RJPEGA">
-                            <p class="fs--25 fw--900 white no-margin">AAHAHHA</p>
-                            <p class="small_text no-margin">AAHAHHA</p></div>
+                <div class="about-feature-block column">
+                    <p class="fs--33 fw--900 width--100 align_center_text">Background remove</p>
+                    <div class="about-contain-all">
+                        <div class="about-feature-image-block">
+                            <slider-comp v-if="bgBlock === 1" :before_img="BgImg1" :after_img="BgImg1_2" :div_class="sliderClass" />
+                            <slider-comp v-else-if="bgBlock === 2" :before_img="BgImg2" :after_img="BgImg2_2" :div_class="sliderClass" />
+                            <slider-comp v-else :before_img="BgImg3" :after_img="BgImg3_2" :div_class="sliderClass" />
                         </div>
-                    <div class="about-feature-image-block">
-                        <slider-comp v-if="jpegBlock === 1" :before_img="JpegImg1" :after_img="JpegImg1_2" :div_class="sliderClass" />
-                        <slider-comp v-else-if="jpegBlock === 2" :before_img="JpegImg2" :after_img="JpegImg2_2" :div_class="sliderClass" />
-                        <slider-comp v-else :before_img="JpegImg3" :after_img="JpegImg3_2" :div_class="sliderClass" />
+                        <div class="about-feature-info white">
+                            <div class=""></div>
+                            <div @click="setNewImgBg($event, 1)" class="article_choose__btn BGR">
+                                <p class="fs--25 fw--900 white no-margin">AAHAHHA</p>
+                                <p class="small_text no-margin">AAHAHHA</p></div>
+                            <div @click="setNewImgBg($event, 2)" class="article_choose__btn BGR">
+                                <p class="fs--25 fw--900 white no-margin">AAHAHHA</p>
+                                <p class="small_text no-margin">AAHAHHA</p></div>
+                            <div @click="setNewImgBg($event, 3)" :class="bgBlock > 3 || bgBlock < 1 ? 'active' : '' " class="article_choose__btn BGR">
+                                <p class="fs--25 fw--900 white no-margin">AAHAHHA</p>
+                                <p class="small_text no-margin">AAHAHHA</p></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="about-feature-block column">
+                    <p class="fs--33 fw--900 width--100 align_center_text">Remove JPEG Artifacts</p>
+                    <div class="about-contain-all">
+                        <div class="about-feature-info white">
+                            <div @click="setNewImgJpeg($event, 1)" class="article_choose__btn RJPEGA">
+                                <p class="fs--25 fw--900 white no-margin">AAHAHHA</p>
+                                <p class="small_text no-margin">AAHAHHA</p></div>
+                            <div @click="setNewImgJpeg($event, 2)" class="article_choose__btn RJPEGA">
+                                <p class="fs--25 fw--900 white no-margin">AAHAHHA</p>
+                                <p class="small_text no-margin">AAHAHHA</p></div>
+                            <div @click="setNewImgJpeg($event, 3)" :class="jpegBlock > 3 || jpegBlock < 1 ? 'active' : '' " class="article_choose__btn  RJPEGA">
+                                <p class="fs--25 fw--900 white no-margin">AAHAHHA</p>
+                                <p class="small_text no-margin">AAHAHHA</p></div>
+                            </div>
+                        <div class="about-feature-image-block">
+                            <slider-comp v-if="jpegBlock === 1" :before_img="JpegImg1" :after_img="JpegImg1_2" :div_class="sliderClass" />
+                            <slider-comp v-else-if="jpegBlock === 2" :before_img="JpegImg2" :after_img="JpegImg2_2" :div_class="sliderClass" />
+                            <slider-comp v-else :before_img="JpegImg3" :after_img="JpegImg3_2" :div_class="sliderClass" />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -251,6 +257,13 @@
     gap: 20px;
 }
 
+.about-contain-all {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+}
+
 .article_choose__btn {
     width: 100%;
     height: 150px;
@@ -362,6 +375,10 @@
         flex-direction: column;
     }
 
+    .about-contain-all {
+        width: 100%;
+    }
+
     .article_choose__btn {
         width: 90%;
         height: 150px;
@@ -375,10 +392,14 @@
 
 @media (min-width: 651px) and (max-width: 767px) {
     .about-feature-block {
-        width: 90%;
+        width: 100%;
         flex-direction: column;
     }
 
+    .about-contain-all {
+        width: 90%;
+        flex-direction: column;
+    }
     .article_choose__btn {
         width: 90%;
         height: 150px;
@@ -394,6 +415,19 @@
     .about-feature-block {
         width: 100%;
         flex-direction: column;
+    }
+
+    .about-feature-block .fs-33 {
+        font-size: 20px
+    }
+
+    .about-contain-all {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .more-features-block-block {
+        width: 70%
     }
 
     .article_choose__btn {
@@ -413,6 +447,15 @@
     }
 
     .about-feature-block {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .about-feature-block .align_center_text {
+        font-size: 20px
+    }
+
+    .about-contain-all {
         width: 90%;
         flex-direction: column;
     }

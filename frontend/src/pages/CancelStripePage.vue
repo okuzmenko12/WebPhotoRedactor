@@ -21,17 +21,21 @@
         },
         mounted() {
             handlePopState()
-            if (this.$route.query.token !== undefined) {
-                this.queryToken = this.$route.query.token
+            if (this.$route.query.cancel_id !== undefined) {
+                this.queryToken = this.$route.query.cancel_id
                 this.validURL = true
-                axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/payments/paypal/complete_order/${this.queryToken}/`)
+                axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/payments/stripe/cancel_order/${this.queryToken}/`)
                 .then(res => {
                     this.success = true
                     const modal = document.getElementById('success_modal')
                     console.log(res);
-                    console.log(status);
-                    this.message = "You have successfuly bought the plan."
-                    modal.style.backgroundColor = '#66ff63'
+                    if (window.location.href.includes('/payment/stripe/cancel')) {
+                        modal.style.backgroundColor = 'rgb(255, 000, 121)';
+                    } else {
+                        modal.style.backgroundColor = '#66ff63'
+                    }
+
+                    this.message = res.data.success
                     setTimeout(() => {
                         router.push({ path: "/" })
                     }, 2000)
@@ -69,7 +73,6 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 112;
     background-color: #171921;
 }
 
@@ -85,6 +88,7 @@
     flex-direction: column;
     display: flex;
     transition: .3s;
+    z-index: 112;
     gap: 10px;
 }
 </style>

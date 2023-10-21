@@ -24,16 +24,16 @@
             if (this.$route.query.token !== undefined) {
                 this.queryToken = this.$route.query.token
                 this.validURL = true
-                axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/payments/paypal/complete_order/${this.queryToken}/`)
+                axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/payments/paypal/foreign/cancel_order/${this.queryToken}/`, {})
                 .then(res => {
                     this.success = true
                     const modal = document.getElementById('success_modal')
                     console.log(res);
                     console.log(status);
-                    this.message = "You have successfuly bought the plan."
+                    this.message = res.data.success
                     modal.style.backgroundColor = '#66ff63'
                     setTimeout(() => {
-                        router.push({ path: "/" })
+                        window.location.href = res.data.cancel_url
                     }, 2000)
                 })
                 .catch(err => {
