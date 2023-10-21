@@ -125,11 +125,9 @@ export default {
         },
         loadPaypal() {
             this.paypalRedirectLink = '/payment/paypal/creating_notified_order'
-            console.log(this.paypalRedirectLink);
         },
         loadStripe() {
             this.stripeRedirectLink = '/payment/stripe/creating_notified_order'
-            console.log(this.stripeRedirectLink);
         },
         beforeDestroy() {
             window.removeEventListener('load', this.handlePageLoad(false));

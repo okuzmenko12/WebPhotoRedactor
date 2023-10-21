@@ -26,8 +26,6 @@
         mounted() {
             this.tokenQuery = this.$route.query.token;
             this.emailQuery = this.$route.query.email;
-            console.log(this.$route.query.token);
-            console.log(this.$route.query.email);
             if(fetchToken() === true) {
                 router.push({ path: "/" })
             }
@@ -39,7 +37,6 @@
                     "password1": this.pass1
                 }, { headers: getHeaders() })
                 .then(res => {
-                    console.log(res);
                     this.message = res.data.success + " You will be redirected in 2 seconds."
                     const messageBlock = document.getElementById('message_conf')
                     messageBlock.style.color = "#00FF00"
@@ -48,7 +45,6 @@
                     }, 2000)
                 })
                 .catch(err => {
-                    console.log(err)
                     this.message = err.response.data.error
                     const messageBlock = document.getElementById('message_conf')
                     messageBlock.style.color = "#FF0000"

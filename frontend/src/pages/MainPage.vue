@@ -81,41 +81,42 @@
 </template>
 
 <script>
-  import NavbarComp from "@/components/NavbarComp.vue";
-  import OftenQuestions from "@/components/OftenQuestion.vue";
-  import UseCasesBlock from "@/components/UseCasesBlock.vue";
-  import ToolCard from "@/components/UI/ToolCard.vue";
-  import FooterComp from "@/components/FooterComp.vue";
-  import handlePopState from "@/utils/index.js";
-  import { fetchToken } from '@/Auth.js';
-  export default {
-      components: {
+    import NavbarComp from "@/components/NavbarComp.vue";
+    import OftenQuestions from "@/components/OftenQuestion.vue";
+    import UseCasesBlock from "@/components/UseCasesBlock.vue";
+    import ToolCard from "@/components/UI/ToolCard.vue";
+    import FooterComp from "@/components/FooterComp.vue";
+    import handlePopState from "@/utils/index.js";
+    import { fetchToken } from '@/Auth.js';
+
+    export default {
+        components: {
           NavbarComp,
           ToolCard,
           OftenQuestions,
           FooterComp,
           UseCasesBlock
-      },
-      data() {
-        return {
-          Img: require('@/assets/car.jpg'),
-          Img2: require('@/assets/car2.png'),
-          Bg: require('@/assets/car.jpg'),
-          Bg2: require('@/assets/car.jpg'),
-          JPEG: require('@/assets/car.jpg'),
-          JPEG2: require('@/assets/car.jpg'),
-          isAuthenticated: false
+        },
+        data() {
+          return {
+            Img: require('@/assets/car.jpg'),
+            Img2: require('@/assets/car2.png'),
+            Bg: require('@/assets/car.jpg'),
+            Bg2: require('@/assets/car.jpg'),
+            JPEG: require('@/assets/car.jpg'),
+            JPEG2: require('@/assets/car.jpg'),
+            isAuthenticated: false
+          }
+        },
+        async created() {
+          const result = await fetchToken();
+          this.isAuthenticated = result;
+        },
+        mounted() {
+          handlePopState()
+          document.title = `FlexFi Upscale - Main`
         }
-      },
-      async created() {
-        const result = await fetchToken();
-        this.isAuthenticated = result;
-      },
-      mounted() {
-        handlePopState()
-        document.title = `FlexFi Upscale - Main`
-      }
-  }
+    }
 </script>
 
 <style>

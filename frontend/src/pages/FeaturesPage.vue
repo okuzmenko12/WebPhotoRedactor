@@ -20,6 +20,47 @@
                 <div class="about-feature-block column">
                     <p class="fs--33 fw--900 width--100 align_center_text">Upscaling</p>
                     <div class="about-contain-all">
+
+                        <div class="swiper-container">
+                            <swiper
+                                :modules="modules"
+                                :slides-per-view="1"
+                                :space-between="50"
+                                navigation
+                                :pagination="{ clickable: true }"
+                                @swiper="onSwiper"
+                                @slideChange="onSlideChange"
+                            >
+                                <swiper-slide>
+                                    <div class="article_choose__btn active">
+                                            <p class="fs--25 fw--900 white no-margin">AAHAHHA</p>
+                                            <p class="small_text no-margin">AAHAHHA</p>
+                                    </div>
+                                    <div class="about-feature-image-block2">
+                                        <slider-comp :before_img="UpImg1" :after_img="UpImg1_2" :div_class="sliderClass" />
+                                    </div>
+                                </swiper-slide>
+                                <swiper-slide>
+                                    <div class="article_choose__btn active">
+                                            <p class="fs--25 fw--900 white no-margin">AAHAHHA</p>
+                                            <p class="small_text no-margin">AAHAHHA</p>
+                                    </div>
+                                    <div class="about-feature-image-block2">
+                                        <slider-comp :before_img="UpImg2" :after_img="UpImg2_2" :div_class="sliderClass" />
+                                    </div>
+                                </swiper-slide>
+                                <swiper-slide>
+                                    <div class="article_choose__btn active">
+                                            <p class="fs--25 fw--900 white no-margin">AAHAHHA</p>
+                                            <p class="small_text no-margin">AAHAHHA</p>
+                                    </div>
+                                    <div class="about-feature-image-block2">
+                                        <slider-comp :before_img="UpImg3" :after_img="UpImg3_2" :div_class="sliderClass" />
+                                    </div>
+                                </swiper-slide>
+                            </swiper>
+                        </div>
+
                         <div class="about-feature-info white">
                             <div @click="setNewImg($event, 1)" class="article_choose__btn UPSC">
                                 <p class="fs--25 fw--900 white no-margin">Upscale</p>
@@ -45,13 +86,53 @@
                 <div class="about-feature-block column">
                     <p class="fs--33 fw--900 width--100 align_center_text">Background remove</p>
                     <div class="about-contain-all">
+
+                        <div class="swiper-container">
+                            <swiper
+                                :modules="modules"
+                                :slides-per-view="1"
+                                :space-between="50"
+                                navigation
+                                :pagination="{ clickable: true }"
+                                @swiper="onSwiper"
+                                @slideChange="onSlideChange"
+                            >
+                                <swiper-slide>
+                                    <div class="article_choose__btn active">
+                                            <p class="fs--25 fw--900 white no-margin">AAHAHHA</p>
+                                            <p class="small_text no-margin">AAHAHHA</p>
+                                    </div>
+                                    <div class="about-feature-image-block2">
+                                        <slider-comp :before_img="BgImg1" :after_img="BgImg1_2" :div_class="sliderClass" />
+                                    </div>
+                                </swiper-slide>
+                                <swiper-slide>
+                                    <div class="article_choose__btn active">
+                                            <p class="fs--25 fw--900 white no-margin">AAHAHHA</p>
+                                            <p class="small_text no-margin">AAHAHHA</p>
+                                    </div>
+                                    <div class="about-feature-image-block2">
+                                        <slider-comp :before_img="BgImg2" :after_img="BgImg2_2" :div_class="sliderClass" />
+                                    </div>
+                                </swiper-slide>
+                                <swiper-slide>
+                                    <div class="article_choose__btn active">
+                                            <p class="fs--25 fw--900 white no-margin">AAHAHHA</p>
+                                            <p class="small_text no-margin">AAHAHHA</p>
+                                    </div>
+                                    <div class="about-feature-image-block2">
+                                        <slider-comp :before_img="BgImg3" :after_img="BgImg3_2" :div_class="sliderClass" />
+                                    </div>
+                                </swiper-slide>
+                            </swiper>
+                        </div>
+
                         <div class="about-feature-image-block">
                             <slider-comp v-if="bgBlock === 1" :before_img="BgImg1" :after_img="BgImg1_2" :div_class="sliderClass" />
                             <slider-comp v-else-if="bgBlock === 2" :before_img="BgImg2" :after_img="BgImg2_2" :div_class="sliderClass" />
                             <slider-comp v-else :before_img="BgImg3" :after_img="BgImg3_2" :div_class="sliderClass" />
                         </div>
                         <div class="about-feature-info white">
-                            <div class=""></div>
                             <div @click="setNewImgBg($event, 1)" class="article_choose__btn BGR">
                                 <p class="fs--25 fw--900 white no-margin">AAHAHHA</p>
                                 <p class="small_text no-margin">AAHAHHA</p></div>
@@ -68,6 +149,45 @@
                 <div class="about-feature-block column">
                     <p class="fs--33 fw--900 width--100 align_center_text">Remove JPEG Artifacts</p>
                     <div class="about-contain-all">
+                        <div class="swiper-container">
+                            <swiper
+                                :modules="modules"
+                                :slides-per-view="1"
+                                :space-between="50"
+                                navigation
+                                :pagination="{ clickable: true }"
+                                @swiper="onSwiper"
+                                @slideChange="onSlideChange"
+                            >
+                                <swiper-slide>
+                                    <div class="article_choose__btn active">
+                                            <p class="fs--25 fw--900 white no-margin">AAHAHHA</p>
+                                            <p class="small_text no-margin">AAHAHHA</p>
+                                    </div>
+                                    <div class="about-feature-image-block2">
+                                        <slider-comp :before_img="JpegImg1" :after_img="JpegImg1_2" :div_class="sliderClass" />
+                                    </div>
+                                </swiper-slide>
+                                <swiper-slide>
+                                    <div class="article_choose__btn active">
+                                            <p class="fs--25 fw--900 white no-margin">AAHAHHA</p>
+                                            <p class="small_text no-margin">AAHAHHA</p>
+                                    </div>
+                                    <div class="about-feature-image-block2">
+                                        <slider-comp :before_img="JpegImg2" :after_img="JpegImg2_2" :div_class="sliderClass" />
+                                    </div>
+                                </swiper-slide>
+                                <swiper-slide>
+                                    <div class="article_choose__btn active">
+                                            <p class="fs--25 fw--900 white no-margin">AAHAHHA</p>
+                                            <p class="small_text no-margin">AAHAHHA</p>
+                                    </div>
+                                    <div class="about-feature-image-block2">
+                                        <slider-comp :before_img="JpegImg3" :after_img="JpegImg3_2" :div_class="sliderClass" />
+                                    </div>
+                                </swiper-slide>
+                            </swiper>
+                        </div>
                         <div class="about-feature-info white">
                             <div @click="setNewImgJpeg($event, 1)" class="article_choose__btn RJPEGA">
                                 <p class="fs--25 fw--900 white no-margin">AAHAHHA</p>
@@ -93,6 +213,12 @@
 </template>
 
 <script>
+    import { Navigation, Pagination, A11y } from 'swiper/modules';
+    import { Swiper, SwiperSlide } from 'swiper/vue';
+    import 'swiper/css';
+    import 'swiper/css/navigation';
+    import 'swiper/css/pagination';
+
     import NavbarComp from "@/components/NavbarComp.vue";
     import FooterComp from "@/components/FooterComp.vue";
     import ArticleUi from "@/components/UI/ArticleUi.vue";
@@ -100,10 +226,17 @@
     import SliderComp from "@/components/SliderComp.vue";
     export default {
         components: {
+            Swiper,
+            SwiperSlide,
             NavbarComp,
             FooterComp,
             ArticleUi,
             SliderComp
+        },
+        setup() {
+            return {
+                modules: [Navigation, Pagination, A11y],
+            };
         },
         data() {
             return {
@@ -147,7 +280,6 @@
                     setTimeout(() => {
                         e.target.classList.add("active")
                     }, 0)
-                    console.log(value);
                 }
             },
             setNewImgBg(e, value) {
@@ -157,7 +289,6 @@
                     setTimeout(() => {
                         e.target.classList.add("active")
                     }, 0)
-                    console.log(value);
                 }
             },
             setNewImgJpeg(e, value) {
@@ -167,7 +298,6 @@
                     setTimeout(() => {
                         e.target.classList.add("active")
                     }, 0)
-                    console.log(value);
                 }
             },
         }
@@ -186,6 +316,47 @@
     flex-direction: column;
     gap: 200px;
     z-index: 1;
+}
+
+.swiper-container {
+    display: none;
+    min-height: 0;
+    min-width: 0;
+    width: 100vw; 
+    overflow: hidden;
+}
+
+.swiper-slide {
+    width: auto;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.swiper-wrapper {
+    display: flex;
+}
+
+.swiper-pagination-bullet {
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 1;
+}
+
+.swiper-pagination-bullet-active {
+    opacity: 1;
+    background: var(--swiper-pagination-color, var(--swiper-theme-color));
+    background-color: var(--secondary_color);
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+    top: 50%;
+    color: var(--secondary_color) !important;
+    fill: black !important;
+    stroke: black !important;
 }
 
 .articles_arts_cont {
@@ -380,13 +551,31 @@
     }
 
     .article_choose__btn {
-        width: 90%;
+        width: 70%;
         height: 150px;
     }
 
-    .about-feature-image-block {
+    .about-feature-image-block2 {
         width: 300px;
         height: 300px;
+    }
+
+    .swiper-container {
+        display: flex;
+        max-width: 90vw; 
+    }
+
+    .about-feature-info {
+        display: none
+    }
+
+    .about-feature-image-block {
+        display: none
+    }
+
+    .slider-features {
+        display: flex;
+        align-items: center
     }
 }
 
@@ -401,13 +590,31 @@
         flex-direction: column;
     }
     .article_choose__btn {
-        width: 90%;
+        width: 70%;
         height: 150px;
     }
 
-    .about-feature-image-block {
+    .about-feature-image-block2 {
         width: 300px;
         height: 300px;
+    }
+
+    .swiper-container {
+        display: flex;
+        max-width: 90vw; 
+    }
+
+    .about-feature-info {
+        display: none
+    }
+
+    .about-feature-image-block {
+        display: none
+    }
+
+    .slider-features {
+        display: flex;
+        align-items: center
     }
 }
 
@@ -431,13 +638,31 @@
     }
 
     .article_choose__btn {
-        width: 90%;
+        width: 70%;
         height: 150px;
     }
 
-    .about-feature-image-block {
+    .about-feature-image-block2 {
         width: 200px;
         height: 200px;
+    }
+
+    .swiper-container {
+        display: flex;
+        max-width: 90vw; 
+    }
+
+    .about-feature-info {
+        display: none
+    }
+
+    .about-feature-image-block {
+        display: none
+    }
+
+    .slider-features {
+        display: flex;
+        align-items: center
     }
 }
 
@@ -461,11 +686,11 @@
     }
 
     .article_choose__btn {
-        width: 90%;
+        width: 40%;
         height: 150px;
     }
 
-    .about-feature-image-block {
+    .about-feature-image-block2 {
         width: 150px;
         height: 150px;
     }
@@ -476,6 +701,19 @@
 
     .article_choose__btn .small_text {
         font-size: 11px
+    }
+
+    .swiper-container {
+        display: flex;
+        max-width: 90vw; 
+    }
+
+    .about-feature-info {
+        display: none
+    }
+
+    .about-feature-image-block {
+        display: none
     }
 }
 </style>

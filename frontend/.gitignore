@@ -30,3 +30,5 @@ Thumbs.db
 
 # Environment
 .env.development
+.env.defaults
+.env.production

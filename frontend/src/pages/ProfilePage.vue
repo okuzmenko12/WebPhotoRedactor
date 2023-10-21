@@ -260,7 +260,6 @@
             changeUsername() {
                 axios.patch(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/auth/user/`, { 'username': this.validateUsername() }, { headers: getHeaders() })
                 .then(res => {
-                    console.log(res);
                     this.user_message = `Username was successfuly change to ${res.data.username}`
                     this.Stusername = res.data.username
                     const passObj = document.getElementById('user_message')
@@ -277,7 +276,6 @@
             },
             changeInputStatus(id) {
                 const input = document.getElementById(id);
-                console.log(input.readOnly);
                 if (input.hasAttribute('readonly')) {
                     input.removeAttribute('readonly');
                 } else {
@@ -311,10 +309,8 @@
                     "new_password_confirm": this.pass1
                 }, { headers: getHeaders() })
                 .then(res => {
-                    console.log(res)
                 })
                 .catch(err => {
-                    console.log(err);
                     if (err.response.data.new_password) {
                         this.pass_message = err.response.data.new_password[0]
                         const input = document.getElementById('new_pass_input')
@@ -360,7 +356,6 @@
                 if (this.isActive('#credits') && this.userIp !== "") {
                     axios.post(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/auth/user/credits/`, { "ip_address_or_token": ip })
                     .then(res => {
-                        console.log(res)
                         this.free_upscale = res.data.free_credits.up_scales_count
                         this.free_bg = res.data.free_credits.bg_deletions_count
                         this.free_jpeg = res.data.free_credits.jpg_artifacts_deletions_count
@@ -375,12 +370,10 @@
                 if (this.isActive('#transactions') && !this.transactions_loaded) {
                     axios.get(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/payments/user_orders/`, { headers: getHeaders() })
                     .then(res => {
-                        console.log(res)
                         this.transactions = res.data
                         this.transactions_loaded = true
                     })
                     .catch(err => {
-                        console.log(err)
                         this.transactions_loaded = true
                     })
                 }

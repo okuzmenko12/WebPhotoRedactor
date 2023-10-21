@@ -104,7 +104,6 @@ export default {
         handlePopState();
         axios.get(`${process.env.VUE_APP_BACKEND_DOMAIN}/api/v1/payments/plans/${subId}/`)
         .then(res => {
-            console.log(res);
             this.plan = res.data
             this.stripeId = this.plan.stripe_price_id
             this.sub_id = this.plan.id
@@ -199,13 +198,11 @@ export default {
                     'email': this.values[0].email
                 })
                 .then(res => {
-                    console.log(res);
                     setLocalToken(res.data.access)
                     setLocalRefreshToken(res.data.refresh)
                     this.authEd = true
                 })
                 .catch(err => {
-                    console.log(err);
                     const input = document.getElementById('email_input_field')
                     const msg = document.getElementById('email_message_msg')
                     const input2 = document.getElementById('name_input_field')
@@ -228,12 +225,10 @@ export default {
         },
         loadPaypal() {
             this.paypalRedirectLink = '/payment/paypal/creating_order'
-            console.log(this.paypalRedirectLink);
             this.handlePageLoad(true);
         },
         loadStripe() {
             this.stripeRedirectLink = '/payment/stripe/creating_order'
-            console.log(this.stripeRedirectLink);
             this.handlePageLoad(true);
         },
         returnToPricing() {
